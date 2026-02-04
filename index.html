@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Vision Group CMS</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        visionRed: '#CF2E2E',
+                        visionBlack: '#0F172A',
+                        visionGray: '#F8FAFC',
+                        muted: '#F1F5F9',
+                        border: '#E2E8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-visionGray min-h-screen flex items-center justify-center font-sans antialiased">
+
+    <div class="w-full max-w-md px-6 fade-in">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-white px-8 py-10 text-center border-b-4 border-visionRed">
+                <div class="mx-auto mb-2" style="max-width: 200px;">
+                    <img src="images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-auto">
+                </div>
+                <h1 class="text-3xl font-bold text-visionBlack tracking-tight mt-6">Change Management System</h1>
+                <p class="text-slate-600 text-sm mt-2">Secure Access Portal</p>
+            </div>
+
+            <form id="loginForm" class="p-8 space-y-6">
+                <div>
+                    <label for="username" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Username</label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Enter your username"
+                           class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
+                </div>
+
+                <div>
+                    <label for="password" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Password</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password"
+                           class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
+                </div>
+
+                <div>
+                    <label for="role" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Login As</label>
+                    <select id="role" name="role" required
+                            class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
+                        <option value="">Select Role</option>
+                        <option value="staff">Staff Member</option>
+                        <option value="hod">Head of Department</option>
+                        <option value="it">IT Department</option>
+                        <option value="admin">System Administrator</option>
+                    </select>
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-md shadow-md transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
+                    <i class="ph ph-sign-in text-xl"></i> Login
+                </button>
+            </form>
+
+            <div class="px-8 pb-6 text-center text-base text-slate-600 leading-relaxed">
+                <p>&copy; 2026 VISIONGROUP. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Vision Group CMS</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        visionRed: '#CF2E2E',
+                        visionBlack: '#0F172A',
+                        visionGray: '#F8FAFC',
+                        muted: '#F1F5F9',
+                        border: '#E2E8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+        .animate-slide-in { animation: slideIn 0.3s ease-out; }
+    </style>
+</head>
+<body class="bg-visionGray text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300">
+            <div class="h-20 flex items-center px-6 border-b border-slate-800">
+                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">CMS Portal</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="dashboard.html" class="flex items-center px-4 py-3.5 bg-white/10 text-white rounded-lg border-l-4 border-visionRed transition-all min-h-[48px]">
+                    <i class="ph ph-squares-four text-2xl mr-3"></i>
+                    <span class="font-semibold text-base">Dashboard</span>
+                </a>
+                <a href="submit-request.html" class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group min-h-[48px]">
+                    <i class="ph ph-plus-circle text-2xl mr-3"></i>
+                    <span class="text-base">Submit Request</span>
+                </a>
+                <a href="my-requests.html" class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group min-h-[48px]">
+                    <i class="ph ph-clipboard-text text-2xl mr-3"></i>
+                    <span class="text-base">My Requests</span>
+                </a>
+
+                <a href="approvals.html" id="approvalsLink" class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
+                    <i class="ph ph-check-circle text-2xl mr-3"></i>
+                    <span class="text-base">Approvals</span>
+                </a>
+                <a href="it-review.html" id="itReviewLink" class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
+                    <i class="ph ph-wrench text-2xl mr-3"></i>
+                    <span class="text-base">IT Review</span>
+                </a>
+                <a href="reports.html" class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group min-h-[48px]">
+                    <i class="ph ph-chart-line-up text-2xl mr-3"></i>
+                    <span class="text-base">Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                        U
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-base font-semibold truncate">User Name</p>
+                        <p class="text-sm text-slate-400">Staff Member</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                    <i class="ph ph-sign-out text-xl"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8 overflow-y-auto h-full">
+            
+            <header class="flex justify-between items-center mb-8 fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold text-visionBlack">Dashboard Overview</h2>
+                    <p class="text-gray-500 text-sm mt-1">Welcome back, here is what’s happening today.</p>
+                </div>
+                <button onclick="navigateTo('submit-request.html')" class="bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-medium">
+                    <i class="ph ph-plus font-bold"></i> New Change Request
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 fade-in" id="statsGrid">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 text-base font-semibold">Total Requests</p>
+                        <h3 class="text-4xl font-bold text-slate-900 mt-2 tracking-tight" id="totalRequests">0</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                        <i class="ph ph-files text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 text-base font-semibold">Pending HOD</p>
+                        <h3 class="text-4xl font-bold text-slate-900 mt-2 tracking-tight" id="pendingRequests">0</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-amber-50 text-amber-700 rounded-full flex items-center justify-center">
+                        <i class="ph ph-hourglass-high text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 text-base font-semibold">In Progress</p>
+                        <h3 class="text-4xl font-bold text-slate-900 mt-2 tracking-tight" id="inProgressRequests">0</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center">
+                        <i class="ph ph-gear-six text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 text-base font-semibold">Completed</p>
+                        <h3 class="text-4xl font-bold text-slate-900 mt-2 tracking-tight" id="completedRequests">0</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-full flex items-center justify-center">
+                        <i class="ph ph-check-circle text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quickActions" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 hidden">
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden fade-in">
+                <div class="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                    <h2 class="text-2xl font-semibold text-slate-800 tracking-tight">Recent Activity</h2>
+                    <a href="my-requests.html" class="text-base text-visionRed font-semibold hover:underline">View All</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="recentRequestsTable">
+                        <thead class="bg-slate-50/50 text-slate-700 text-sm font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4 text-left">Request ID</th>
+                                <th class="px-6 py-4 text-left">Title</th>
+                                <th class="px-6 py-4 text-left">Department</th>
+                                <th class="px-6 py-4 text-left">Status</th>
+                                <th class="px-6 py-4 text-left">Date</th>
+                                <th class="px-6 py-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentRequestsBody" class="divide-y divide-slate-100 text-base">
+                            <tr>
+                                <td colspan="6" class="px-6 py-8 text-center text-slate-500 leading-relaxed">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // NOTE: Ensure your auth.js defines checkAuth()
+            // This is just a safety wrapper to prevent errors if files are missing during testing
+            if (typeof checkAuth === 'function') {
+                const user = checkAuth();
+                if (!user) return; // Redirects handled in auth.js
+
+                // Role Logic
+                if (user.role !== 'hod') document.getElementById('approvalsLink').classList.add('hidden');
+                if (user.role !== 'it' && user.role !== 'admin') document.getElementById('itReviewLink').classList.add('hidden');
+
+                // Load Data
+                if (typeof loadStatistics === 'function') loadStatistics();
+                if (typeof loadQuickActions === 'function') loadQuickActions(user.role);
+                if (typeof loadRecentRequests === 'function') loadRecentRequests();
+            } else {
+                console.warn("Auth system not found - running in Layout Mode");
+                // Remove 'hidden' from links just so you can see them while designing
+                document.getElementById('approvalsLink').classList.remove('hidden');
+            }
+        });
+
+        // Your existing functions would go here or in app.js
+        // I kept the IDs (totalRequests, recentRequestsBody) identical so your existing JS works.
+    </script>
+</body>
+</html>

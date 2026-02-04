@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | Vision Group CMS</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        visionRed: '#CF2E2E',
+                        visionBlack: '#0F172A',
+                        visionGray: '#F8FAFC',
+                        muted: '#F1F5F9',
+                        border: '#E2E8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media print {
+            aside, header button { display: none !important; }
+            main { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-visionGray text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300">
+            <div class="h-20 flex items-center px-6 border-b border-slate-800">
+                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">CMS Portal</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="dashboard.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-squares-four text-xl mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="submit-request.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-plus-circle text-xl mr-3"></i>
+                    <span>Submit Request</span>
+                </a>
+                <a href="my-requests.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-clipboard-text text-xl mr-3"></i>
+                    <span>My Requests</span>
+                </a>
+
+                <a href="approvals.html" id="approvalsLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                    <i class="ph ph-check-circle text-xl mr-3"></i>
+                    <span>Approvals</span>
+                </a>
+                <a href="it-review.html" id="itReviewLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                    <i class="ph ph-wrench text-xl mr-3"></i>
+                    <span>IT Review</span>
+                </a>
+                <a href="reports.html" class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-2 border-visionRed transition-all">
+                    <i class="ph ph-chart-line-up text-xl mr-3"></i>
+                    <span class="font-medium">Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                        U
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-base font-semibold truncate">User Name</p>
+                        <p class="text-sm text-slate-400">Staff Member</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                    <i class="ph ph-sign-out text-xl"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8 overflow-y-auto h-full">
+            
+            <header class="flex justify-between items-center mb-8 fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold text-visionBlack">Reports & Analytics</h2>
+                    <p class="text-gray-500 text-sm mt-1">Comprehensive insights and data analysis.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="window.print()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
+                        <i class="ph ph-printer"></i> Print
+                    </button>
+                    <button onclick="exportReport()" class="bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-medium">
+                        <i class="ph ph-download-simple"></i> Export Report
+                    </button>
+                </div>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 fade-in">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800">Report Filters</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <select id="reportType" onchange="generateReport()"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                            <option value="overview">Overview Summary</option>
+                            <option value="department">By Department</option>
+                            <option value="status">By Status</option>
+                            <option value="timeline">Timeline Analysis</option>
+                        </select>
+                        <input type="date" id="dateFrom" onchange="generateReport()"
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                        <input type="date" id="dateTo" onchange="generateReport()"
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                        <select id="departmentFilter" onchange="generateReport()"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                            <option value="">All Departments</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 fade-in">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Total Requests</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportTotal">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-files"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Completed</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportCompleted">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-check-circle"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">In Progress</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportProgress">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-gear-six"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Pending</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportPending">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-hourglass-high"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 fade-in">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                    <h3 class="font-bold text-gray-800 text-lg mb-6">Request Trends</h3>
+                    <canvas id="trendChart" style="max-height: 280px;"></canvas>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                    <h3 class="font-bold text-gray-800 text-lg mb-6">Status Distribution</h3>
+                    <canvas id="statusChartPill" style="max-height: 280px;"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-6 fade-in p-8">
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-800 text-lg">Requests by Status</h3>
+                </div>
+                <div class="flex justify-center">
+                    <canvas id="chartCanvas" style="max-height: 350px;"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden fade-in">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800">Detailed Report</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="reportTable">
+                        <thead class="bg-gray-50 text-xs text-gray-500 uppercase font-semibold tracking-wider text-left">
+                            <tr>
+                                <th class="px-6 py-4">Request ID</th>
+                                <th class="px-6 py-4">Title</th>
+                                <th class="px-6 py-4">Department</th>
+                                <th class="px-6 py-4">Type</th>
+                                <th class="px-6 py-4">Priority</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="divide-y divide-gray-100">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800">Requests by Department</h3>
+                </div>
+                <div class="p-6">
+                    <div id="departmentBreakdown">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = checkAuth();
+            if (!user) return;
+
+            if (user.role !== 'hod') {
+                document.getElementById('approvalsLink').style.display = 'none';
+            }
+            if (user.role !== 'it' && user.role !== 'admin') {
+                document.getElementById('itReviewLink').style.display = 'none';
+            }
+
+            populateDepartmentFilter();
+
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+            
+            document.getElementById('dateTo').valueAsDate = today;
+            document.getElementById('dateFrom').valueAsDate = thirtyDaysAgo;
+
+            initializeAdditionalCharts();
+            generateReport();
+        });
+
+        function populateDepartmentFilter() {
+            const select = document.getElementById('departmentFilter');
+            const departments = API.getDepartments();
+            
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                select.appendChild(option);
+            });
+        }
+
+        function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const department = document.getElementById('departmentFilter').value;
+
+            let requests = API.getRequests();
+
+            if (department) {
+                requests = requests.filter(r => r.department === department);
+            }
+
+            if (dateFrom) {
+                requests = requests.filter(r => r.dateSubmitted >= dateFrom);
+            }
+
+            if (dateTo) {
+                requests = requests.filter(r => r.dateSubmitted <= dateTo);
+            }
+
+            updateStatistics(requests);
+            drawChart(requests);
+            updateReportTable(requests);
+            updateDepartmentBreakdown(requests);
+        }
+
+        function updateStatistics(requests) {
+            const total = requests.length;
+            const completed = requests.filter(r => r.status === 'Completed').length;
+            const inProgress = requests.filter(r => r.itStatus === 'In Progress').length;
+            const pending = requests.filter(r => r.status === 'Pending HOD Approval').length;
+
+            document.getElementById('reportTotal').textContent = total;
+            document.getElementById('reportCompleted').textContent = completed;
+            document.getElementById('reportProgress').textContent = inProgress;
+            document.getElementById('reportPending').textContent = pending;
+        }
+
+        let statusChart = null;
+        let trendChart = null;
+        let statusChartPill = null;
+
+        function initializeAdditionalCharts() {
+            const allRequests = API.getRequests();
+            
+            // Calculate monthly trends for the last 6 months
+            const monthlyData = calculateMonthlyTrends(allRequests);
+            
+            // Calculate status distribution
+            const statusData = calculateStatusDistribution(allRequests);
+            
+            // Trend Chart - Curved Line Chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            
+            trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.labels,
+                    datasets: [{
+                        label: 'Submitted',
+                        data: monthlyData.submitted,
+                        borderColor: '#6366F1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366F1',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 6
+                    }, {
+                        label: 'Completed',
+                        data: monthlyData.completed,
+                        borderColor: '#22C55E',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#22C55E',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748B',
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0F172A',
+                            padding: 12,
+                            borderRadius: 8,
+                            titleFont: {
+                                family: 'Inter',
+                                size: 13,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                family: 'Inter',
+                                size: 12
+                            },
+                            displayColors: true,
+                            boxPadding: 6
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748B'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#E2E8F0',
+                                borderDash: [5, 5],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748B',
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Status Pill Chart
+            const statusCtx = document.getElementById('statusChartPill').getContext('2d');
+            
+            statusChartPill = new Chart(statusCtx, {
+                type: 'bar',
+                data: {
+                    labels: statusData.labels,
+                    datasets: [{
+                        label: 'Requests',
+                        data: statusData.counts,
+                        backgroundColor: statusData.colors,
+                        borderRadius: 20,
+                        borderSkipped: false,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#0F172A',
+                            padding: 12,
+                            borderRadius: 8,
+                            titleFont: {
+                                family: 'Inter',
+                                size: 13,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                family: 'Inter',
+                                size: 12
+                            },
+                            displayColors: true,
+                            boxPadding: 6
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748B'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#E2E8F0',
+                                borderDash: [5, 5],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748B',
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateMonthlyTrends(requests) {
+            const months = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
+            const monthValues = ['2025-09', '2025-10', '2025-11', '2025-12', '2026-01', '2026-02'];
+            
+            const submitted = monthValues.map(month => {
+                return requests.filter(r => r.dateSubmitted.startsWith(month)).length;
+            });
+            
+            const completed = monthValues.map(month => {
+                return requests.filter(r => 
+                    r.status === 'Completed' && 
+                    r.acknowledgmentDate && 
+                    r.acknowledgmentDate.startsWith(month)
+                ).length;
+            });
+            
+            return { labels: months, submitted, completed };
+        }
+
+        function calculateStatusDistribution(requests) {
+            const statusMap = {
+                'Pending HOD Approval': { count: 0, color: '#f59e0b', label: 'Pending' },
+                'Clarification Needed': { count: 0, color: '#f59e0b', label: 'Pending' },
+                'Technical Review': { count: 0, color: '#6366F1', label: 'In Review' },
+                'Development': { count: 0, color: '#8b5cf6', label: 'In Progress' },
+                'Completed': { count: 0, color: '#22C55E', label: 'Completed' },
+                'Rejected': { count: 0, color: '#ef4444', label: 'Rejected' }
+            };
+            
+            requests.forEach(r => {
+                if (statusMap[r.status]) {
+                    statusMap[r.status].count++;
+                }
+            });
+            
+            // Aggregate similar statuses
+            const aggregated = {
+                'Pending': statusMap['Pending HOD Approval'].count + statusMap['Clarification Needed'].count,
+                'In Review': statusMap['Technical Review'].count,
+                'In Progress': statusMap['Development'].count,
+                'Completed': statusMap['Completed'].count,
+                'Rejected': statusMap['Rejected'].count
+            };
+            
+            const colors = ['#f59e0b', '#6366F1', '#8b5cf6', '#22C55E', '#ef4444'];
+            
+            return {
+                labels: Object.keys(aggregated),
+                counts: Object.values(aggregated),
+                colors: colors
+            };
+        }
+
+        function drawChart(requests) {
+            const statusCounts = {
+                'Pending HOD Approval': 0,
+                'Approved': 0,
+                'IT Review': 0,
+                'In Progress': 0,
+                'Completed': 0,
+                'Rejected': 0
+            };
+
+            requests.forEach(r => {
+                if (statusCounts.hasOwnProperty(r.status)) {
+                    statusCounts[r.status]++;
+                }
+            });
+
+            const ctx = document.getElementById('chartCanvas').getContext('2d');
+
+            if (statusChart) {
+                statusChart.destroy();
+            }
+
+            statusChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(statusCounts),
+                    datasets: [{
+                        label: 'Requests',
+                        data: Object.values(statusCounts),
+                        backgroundColor: [
+                            '#f59e0b',
+                            '#22C55E',
+                            '#6366F1',
+                            '#8b5cf6',
+                            '#22C55E',
+                            '#ef4444'
+                        ],
+                        borderRadius: 20,
+                        borderSkipped: false,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#0F172A',
+                            padding: 12,
+                            borderRadius: 8,
+                            titleFont: {
+                                family: 'Inter',
+                                size: 13,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                family: 'Inter',
+                                size: 12
+                            },
+                            displayColors: true,
+                            boxPadding: 6
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748B'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#E2E8F0',
+                                borderDash: [5, 5],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748B',
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateReportTable(requests) {
+            const tbody = document.getElementById('reportTableBody');
+
+            if (requests.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">No data available for selected filters</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = requests.map(request => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4"><strong class="text-gray-800">${request.id}</strong></td>
+                    <td class="px-6 py-4 font-medium text-gray-800">${request.title}</td>
+                    <td class="px-6 py-4 text-gray-700">${request.department}</td>
+                    <td class="px-6 py-4 text-gray-600 text-sm">${request.type}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                            request.priority === 'High' ? 'bg-red-100 text-red-700' :
+                            request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-blue-100 text-blue-700'
+                        }">
+                            ${request.priority}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                            request.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                            request.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                            request.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                            'bg-orange-100 text-orange-700'
+                        }">
+                            ${request.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600 text-sm">${utils.formatDate(request.dateSubmitted)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateDepartmentBreakdown(requests) {
+            const container = document.getElementById('departmentBreakdown');
+            
+            const deptCounts = {};
+            requests.forEach(r => {
+                deptCounts[r.department] = (deptCounts[r.department] || 0) + 1;
+            });
+
+            const sortedDepts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]);
+
+            if (sortedDepts.length === 0) {
+                container.innerHTML = '<p class="text-gray-400">No data available</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    ${sortedDepts.map(([dept, count]) => {
+                        const percentage = ((count / requests.length) * 100).toFixed(1);
+                        return `
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-medium text-gray-800">${dept}</span>
+                                    <span class="text-sm text-gray-600"><strong>${count}</strong> requests (${percentage}%)</span>
+                                </div>
+                                <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-visionRed rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function exportReport() {
+            const requests = API.getRequests();
+            const exportData = requests.map(r => ({
+                'Request ID': r.id,
+                'Title': r.title,
+                'Department': r.department,
+                'Section': r.section,
+                'Type': r.type,
+                'Priority': r.priority,
+                'Status': r.status,
+                'Requestor': r.requestor,
+                'Date Submitted': r.dateSubmitted,
+                'HOD Approval': r.hodApproval,
+                'IT Status': r.itStatus
+            }));
+
+            utils.exportToCSV(exportData, `CMS-Report-${new Date().toISOString().split('T')[0]}.csv`);
+        }
+    </script>
+</body>
+</html>

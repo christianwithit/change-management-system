@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Review | Vision Group CMS</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        visionRed: '#CF2E2E',
+                        visionBlack: '#0F172A',
+                        visionGray: '#F8FAFC',
+                        muted: '#F1F5F9',
+                        border: '#E2E8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab { cursor: pointer; }
+    </style>
+</head>
+<body class="bg-visionGray text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300">
+            <div class="h-20 flex items-center px-6 border-b border-slate-800">
+                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">CMS Portal</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="dashboard.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-squares-four text-xl mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="submit-request.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-plus-circle text-xl mr-3"></i>
+                    <span>Submit Request</span>
+                </a>
+                <a href="my-requests.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-clipboard-text text-xl mr-3"></i>
+                    <span>My Requests</span>
+                </a>
+
+                <a href="approvals.html" id="approvalsLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                    <i class="ph ph-check-circle text-xl mr-3"></i>
+                    <span>Approvals</span>
+                </a>
+                <a href="it-review.html" class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-2 border-visionRed transition-all">
+                    <i class="ph ph-wrench text-xl mr-3"></i>
+                    <span class="font-medium">IT Review</span>
+                </a>
+                <a href="reports.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-chart-line-up text-xl mr-3"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                        U
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-base font-semibold truncate">User Name</p>
+                        <p class="text-sm text-slate-400">Staff Member</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                    <i class="ph ph-sign-out text-xl"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8 overflow-y-auto h-full">
+            
+            <header class="flex justify-between items-center mb-8 fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold text-visionBlack">IT Review & Implementation</h2>
+                    <p class="text-gray-500 text-sm mt-1">Review technical feasibility and manage implementation.</p>
+                </div>
+                <button onclick="location.reload()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
+                    <i class="ph ph-arrows-clockwise"></i> Refresh
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 fade-in">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Awaiting Review</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reviewCount">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-clipboard-text"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">In Progress</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="progressCount">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-gear-six"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Completed</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="completedCount">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
+                <div class="border-b border-gray-100 flex">
+                    <div class="tab px-6 py-4 font-medium text-visionRed border-b-2 border-visionRed" onclick="switchStage('review')">
+                        Awaiting Review
+                    </div>
+                    <div class="tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700" onclick="switchStage('progress')">
+                        In Progress
+                    </div>
+                    <div class="tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700" onclick="switchStage('completed')">
+                        Completed
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <div id="requestsList" class="space-y-4">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- IT Review Modal -->
+    <div id="itReviewModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 class="font-bold text-gray-800">IT Review & Methodology</h3>
+                <button onclick="utils.hideModal('itReviewModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div id="modalRequestInfo"></div>
+                
+                <div>
+                    <label for="itDecision" class="block text-sm font-medium text-gray-700 mb-2">IT Decision *</label>
+                    <select id="itDecision" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                        <option value="">Select decision</option>
+                        <option value="Accepted">Accept for Development</option>
+                        <option value="Deferred">Defer</option>
+                        <option value="Rejected">Reject</option>
+                    </select>
+                </div>
+
+                <div id="methodologySection" class="hidden space-y-5">
+                    <div>
+                        <label for="methodology" class="block text-sm font-medium text-gray-700 mb-2">Technical Approach / Methodology *</label>
+                        <textarea id="methodology" rows="4" 
+                                  placeholder="Describe the technical approach and methodology..."
+                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="deliverables" class="block text-sm font-medium text-gray-700 mb-2">Expected Deliverables *</label>
+                        <textarea id="deliverables" rows="3" 
+                                  placeholder="List expected deliverables..."
+                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label for="estimatedTime" class="block text-sm font-medium text-gray-700 mb-2">Estimated Timeline</label>
+                            <input type="text" id="estimatedTime" 
+                                   placeholder="e.g., 2-3 weeks"
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                        </div>
+
+                        <div>
+                            <label for="estimatedCost" class="block text-sm font-medium text-gray-700 mb-2">Estimated Cost (UGX)</label>
+                            <input type="text" id="estimatedCost" 
+                                   placeholder="e.g., 5,000,000"
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="risks" class="block text-sm font-medium text-gray-700 mb-2">Risks & Mitigation</label>
+                        <textarea id="risks" rows="3" 
+                                  placeholder="Identify potential risks and mitigation measures..."
+                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="itComments" class="block text-sm font-medium text-gray-700 mb-2">Comments</label>
+                    <textarea id="itComments" rows="3" 
+                              placeholder="Additional comments or notes..."
+                              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end bg-gray-50/50">
+                <button onclick="utils.hideModal('itReviewModal')" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all border border-gray-200">
+                    Cancel
+                </button>
+                <button onclick="submitITReview()" class="px-6 py-2.5 bg-visionRed hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                    Submit Review
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        let currentStage = 'review';
+        let currentReviewRequest = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = checkAuth();
+            if (!user) return;
+
+            if (user.role !== 'it' && user.role !== 'admin') {
+                utils.showAlert('Access denied. This page is for IT Department only.', 'danger');
+                setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                return;
+            }
+
+            if (user.role !== 'hod') {
+                document.getElementById('approvalsLink').style.display = 'none';
+            }
+
+            document.getElementById('itDecision').addEventListener('change', function() {
+                const methodologySection = document.getElementById('methodologySection');
+                if (this.value === 'Accepted') {
+                    methodologySection.classList.remove('hidden');
+                } else {
+                    methodologySection.classList.add('hidden');
+                }
+            });
+
+            loadITRequests();
+        });
+
+        function loadITRequests() {
+            const allRequests = API.getRequests();
+            
+            const reviewRequests = allRequests.filter(r => r.status === 'IT Review');
+            const progressRequests = allRequests.filter(r => r.itStatus === 'In Progress');
+            const completedRequests = allRequests.filter(r => r.status === 'Completed');
+
+            document.getElementById('reviewCount').textContent = reviewRequests.length;
+            document.getElementById('progressCount').textContent = progressRequests.length;
+            document.getElementById('completedCount').textContent = completedRequests.length;
+
+            displayRequests(currentStage);
+        }
+
+        function switchStage(stage) {
+            currentStage = stage;
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('text-visionRed', 'border-b-2', 'border-visionRed');
+                tab.classList.add('text-gray-500', 'hover:text-gray-700');
+            });
+            event.target.classList.remove('text-gray-500', 'hover:text-gray-700');
+            event.target.classList.add('text-visionRed', 'border-b-2', 'border-visionRed');
+
+            displayRequests(stage);
+        }
+
+        function displayRequests(stage) {
+            const allRequests = API.getRequests();
+            let requests = [];
+
+            if (stage === 'review') {
+                requests = allRequests.filter(r => r.status === 'IT Review');
+            } else if (stage === 'progress') {
+                requests = allRequests.filter(r => r.itStatus === 'In Progress');
+            } else if (stage === 'completed') {
+                requests = allRequests.filter(r => r.status === 'Completed');
+            }
+
+            const container = document.getElementById('requestsList');
+
+            if (requests.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                            <i class="ph ph-clipboard-text"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">No requests in this stage</h3>
+                        <p class="text-gray-500">Requests will appear here when they reach this stage</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = requests.map(request => `
+                <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-visionRed transition-all">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-800 text-lg mb-1">${request.title}</h4>
+                            <p class="text-sm text-gray-500 mb-2">${request.id} • ${request.type}</p>
+                            <p class="text-gray-700">${request.description}</p>
+                        </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            request.priority === 'High' ? 'bg-red-100 text-red-700' :
+                            request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-blue-100 text-blue-700'
+                        }">
+                            ${request.priority}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                        <i class="ph ph-building"></i>
+                        <span><strong>${request.department}</strong> • ${request.requestor} • ${utils.formatDate(request.dateSubmitted)}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="viewRequestDetail('${request.id}')" 
+                                class="px-4 py-2 bg-white hover:bg-gray-100 text-gray-700 rounded-lg text-sm font-medium transition-all border border-gray-300">
+                            View Details
+                        </button>
+                        ${stage === 'review' ? `
+                            <button onclick="openITReviewModal('${request.id}')" 
+                                    class="px-4 py-2 bg-visionRed hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
+                                Review & Define Methodology
+                            </button>
+                        ` : ''}
+                        ${stage === 'progress' ? `
+                            <button onclick="markAsCompleted('${request.id}')" 
+                                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
+                                Mark as Completed
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openITReviewModal(requestId) {
+            currentReviewRequest = API.getRequest(requestId);
+            
+            const modalInfo = document.getElementById('modalRequestInfo');
+            modalInfo.innerHTML = `
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-sm text-gray-600 mb-1">Request ID: <strong class="text-gray-800">${currentReviewRequest.id}</strong></p>
+                    <p class="font-bold text-gray-800">${currentReviewRequest.title}</p>
+                </div>
+            `;
+
+            document.getElementById('itReviewModal').classList.remove('hidden');
+            document.getElementById('itReviewModal').classList.add('flex');
+        }
+
+        function submitITReview() {
+            if (!currentReviewRequest) return;
+
+            const decision = document.getElementById('itDecision').value;
+            const methodology = document.getElementById('methodology').value;
+            const deliverables = document.getElementById('deliverables').value;
+            const estimatedTime = document.getElementById('estimatedTime').value;
+            const estimatedCost = document.getElementById('estimatedCost').value;
+            const risks = document.getElementById('risks').value;
+            const comments = document.getElementById('itComments').value;
+
+            if (!decision) {
+                utils.showAlert('Please select an IT decision', 'warning');
+                return;
+            }
+
+            if (decision === 'Accepted' && (!methodology || !deliverables)) {
+                utils.showAlert('Please provide methodology and deliverables for accepted requests', 'warning');
+                return;
+            }
+
+            const updates = {
+                itDecision: decision,
+                itComments: comments
+            };
+
+            if (decision === 'Accepted') {
+                updates.itStatus = 'In Progress';
+                updates.status = 'Approved';
+                updates.methodology = methodology;
+                updates.deliverables = deliverables;
+                updates.estimatedTime = estimatedTime;
+                updates.estimatedCost = estimatedCost;
+                updates.risks = risks;
+            } else if (decision === 'Rejected') {
+                updates.status = 'Rejected';
+                updates.itStatus = 'Rejected';
+            } else if (decision === 'Deferred') {
+                updates.status = 'Deferred';
+                updates.itStatus = 'Deferred';
+            }
+
+            API.updateRequest(currentReviewRequest.id, updates);
+
+            utils.showAlert('IT review submitted successfully!', 'success');
+            utils.hideModal('itReviewModal');
+            
+            document.getElementById('itDecision').value = '';
+            document.getElementById('methodology').value = '';
+            document.getElementById('deliverables').value = '';
+            document.getElementById('estimatedTime').value = '';
+            document.getElementById('estimatedCost').value = '';
+            document.getElementById('risks').value = '';
+            document.getElementById('itComments').value = '';
+            
+            setTimeout(() => loadITRequests(), 500);
+        }
+
+        function markAsCompleted(requestId) {
+            if (confirm('Mark this request as completed?')) {
+                API.updateRequest(requestId, {
+                    status: 'Completed',
+                    itStatus: 'Completed'
+                });
+
+                utils.showAlert('Request marked as completed!', 'success');
+                setTimeout(() => loadITRequests(), 500);
+            }
+        }
+
+        function viewRequestDetail(id) {
+            window.location.href = `request-detail.html?id=${id}`;
+        }
+    </script>
+</body>
+</html>
