@@ -1,50 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Details | Vision Group CMS</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        visionRed: '#CF2E2E',
-                        visionBlack: '#0F172A',
-                        visionGray: '#F8FAFC',
-                        muted: '#F1F5F9',
-                        border: '#E2E8F0',
-                    }
-                }
-            }
-        }
-    </script>
-    
+    <link rel="stylesheet" href="../css/output.css">
+
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
+
 <body class="bg-visionGray text-gray-800 font-sans antialiased">
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <aside class="w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300">
+    <div class="flex h-screen overflow-hidden bg-gray-50">
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
+            onclick="toggleMobileSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside
+            class="sidebar w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
             <div class="h-20 flex items-center px-6 border-b border-slate-800">
                 <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
-                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-full object-contain">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo"
+                        class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
@@ -53,28 +65,34 @@
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                <a href="dashboard.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-squares-four text-xl mr-3"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="submit-request.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="submit-request.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-plus-circle text-xl mr-3"></i>
                     <span>Submit Request</span>
                 </a>
-                <a href="my-requests.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="my-requests.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-clipboard-text text-xl mr-3"></i>
                     <span>My Requests</span>
                 </a>
 
-                <a href="approvals.html" id="approvalsLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                <a href="approvals.html" id="approvalsLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
                     <i class="ph ph-check-circle text-xl mr-3"></i>
                     <span>Approvals</span>
                 </a>
-                <a href="it-review.html" id="itReviewLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                <a href="it-review.html" id="itReviewLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
                     <i class="ph ph-wrench text-xl mr-3"></i>
                     <span>IT Review</span>
                 </a>
-                <a href="reports.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="reports.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-chart-line-up text-xl mr-3"></i>
                     <span>Reports</span>
                 </a>
@@ -82,7 +100,8 @@
 
             <div class="p-4 border-t border-slate-800">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
                         U
                     </div>
                     <div class="overflow-hidden">
@@ -90,24 +109,36 @@
                         <p class="text-sm text-slate-400">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                <button onclick="logout()"
+                    class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 ml-64 p-8 overflow-y-auto h-full">
-            
-            <header class="flex justify-between items-center mb-8 fade-in">
-                <div>
-                    <h2 class="text-2xl font-bold text-visionBlack">Request Details</h2>
-                    <p class="text-gray-500 text-sm mt-1">View complete information about this change request.</p>
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 ml-0 p-4 md:p-8 overflow-y-auto h-full w-full">
+
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Toggle Button -->
+                    <button onclick="toggleMobileSidebar()"
+                        class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-visionBlack">Request Details</h2>
+                        <p class="text-gray-500 text-sm mt-1">View complete information about this change request.</p>
+                    </div>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="window.print()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
+                    <button onclick="window.print()"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
                         <i class="ph ph-printer"></i> Print
                     </button>
-                    <button onclick="history.back()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-slate-200">
+                    <button onclick="history.back()"
+                        class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-slate-200">
                         <i class="ph ph-arrow-left"></i> Back
                     </button>
                 </div>
@@ -121,16 +152,20 @@
             <!-- Tabs Card -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
                 <div class="border-b border-gray-100 flex">
-                    <button class="tab-button px-6 py-4 font-medium text-visionRed border-b-2 border-visionRed" onclick="switchTab('details')">
+                    <button class="tab-button px-6 py-4 font-medium text-visionRed border-b-2 border-visionRed"
+                        onclick="switchTab('details')">
                         Details
                     </button>
-                    <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('timeline')">
+                    <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
+                        onclick="switchTab('timeline')">
                         Timeline
                     </button>
-                    <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('documents')">
+                    <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
+                        onclick="switchTab('documents')">
                         Documents
                     </button>
-                    <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700" onclick="switchTab('comments')">
+                    <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
+                        onclick="switchTab('comments')">
                         Comments
                     </button>
                 </div>
@@ -153,7 +188,8 @@
                     <!-- Documents Tab -->
                     <div id="documents" class="tab-content">
                         <div class="text-center py-12">
-                            <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                            <div
+                                class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
                                 <i class="ph ph-file-text"></i>
                             </div>
                             <h3 class="text-lg font-bold text-gray-800 mb-2">No documents uploaded yet</h3>
@@ -164,16 +200,18 @@
                     <!-- Comments Tab -->
                     <div id="comments" class="tab-content">
                         <div class="text-center py-12 mb-6">
-                            <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                            <div
+                                class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
                                 <i class="ph ph-chat-circle-text"></i>
                             </div>
                             <h3 class="text-lg font-bold text-gray-800 mb-2">No comments yet</h3>
                             <p class="text-gray-500">Add a comment to start the discussion</p>
                         </div>
                         <div>
-                            <textarea placeholder="Add a comment..." rows="3" 
-                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
-                            <button class="mt-3 bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all font-medium">
+                            <textarea placeholder="Add a comment..." rows="3"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
+                            <button
+                                class="mt-3 bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all font-medium">
                                 Post Comment
                             </button>
                         </div>
@@ -192,7 +230,7 @@
     <script>
         let currentRequest = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const user = checkAuth();
             if (!user) return;
 
@@ -238,19 +276,17 @@
                             <p class="text-gray-500 font-medium">${currentRequest.id}</p>
                         </div>
                         <div class="flex gap-2">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                currentRequest.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                                currentRequest.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                                currentRequest.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
-                                'bg-orange-100 text-orange-700'
-                            }">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${currentRequest.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                    currentRequest.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                        currentRequest.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                            'bg-orange-100 text-orange-700'
+                }">
                                 ${currentRequest.status}
                             </span>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                currentRequest.priority === 'High' ? 'bg-red-100 text-red-700' :
-                                currentRequest.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-blue-100 text-blue-700'
-                            }">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${currentRequest.priority === 'High' ? 'bg-red-100 text-red-700' :
+                    currentRequest.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-blue-100 text-blue-700'
+                }">
                                 ${currentRequest.priority}
                             </span>
                         </div>
@@ -278,11 +314,10 @@
                         </div>
                         <div>
                             <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">HOD Approval</label>
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                                currentRequest.hodApproval === 'Approved' ? 'bg-green-100 text-green-700' :
-                                currentRequest.hodApproval === 'Rejected' ? 'bg-red-100 text-red-700' :
-                                'bg-orange-100 text-orange-700'
-                            }">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${currentRequest.hodApproval === 'Approved' ? 'bg-green-100 text-green-700' :
+                    currentRequest.hodApproval === 'Rejected' ? 'bg-red-100 text-red-700' :
+                        'bg-orange-100 text-orange-700'
+                }">
                                 ${currentRequest.hodApproval}
                             </span>
                         </div>
@@ -308,11 +343,10 @@
                 </div>
                 <div>
                     <label class="text-sm font-bold uppercase tracking-wider text-gray-700 mb-2 block">IT Status</label>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        currentRequest.itStatus === 'Completed' ? 'bg-green-100 text-green-700' :
-                        currentRequest.itStatus === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${currentRequest.itStatus === 'Completed' ? 'bg-green-100 text-green-700' :
+                    currentRequest.itStatus === 'In Progress' ? 'bg-blue-100 text-blue-700' :
                         'bg-gray-100 text-gray-700'
-                    }">
+                }">
                         ${currentRequest.itStatus || 'Pending'}
                     </span>
                 </div>
@@ -382,20 +416,21 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            
+
             document.querySelectorAll('.tab-button').forEach(tab => {
                 tab.classList.remove('text-visionRed', 'border-b-2', 'border-visionRed');
                 tab.classList.add('text-gray-500', 'hover:text-gray-700');
             });
-            
+
             const selectedContent = document.getElementById(tabName);
             if (selectedContent) {
                 selectedContent.classList.add('active');
             }
-            
+
             event.target.classList.remove('text-gray-500', 'hover:text-gray-700');
             event.target.classList.add('text-visionRed', 'border-b-2', 'border-visionRed');
         }
     </script>
 </body>
+
 </html>

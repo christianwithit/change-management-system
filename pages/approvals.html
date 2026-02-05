@@ -1,59 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Approvals | Vision Group CMS</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        visionRed: '#CF2E2E',
-                        visionBlack: '#0F172A',
-                        visionGray: '#F8FAFC',
-                        muted: '#F1F5F9',
-                        border: '#E2E8F0',
-                    }
-                }
-            }
-        }
-    </script>
-    
+    <link rel="stylesheet" href="../css/output.css">
+
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Toast animations */
         @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
+
         @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(400px); opacity: 0; }
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
         }
-        .animate-slide-in { animation: slideIn 0.3s ease-out; }
+
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
     </style>
 </head>
+
 <body class="bg-visionGray text-gray-800 font-sans antialiased">
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <aside class="w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300">
+    <div class="flex h-screen overflow-hidden bg-gray-50">
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
+            onclick="toggleMobileSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside
+            class="sidebar w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
             <div class="h-20 flex items-center px-6 border-b border-slate-800">
                 <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
-                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-full object-contain">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo"
+                        class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
@@ -62,28 +86,34 @@
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                <a href="dashboard.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-squares-four text-xl mr-3"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="submit-request.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="submit-request.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-plus-circle text-xl mr-3"></i>
                     <span>Submit Request</span>
                 </a>
-                <a href="my-requests.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="my-requests.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-clipboard-text text-xl mr-3"></i>
                     <span>My Requests</span>
                 </a>
 
-                <a href="approvals.html" class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-4 border-visionRed transition-all">
+                <a href="approvals.html"
+                    class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-4 border-visionRed transition-all">
                     <i class="ph ph-check-circle text-xl mr-3"></i>
                     <span class="font-medium">Approvals</span>
                 </a>
-                <a href="it-review.html" id="itReviewLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden">
+                <a href="it-review.html" id="itReviewLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden">
                     <i class="ph ph-wrench text-xl mr-3"></i>
                     <span>IT Review</span>
                 </a>
-                <a href="reports.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group">
+                <a href="reports.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-chart-line-up text-xl mr-3"></i>
                     <span>Reports</span>
                 </a>
@@ -91,7 +121,8 @@
 
             <div class="p-4 border-t border-slate-800">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
                         U
                     </div>
                     <div class="overflow-hidden">
@@ -99,46 +130,63 @@
                         <p class="text-sm text-slate-400">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                <button onclick="logout()"
+                    class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 ml-64 p-8 overflow-y-auto h-full">
-            
-            <header class="flex justify-between items-center mb-8 fade-in">
-                <div>
-                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Pending Approvals</h1>
-                    <p class="text-slate-500 text-sm mt-1">Review and approve change requests from your department.</p>
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 ml-0 p-4 md:p-8 overflow-y-auto h-full w-full">
+
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Toggle Button -->
+                    <button onclick="toggleMobileSidebar()"
+                        class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Pending Approvals</h1>
+                        <p class="text-slate-500 text-sm mt-1">Review and approve change requests.</p>
+                    </div>
                 </div>
-                <button onclick="location.reload()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-slate-200">
+
+                <button onclick="location.reload()"
+                    class="bg-white hover:bg-slate-50 text-slate-700 px-4 md:px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-slate-200 w-full md:w-auto justify-center">
                     <i class="ph ph-arrows-clockwise"></i> Refresh
                 </button>
             </header>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 fade-in">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
                     <div>
                         <p class="text-slate-500 text-sm font-medium">Pending Approval</p>
                         <h3 class="text-3xl font-bold text-slate-900 mt-1 tracking-tight" id="pendingCount">0</h3>
                     </div>
-                    <div class="w-12 h-12 bg-amber-50 text-amber-700 rounded-full flex items-center justify-center text-xl">
+                    <div
+                        class="w-12 h-12 bg-amber-50 text-amber-700 rounded-full flex items-center justify-center text-xl">
                         <i class="ph ph-hourglass-high"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
                     <div>
                         <p class="text-slate-500 text-sm font-medium">Approved Today</p>
                         <h3 class="text-3xl font-bold text-slate-900 mt-1 tracking-tight" id="approvedToday">0</h3>
                     </div>
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-full flex items-center justify-center text-xl">
+                    <div
+                        class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-full flex items-center justify-center text-xl">
                         <i class="ph ph-check-circle"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
                     <div>
                         <p class="text-slate-500 text-sm font-medium">Rejected</p>
                         <h3 class="text-3xl font-bold text-slate-900 mt-1 tracking-tight" id="rejectedCount">0</h3>
@@ -153,17 +201,18 @@
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
                     <h2 class="text-lg font-semibold text-slate-800 tracking-tight">Requests Awaiting Your Approval</h2>
                 </div>
-                
+
                 <!-- Empty State -->
                 <div id="emptyState" class="hidden p-6">
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center py-16 bg-slate-50">
+                    <div
+                        class="border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center py-16 bg-slate-50">
                         <i class="ph ph-check-circle text-6xl text-emerald-500 mb-4"></i>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">All caught up!</h3>
                         <p class="text-slate-500 mb-2">No pending approvals at the moment</p>
                         <p class="text-sm text-slate-400">New requests will appear here when submitted</p>
                     </div>
                 </div>
-                
+
                 <div class="p-6" id="pendingRequestsContainer">
                     <div id="pendingRequestsList" class="space-y-4">
                         <!-- Populated by JavaScript -->
@@ -179,27 +228,32 @@
         <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
                 <h2 class="text-lg font-semibold text-slate-800 tracking-tight">Review Request</h2>
-                <button onclick="utils.hideModal('approvalModal')" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">
+                <button onclick="utils.hideModal('approvalModal')"
+                    class="text-slate-400 hover:text-slate-600 text-2xl leading-none">
                     &times;
                 </button>
             </div>
             <div class="p-6 space-y-4">
                 <div id="modalRequestDetails"></div>
                 <div>
-                    <label for="approvalComments" class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 block">Comments (Optional)</label>
-                    <textarea id="approvalComments" rows="4" 
-                              placeholder="Add any comments or feedback..."
-                              class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
+                    <label for="approvalComments"
+                        class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 block">Comments
+                        (Optional)</label>
+                    <textarea id="approvalComments" rows="4" placeholder="Add any comments or feedback..."
+                        class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-slate-200 flex gap-3 justify-end bg-slate-50/50">
-                <button onclick="utils.hideModal('approvalModal')" class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-all border border-slate-200">
+                <button onclick="utils.hideModal('approvalModal')"
+                    class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-all border border-slate-200">
                     Cancel
                 </button>
-                <button onclick="rejectRequest()" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                <button onclick="rejectRequest()"
+                    class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
                     Reject
                 </button>
-                <button onclick="approveRequest()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                <button onclick="approveRequest()"
+                    class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
                     Approve
                 </button>
             </div>
@@ -214,7 +268,7 @@
     <script>
         let currentReviewRequest = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const user = checkAuth();
             if (!user) return;
 
@@ -236,19 +290,19 @@
         function loadPendingApprovals() {
             const user = getCurrentUser();
             const allRequests = API.getRequests();
-            
-            const pendingRequests = allRequests.filter(r => 
-                r.status === 'Pending HOD Approval' && 
+
+            const pendingRequests = allRequests.filter(r =>
+                r.status === 'Pending HOD Approval' &&
                 r.department === user.department
             );
 
-            const approvedToday = allRequests.filter(r => 
-                r.hodApproval === 'Approved' && 
+            const approvedToday = allRequests.filter(r =>
+                r.hodApproval === 'Approved' &&
                 r.department === user.department
             ).length;
 
-            const rejected = allRequests.filter(r => 
-                r.status === 'Rejected' && 
+            const rejected = allRequests.filter(r =>
+                r.status === 'Rejected' &&
                 r.department === user.department
             ).length;
 
@@ -282,11 +336,10 @@
                             <p class="text-sm text-slate-500 mb-2">${request.id} • ${request.type}</p>
                             <p class="text-slate-700">${request.description}</p>
                         </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
-                            request.priority === 'High' ? 'bg-red-100/50 text-red-700 border-red-200' :
-                            request.priority === 'Medium' ? 'bg-amber-100/50 text-amber-700 border-amber-200' :
-                            'bg-blue-100/50 text-blue-700 border-blue-200'
-                        }">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${request.priority === 'High' ? 'bg-red-100/50 text-red-700 border-red-200' :
+                    request.priority === 'Medium' ? 'bg-amber-100/50 text-amber-700 border-amber-200' :
+                        'bg-blue-100/50 text-blue-700 border-blue-200'
+                }">
                             ${request.priority}
                         </span>
                     </div>
@@ -314,7 +367,7 @@
 
         function openApprovalModal(requestId, action) {
             currentReviewRequest = API.getRequest(requestId);
-            
+
             const modalDetails = document.getElementById('modalRequestDetails');
             modalDetails.innerHTML = `
                 <div class="bg-blue-50/50 border border-blue-200 rounded-lg p-4 space-y-2">
@@ -373,4 +426,5 @@
         }
     </script>
 </body>
+
 </html>

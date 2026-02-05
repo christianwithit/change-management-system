@@ -1,55 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Request | Vision Group CMS</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        visionRed: '#CF2E2E',
-                        visionBlack: '#0F172A',
-                        visionGray: '#F8FAFC',
-                        muted: '#F1F5F9',
-                        border: '#E2E8F0',
-                    }
-                }
-            }
-        }
-    </script>
-    
+    <link rel="stylesheet" href="../css/output.css">
+
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
-        .animate-slide-in { animation: slideIn 0.3s ease-out; }
-        .form-step { display: none; }
-        .form-step.active { display: block; }
-        .step-connector { transition: background-color 0.3s ease; }
-        .step-connector.completed { background-color: #CF2E2E; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .step-connector {
+            transition: background-color 0.3s ease;
+        }
+
+        .step-connector.completed {
+            background-color: #CF2E2E;
+        }
     </style>
 </head>
+
 <body class="bg-visionGray text-gray-800 font-sans antialiased">
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <aside class="w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300">
+    <div class="flex h-screen overflow-hidden bg-gray-50">
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
+            onclick="toggleMobileSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside
+            class="sidebar w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
             <div class="h-20 flex items-center px-6 border-b border-slate-800">
                 <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
-                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-full object-contain">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo"
+                        class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
@@ -58,28 +101,34 @@
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                <a href="dashboard.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-squares-four text-xl mr-3"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="submit-request.html" class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-2 border-visionRed transition-all">
+                <a href="submit-request.html"
+                    class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-2 border-visionRed transition-all">
                     <i class="ph ph-plus-circle text-xl mr-3"></i>
                     <span class="font-medium">Submit Request</span>
                 </a>
-                <a href="my-requests.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="my-requests.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-clipboard-text text-xl mr-3"></i>
                     <span>My Requests</span>
                 </a>
 
-                <a href="approvals.html" id="approvalsLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                <a href="approvals.html" id="approvalsLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
                     <i class="ph ph-check-circle text-xl mr-3"></i>
                     <span>Approvals</span>
                 </a>
-                <a href="it-review.html" id="itReviewLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                <a href="it-review.html" id="itReviewLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
                     <i class="ph ph-wrench text-xl mr-3"></i>
                     <span>IT Review</span>
                 </a>
-                <a href="reports.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="reports.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-chart-line-up text-xl mr-3"></i>
                     <span>Reports</span>
                 </a>
@@ -87,7 +136,8 @@
 
             <div class="p-4 border-t border-slate-800">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
                         U
                     </div>
                     <div class="overflow-hidden">
@@ -95,20 +145,32 @@
                         <p class="text-sm text-slate-400">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                <button onclick="logout()"
+                    class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 ml-64 p-8 overflow-y-auto h-full">
-            
-            <header class="flex justify-between items-center mb-8 fade-in">
-                <div>
-                    <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Submit Change Request</h1>
-                    <p class="text-slate-600 text-base mt-2 leading-relaxed">Fill out the form below to submit a new change request.</p>
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 ml-0 p-4 md:p-8 overflow-y-auto h-full w-full">
+
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Toggle Button -->
+                    <button onclick="toggleMobileSidebar()"
+                        class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+
+                    <div>
+                        <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Submit Change Request</h1>
+                        <p class="text-slate-600 text-base mt-2 leading-relaxed">Fill out the form below to submit a new
+                            change request.</p>
+                    </div>
                 </div>
-                <button onclick="navigateTo('dashboard.html')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-semibold text-base border border-slate-200 min-h-[48px]">
+                <button onclick="navigateTo('dashboard.html')"
+                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-semibold text-base border border-slate-200 min-h-[48px]">
                     <i class="ph ph-arrow-left text-xl"></i> Back to Dashboard
                 </button>
             </header>
@@ -117,93 +179,106 @@
                 <div class="px-6 py-5 border-b border-slate-200 bg-slate-50/50">
                     <h2 class="text-2xl font-semibold text-slate-800 tracking-tight">New Change Request Form</h2>
                 </div>
-                
+
                 <!-- Form Stepper -->
                 <div class="px-6 pt-6 pb-4">
                     <div class="flex items-center justify-between max-w-2xl mx-auto">
                         <!-- Step 1 -->
                         <div class="flex flex-col items-center flex-1">
-                            <div id="step1Circle" class="w-14 h-14 rounded-full bg-visionRed text-white ring-4 ring-red-100 flex items-center justify-center font-bold text-xl mb-2 transition-all">
+                            <div id="step1Circle"
+                                class="w-14 h-14 rounded-full bg-visionRed text-white ring-4 ring-red-100 flex items-center justify-center font-bold text-xl mb-2 transition-all">
                                 1
                             </div>
                             <span class="text-base font-semibold text-slate-700">Request Details</span>
                         </div>
-                        
+
                         <!-- Connector 1 -->
                         <div id="connector1" class="h-1 bg-slate-200 flex-1 mx-2 step-connector"></div>
-                        
+
                         <!-- Step 2 -->
                         <div class="flex flex-col items-center flex-1">
-                            <div id="step2Circle" class="w-14 h-14 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xl mb-2 transition-all">
+                            <div id="step2Circle"
+                                class="w-14 h-14 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xl mb-2 transition-all">
                                 2
                             </div>
                             <span class="text-base font-semibold text-slate-500">Impact Analysis</span>
                         </div>
-                        
+
                         <!-- Connector 2 -->
                         <div id="connector2" class="h-1 bg-slate-200 flex-1 mx-2 step-connector"></div>
-                        
+
                         <!-- Step 3 -->
                         <div class="flex flex-col items-center flex-1">
-                            <div id="step3Circle" class="w-14 h-14 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xl mb-2 transition-all">
+                            <div id="step3Circle"
+                                class="w-14 h-14 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xl mb-2 transition-all">
                                 3
                             </div>
                             <span class="text-base font-semibold text-slate-500">Confirmation</span>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="p-6">
                     <form id="submitRequestForm" class="space-y-6">
-                        
+
                         <!-- Step 1: Request Details -->
                         <div class="form-step active" id="formStep1">
                             <div>
-                                <label for="title" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Request Title *</label>
-                                <input type="text" id="title" name="title" required 
-                                       placeholder="Brief title describing the change"
-                                       class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
+                                <label for="title"
+                                    class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Request
+                                    Title *</label>
+                                <input type="text" id="title" name="title" required
+                                    placeholder="Brief title describing the change"
+                                    class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
                             </div>
 
                             <div>
-                                <label for="type" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Type of Change *</label>
+                                <label for="type"
+                                    class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Type of
+                                    Change *</label>
                                 <select id="type" name="type" required
-                                        class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
+                                    class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
                                     <option value="">Select change type</option>
                                 </select>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="department" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Department *</label>
+                                    <label for="department"
+                                        class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Department
+                                        *</label>
                                     <select id="department" name="department" required
-                                            class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
+                                        class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
                                         <option value="">Select department</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label for="section" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Section *</label>
-                                    <input type="text" id="section" name="section" required 
-                                           placeholder="Your section/unit"
-                                           class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
+                                    <label for="section"
+                                        class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Section
+                                        *</label>
+                                    <input type="text" id="section" name="section" required
+                                        placeholder="Your section/unit"
+                                        class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
                                 </div>
                             </div>
 
                             <div>
-                                <label for="description" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Detailed Description *</label>
+                                <label for="description"
+                                    class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Detailed
+                                    Description *</label>
                                 <textarea id="description" name="description" required rows="5"
-                                          placeholder="Provide a detailed description of the change you are requesting"
-                                          class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 leading-relaxed focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
+                                    placeholder="Provide a detailed description of the change you are requesting"
+                                    class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 leading-relaxed focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
                             </div>
 
                             <div class="flex gap-3 pt-4 border-t border-slate-200">
-                                <button type="button" onclick="resetForm()" 
-                                        class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 min-h-[48px]">
+                                <button type="button" onclick="resetForm()"
+                                    class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 min-h-[48px]">
                                     Reset Form
                                 </button>
-                                <button type="button" onclick="nextStep(2)" 
-                                        class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
+                                <button type="button" onclick="nextStep(2)"
+                                    class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
                                     Next: Impact Analysis <i class="ph ph-arrow-right text-xl"></i>
                                 </button>
                             </div>
@@ -212,23 +287,29 @@
                         <!-- Step 2: Impact Analysis -->
                         <div class="form-step" id="formStep2">
                             <div>
-                                <label for="justification" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Business Justification *</label>
+                                <label for="justification"
+                                    class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Business
+                                    Justification *</label>
                                 <textarea id="justification" name="justification" required rows="5"
-                                          placeholder="Explain why this change is needed and its business impact"
-                                          class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 leading-relaxed focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
+                                    placeholder="Explain why this change is needed and its business impact"
+                                    class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 leading-relaxed focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
                             </div>
 
                             <div>
-                                <label for="benefits" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Expected Benefits *</label>
+                                <label for="benefits"
+                                    class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Expected
+                                    Benefits *</label>
                                 <textarea id="benefits" name="benefits" required rows="5"
-                                          placeholder="Describe the expected benefits and outcomes"
-                                          class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 leading-relaxed focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
+                                    placeholder="Describe the expected benefits and outcomes"
+                                    class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 leading-relaxed focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all resize-none"></textarea>
                             </div>
 
                             <div>
-                                <label for="priority" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Priority Level *</label>
+                                <label for="priority"
+                                    class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Priority
+                                    Level *</label>
                                 <select id="priority" name="priority" required
-                                        class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
+                                    class="h-12 w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-base font-medium text-slate-900 focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-visionRed outline-none transition-all">
                                     <option value="">Select priority</option>
                                     <option value="High">High - Urgent, critical business impact</option>
                                     <option value="Medium">Medium - Important but not urgent</option>
@@ -237,12 +318,12 @@
                             </div>
 
                             <div class="flex gap-3 pt-4 border-t border-slate-200">
-                                <button type="button" onclick="previousStep(1)" 
-                                        class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 flex items-center gap-2 min-h-[48px]">
+                                <button type="button" onclick="previousStep(1)"
+                                    class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 flex items-center gap-2 min-h-[48px]">
                                     <i class="ph ph-arrow-left text-xl"></i> Back
                                 </button>
-                                <button type="button" onclick="nextStep(3)" 
-                                        class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
+                                <button type="button" onclick="nextStep(3)"
+                                    class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
                                     Next: Confirmation <i class="ph ph-arrow-right text-xl"></i>
                                 </button>
                             </div>
@@ -251,14 +332,18 @@
                         <!-- Step 3: Confirmation -->
                         <div class="form-step" id="formStep3">
                             <div>
-                                <label class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Supporting Documents (Optional)</label>
-                                <div onclick="document.getElementById('fileInput').click()" 
-                                     class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-visionRed hover:bg-red-50/30 transition-all">
+                                <label
+                                    class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Supporting
+                                    Documents (Optional)</label>
+                                <div onclick="document.getElementById('fileInput').click()"
+                                    class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-visionRed hover:bg-red-50/30 transition-all">
                                     <input type="file" id="fileInput" multiple class="hidden"
-                                           onchange="handleFileUpload(this)" accept=".pdf,.doc,.docx,.xls,.xlsx">
+                                        onchange="handleFileUpload(this)" accept=".pdf,.doc,.docx,.xls,.xlsx">
                                     <i class="ph ph-upload-simple text-5xl text-slate-400 mb-3"></i>
-                                    <p class="text-slate-700 font-semibold text-base">Click to upload files or drag and drop</p>
-                                    <p class="text-base text-slate-500 mt-2 leading-relaxed">PDF, Word, Excel files accepted</p>
+                                    <p class="text-slate-700 font-semibold text-base">Click to upload files or drag and
+                                        drop</p>
+                                    <p class="text-base text-slate-500 mt-2 leading-relaxed">PDF, Word, Excel files
+                                        accepted</p>
                                 </div>
                                 <div id="fileList" class="mt-3"></div>
                             </div>
@@ -267,16 +352,18 @@
                                 <h4 class="font-bold text-slate-800 text-base mb-2 flex items-center gap-2">
                                     <i class="ph ph-info text-blue-600 text-xl"></i> Review Your Request
                                 </h4>
-                                <p class="text-base text-slate-700 leading-relaxed">Please review all information before submitting. Once submitted, your request will be sent to your Head of Department for approval.</p>
+                                <p class="text-base text-slate-700 leading-relaxed">Please review all information before
+                                    submitting. Once submitted, your request will be sent to your Head of Department for
+                                    approval.</p>
                             </div>
 
                             <div class="flex gap-3 pt-4 border-t border-slate-200">
-                                <button type="button" onclick="previousStep(2)" 
-                                        class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 flex items-center gap-2 min-h-[48px]">
+                                <button type="button" onclick="previousStep(2)"
+                                    class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 flex items-center gap-2 min-h-[48px]">
                                     <i class="ph ph-arrow-left text-xl"></i> Back
                                 </button>
                                 <button type="submit" id="submitBtn"
-                                        class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
+                                    class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
                                     <i class="ph ph-paper-plane-tilt text-xl"></i> Submit Request
                                 </button>
                             </div>
@@ -296,7 +383,7 @@
     <script>
         let currentStep = 1;
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const user = checkAuth();
             if (!user) return;
 
@@ -319,7 +406,7 @@
         function populateChangeTypes() {
             const select = document.getElementById('type');
             const types = API.getChangeTypes();
-            
+
             types.forEach(type => {
                 const option = document.createElement('option');
                 option.value = type;
@@ -331,7 +418,7 @@
         function populateDepartments() {
             const select = document.getElementById('department');
             const departments = API.getDepartments();
-            
+
             departments.forEach(dept => {
                 const option = document.createElement('option');
                 option.value = dept;
@@ -363,15 +450,15 @@
 
             // Hide current step
             document.getElementById(`formStep${currentStep}`).classList.remove('active');
-            
+
             // Show next step
             document.getElementById(`formStep${step}`).classList.add('active');
-            
+
             // Update stepper UI
             updateStepper(step);
-            
+
             currentStep = step;
-            
+
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -379,15 +466,15 @@
         function previousStep(step) {
             // Hide current step
             document.getElementById(`formStep${currentStep}`).classList.remove('active');
-            
+
             // Show previous step
             document.getElementById(`formStep${step}`).classList.add('active');
-            
+
             // Update stepper UI
             updateStepper(step);
-            
+
             currentStep = step;
-            
+
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -397,7 +484,7 @@
             for (let i = 1; i <= 3; i++) {
                 const circle = document.getElementById(`step${i}Circle`);
                 const connector = document.getElementById(`connector${i}`);
-                
+
                 if (i < activeStep) {
                     // Completed step
                     circle.className = 'w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xl mb-2 transition-all';
@@ -431,7 +518,7 @@
             setTimeout(() => {
                 const user = getCurrentUser();
                 const formData = new FormData(e.target);
-                
+
                 const requestData = {
                     title: formData.get('title'),
                     type: formData.get('type'),
@@ -473,4 +560,5 @@
         }
     </script>
 </body>
+
 </html>

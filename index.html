@@ -1,40 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Vision Group CMS</title>
     <link rel="icon" type="image/png" href="images/favicon.png">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        visionRed: '#CF2E2E',
-                        visionBlack: '#0F172A',
-                        visionGray: '#F8FAFC',
-                        muted: '#F1F5F9',
-                        border: '#E2E8F0',
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="css/output.css">
 
-    <style>
-        .fade-in { animation: fadeIn 0.6s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
+
 <body class="bg-visionGray min-h-screen flex items-center justify-center font-sans antialiased">
 
     <div class="w-full max-w-md px-6 fade-in">
@@ -49,23 +30,30 @@
 
             <form id="loginForm" class="p-8 space-y-6">
                 <div>
-                    <label for="username" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Username</label>
-                    <input type="text" id="username" name="username" required 
-                           placeholder="Enter your username"
-                           class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
+                    <label for="username"
+                        class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username"
+                        class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
                 </div>
 
                 <div>
-                    <label for="password" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Password</label>
-                    <input type="password" id="password" name="password" required 
-                           placeholder="Enter your password"
-                           class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
+                    <label for="password"
+                        class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required placeholder="Enter your password"
+                            class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
+                        <button type="button" id="togglePassword"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-visionRed transition-colors">
+                            <i class="ph ph-eye text-xl"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div>
-                    <label for="role" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Login As</label>
+                    <label for="role" class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Login
+                        As</label>
                     <select id="role" name="role" required
-                            class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
+                        class="h-12 w-full rounded-md border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-visionRed focus:bg-white transition-all">
                         <option value="">Select Role</option>
                         <option value="staff">Staff Member</option>
                         <option value="hod">Head of Department</option>
@@ -74,8 +62,8 @@
                     </select>
                 </div>
 
-                <button type="submit" 
-                        class="w-full bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-md shadow-md transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
+                <button type="submit"
+                    class="w-full bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-md shadow-md transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-in text-xl"></i> Login
                 </button>
             </form>
@@ -87,5 +75,18 @@
     </div>
 
     <script src="js/auth.js"></script>
+    <script>
+        // Password visibility toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = togglePassword.querySelector('i');
+
+        togglePassword.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleIcon.className = isPassword ? 'ph ph-eye-slash text-xl' : 'ph ph-eye text-xl';
+        });
+    </script>
 </body>
+
 </html>

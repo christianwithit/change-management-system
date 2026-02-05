@@ -1,53 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports | Vision Group CMS</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        visionRed: '#CF2E2E',
-                        visionBlack: '#0F172A',
-                        visionGray: '#F8FAFC',
-                        muted: '#F1F5F9',
-                        border: '#E2E8F0',
-                    }
-                }
-            }
-        }
-    </script>
-    
+    <link rel="stylesheet" href="../css/output.css">
+
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media print {
-            aside, header button { display: none !important; }
-            main { margin-left: 0 !important; }
+
+            aside,
+            header button {
+                display: none !important;
+            }
+
+            main {
+                margin-left: 0 !important;
+            }
         }
     </style>
 </head>
+
 <body class="bg-visionGray text-gray-800 font-sans antialiased">
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <aside class="w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300">
+    <div class="flex h-screen overflow-hidden bg-gray-50">
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
+            onclick="toggleMobileSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside
+            class="sidebar w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
             <div class="h-20 flex items-center px-6 border-b border-slate-800">
                 <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
-                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo" class="w-full h-full object-contain">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo"
+                        class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
@@ -56,28 +70,34 @@
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                <a href="dashboard.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-squares-four text-xl mr-3"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="submit-request.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="submit-request.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-plus-circle text-xl mr-3"></i>
                     <span>Submit Request</span>
                 </a>
-                <a href="my-requests.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                <a href="my-requests.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-clipboard-text text-xl mr-3"></i>
                     <span>My Requests</span>
                 </a>
 
-                <a href="approvals.html" id="approvalsLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                <a href="approvals.html" id="approvalsLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
                     <i class="ph ph-check-circle text-xl mr-3"></i>
                     <span>Approvals</span>
                 </a>
-                <a href="it-review.html" id="itReviewLink" class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                <a href="it-review.html" id="itReviewLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
                     <i class="ph ph-wrench text-xl mr-3"></i>
                     <span>IT Review</span>
                 </a>
-                <a href="reports.html" class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-2 border-visionRed transition-all">
+                <a href="reports.html"
+                    class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-2 border-visionRed transition-all">
                     <i class="ph ph-chart-line-up text-xl mr-3"></i>
                     <span class="font-medium">Reports</span>
                 </a>
@@ -85,7 +105,8 @@
 
             <div class="p-4 border-t border-slate-800">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
                         U
                     </div>
                     <div class="overflow-hidden">
@@ -93,24 +114,36 @@
                         <p class="text-sm text-slate-400">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                <button onclick="logout()"
+                    class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 ml-64 p-8 overflow-y-auto h-full">
-            
-            <header class="flex justify-between items-center mb-8 fade-in">
-                <div>
-                    <h2 class="text-2xl font-bold text-visionBlack">Reports & Analytics</h2>
-                    <p class="text-gray-500 text-sm mt-1">Comprehensive insights and data analysis.</p>
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 ml-0 p-4 md:p-8 overflow-y-auto h-full w-full">
+
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Toggle Button -->
+                    <button onclick="toggleMobileSidebar()"
+                        class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-visionBlack">Reports & Analytics</h2>
+                        <p class="text-gray-500 text-sm mt-1">Comprehensive insights and data analysis.</p>
+                    </div>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="window.print()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
+                    <button onclick="window.print()"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
                         <i class="ph ph-printer"></i> Print
                     </button>
-                    <button onclick="exportReport()" class="bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-medium">
+                    <button onclick="exportReport()"
+                        class="bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-medium">
                         <i class="ph ph-download-simple"></i> Export Report
                     </button>
                 </div>
@@ -123,18 +156,18 @@
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <select id="reportType" onchange="generateReport()"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
                             <option value="overview">Overview Summary</option>
                             <option value="department">By Department</option>
                             <option value="status">By Status</option>
                             <option value="timeline">Timeline Analysis</option>
                         </select>
                         <input type="date" id="dateFrom" onchange="generateReport()"
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
                         <input type="date" id="dateTo" onchange="generateReport()"
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
                         <select id="departmentFilter" onchange="generateReport()"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
                             <option value="">All Departments</option>
                         </select>
                     </div>
@@ -147,7 +180,8 @@
                         <p class="text-gray-500 text-sm font-medium">Total Requests</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportTotal">0</h3>
                     </div>
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl">
+                    <div
+                        class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl">
                         <i class="ph ph-files"></i>
                     </div>
                 </div>
@@ -157,7 +191,8 @@
                         <p class="text-gray-500 text-sm font-medium">Completed</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportCompleted">0</h3>
                     </div>
-                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl">
+                    <div
+                        class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl">
                         <i class="ph ph-check-circle"></i>
                     </div>
                 </div>
@@ -167,7 +202,8 @@
                         <p class="text-gray-500 text-sm font-medium">In Progress</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportProgress">0</h3>
                     </div>
-                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xl">
+                    <div
+                        class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xl">
                         <i class="ph ph-gear-six"></i>
                     </div>
                 </div>
@@ -177,7 +213,8 @@
                         <p class="text-gray-500 text-sm font-medium">Pending</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1" id="reportPending">0</h3>
                     </div>
-                    <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-xl">
+                    <div
+                        class="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-xl">
                         <i class="ph ph-hourglass-high"></i>
                     </div>
                 </div>
@@ -210,7 +247,8 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full" id="reportTable">
-                        <thead class="bg-gray-50 text-xs text-gray-500 uppercase font-semibold tracking-wider text-left">
+                        <thead
+                            class="bg-gray-50 text-xs text-gray-500 uppercase font-semibold tracking-wider text-left">
                             <tr>
                                 <th class="px-6 py-4">Request ID</th>
                                 <th class="px-6 py-4">Title</th>
@@ -248,7 +286,7 @@
     <script src="../js/utils.js"></script>
     <script src="../js/app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const user = checkAuth();
             if (!user) return;
 
@@ -263,7 +301,7 @@
 
             const today = new Date();
             const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
-            
+
             document.getElementById('dateTo').valueAsDate = today;
             document.getElementById('dateFrom').valueAsDate = thirtyDaysAgo;
 
@@ -274,7 +312,7 @@
         function populateDepartmentFilter() {
             const select = document.getElementById('departmentFilter');
             const departments = API.getDepartments();
-            
+
             departments.forEach(dept => {
                 const option = document.createElement('option');
                 option.value = dept;
@@ -327,16 +365,16 @@
 
         function initializeAdditionalCharts() {
             const allRequests = API.getRequests();
-            
+
             // Calculate monthly trends for the last 6 months
             const monthlyData = calculateMonthlyTrends(allRequests);
-            
+
             // Calculate status distribution
             const statusData = calculateStatusDistribution(allRequests);
-            
+
             // Trend Chart - Curved Line Chart
             const trendCtx = document.getElementById('trendChart').getContext('2d');
-            
+
             trendChart = new Chart(trendCtx, {
                 type: 'line',
                 data: {
@@ -438,7 +476,7 @@
 
             // Status Pill Chart
             const statusCtx = document.getElementById('statusChartPill').getContext('2d');
-            
+
             statusChartPill = new Chart(statusCtx, {
                 type: 'bar',
                 data: {
@@ -514,19 +552,19 @@
         function calculateMonthlyTrends(requests) {
             const months = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
             const monthValues = ['2025-09', '2025-10', '2025-11', '2025-12', '2026-01', '2026-02'];
-            
+
             const submitted = monthValues.map(month => {
                 return requests.filter(r => r.dateSubmitted.startsWith(month)).length;
             });
-            
+
             const completed = monthValues.map(month => {
-                return requests.filter(r => 
-                    r.status === 'Completed' && 
-                    r.acknowledgmentDate && 
+                return requests.filter(r =>
+                    r.status === 'Completed' &&
+                    r.acknowledgmentDate &&
                     r.acknowledgmentDate.startsWith(month)
                 ).length;
             });
-            
+
             return { labels: months, submitted, completed };
         }
 
@@ -539,13 +577,13 @@
                 'Completed': { count: 0, color: '#22C55E', label: 'Completed' },
                 'Rejected': { count: 0, color: '#ef4444', label: 'Rejected' }
             };
-            
+
             requests.forEach(r => {
                 if (statusMap[r.status]) {
                     statusMap[r.status].count++;
                 }
             });
-            
+
             // Aggregate similar statuses
             const aggregated = {
                 'Pending': statusMap['Pending HOD Approval'].count + statusMap['Clarification Needed'].count,
@@ -554,9 +592,9 @@
                 'Completed': statusMap['Completed'].count,
                 'Rejected': statusMap['Rejected'].count
             };
-            
+
             const colors = ['#f59e0b', '#6366F1', '#8b5cf6', '#22C55E', '#ef4444'];
-            
+
             return {
                 labels: Object.keys(aggregated),
                 counts: Object.values(aggregated),
@@ -680,21 +718,19 @@
                     <td class="px-6 py-4 text-gray-700">${request.department}</td>
                     <td class="px-6 py-4 text-gray-600 text-sm">${request.type}</td>
                     <td class="px-6 py-4">
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                            request.priority === 'High' ? 'bg-red-100 text-red-700' :
-                            request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-blue-100 text-blue-700'
-                        }">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${request.priority === 'High' ? 'bg-red-100 text-red-700' :
+                    request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-blue-100 text-blue-700'
+                }">
                             ${request.priority}
                         </span>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                            request.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                            request.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                            request.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${request.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                    request.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                        request.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
                             'bg-orange-100 text-orange-700'
-                        }">
+                }">
                             ${request.status}
                         </span>
                     </td>
@@ -705,7 +741,7 @@
 
         function updateDepartmentBreakdown(requests) {
             const container = document.getElementById('departmentBreakdown');
-            
+
             const deptCounts = {};
             requests.forEach(r => {
                 deptCounts[r.department] = (deptCounts[r.department] || 0) + 1;
@@ -721,8 +757,8 @@
             container.innerHTML = `
                 <div class="space-y-4">
                     ${sortedDepts.map(([dept, count]) => {
-                        const percentage = ((count / requests.length) * 100).toFixed(1);
-                        return `
+                const percentage = ((count / requests.length) * 100).toFixed(1);
+                return `
                             <div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="font-medium text-gray-800">${dept}</span>
@@ -733,7 +769,7 @@
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
             `;
         }
@@ -758,4 +794,5 @@
         }
     </script>
 </body>
+
 </html>

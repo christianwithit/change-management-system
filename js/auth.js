@@ -1,15 +1,15 @@
 // Authentication handling
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('loginForm');
-    
+
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
-            
+
             // Mock authentication - In production, this would call an API
             if (username && password && role) {
                 // Store user session
@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     department: role === 'hod' ? 'IT Department' : 'General',
                     loginTime: new Date().toISOString()
                 };
-                
+
                 localStorage.setItem('currentUser', JSON.stringify(user));
-                
+
                 // Redirect to dashboard
                 window.location.href = 'pages/dashboard.html';
             } else {
