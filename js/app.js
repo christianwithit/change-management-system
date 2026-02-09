@@ -12,7 +12,91 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Set active navigation
     setActiveNav();
+    
+    // Update user info in sidebar
+    updateUserInfo();
 });
+
+// Initialize page with user authentication and role-based access
+function initializePage() {
+    const user = getCurrentUser();
+    if (!user) return;
+    
+    updateUserInfo();
+    updateNavigationVisibility(user);
+}
+
+// Update user information in sidebar
+function updateUserInfo() {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    // Update user name
+    const userNameElements = document.querySelectorAll('#sidebarUserName, #userName');
+    userNameElements.forEach(el => {
+        if (el) el.textContent = user.fullName;
+    });
+
+    // Update user initial
+    const userInitialElements = document.querySelectorAll('#sidebarUserInitial, #userInitials');
+    userInitialElements.forEach(el => {
+        if (el) el.textContent = user.fullName.charAt(0).toUpperCase();
+    });
+
+    // Update user role with proper display name
+    const roleDisplayName = getRoleDisplayName(user.role);
+    const userRoleElements = document.querySelectorAll('#sidebarUserRole, #userRole');
+    userRoleElements.forEach(el => {
+        if (el) el.textContent = roleDisplayName;
+    });
+
+    // Update user department
+    const userDeptElements = document.querySelectorAll('#userDept');
+    userDeptElements.forEach(el => {
+        if (el) el.textContent = user.department;
+    });
+}
+
+// Get display name for user role
+function getRoleDisplayName(role) {
+    const roleNames = {
+        'staff': 'Staff Member',
+        'hod': 'Head of Department',
+        'it': 'IT Administrator',
+        'admin': 'System Administrator'
+    };
+    return roleNames[role] || 'User';
+}
+
+// Update navigation visibility based on user role
+function updateNavigationVisibility(user) {
+    // Show Review Requests for HOD
+    const hodReviewLink = document.getElementById('hodReviewLink');
+    if (hodReviewLink) {
+        if (user.role === 'hod') {
+            hodReviewLink.classList.remove('hidden');
+            hodReviewLink.style.display = 'flex';
+        }
+    }
+
+    // Show IT Review for IT and Admin
+    const itReviewLink = document.getElementById('itReviewLink');
+    if (itReviewLink) {
+        if (user.role === 'it' || user.role === 'admin') {
+            itReviewLink.classList.remove('hidden');
+            itReviewLink.style.display = 'flex';
+        }
+    }
+
+    // Show Reports for HOD, IT, and Admin
+    const reportsLink = document.getElementById('reportsLink');
+    if (reportsLink) {
+        if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
+            reportsLink.classList.remove('hidden');
+            reportsLink.style.display = 'flex';
+        }
+    }
+}
 
 // Mobile sidebar functionality
 function initializeMobileSidebar() {

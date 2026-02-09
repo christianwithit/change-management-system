@@ -102,18 +102,18 @@
                     <span class="text-base">My Requests</span>
                 </a>
 
-                <a href="approvals.html" id="approvalsLink"
+                <a href="hod-review.html" id="hodReviewLink"
                     class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
-                    <i class="ph ph-check-circle text-2xl mr-3"></i>
-                    <span class="text-base">Approvals</span>
+                    <i class="ph ph-check-square text-2xl mr-3"></i>
+                    <span class="text-base">Review Requests</span>
                 </a>
                 <a href="it-review.html" id="itReviewLink"
                     class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
                     <i class="ph ph-wrench text-2xl mr-3"></i>
                     <span class="text-base">IT Review</span>
                 </a>
-                <a href="reports.html"
-                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group min-h-[48px]">
+                <a href="reports.html" id="reportsLink"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
                     <i class="ph ph-chart-line-up text-2xl mr-3"></i>
                     <span class="text-base">Reports</span>
                 </a>
@@ -122,12 +122,12 @@
             <div class="p-4 border-t border-slate-800">
                 <div class="flex items-center gap-3 mb-4">
                     <div
-                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold" id="sidebarUserInitial">
                         U
                     </div>
                     <div class="overflow-hidden">
-                        <p class="text-base font-semibold truncate">User Name</p>
-                        <p class="text-sm text-slate-400">Staff Member</p>
+                        <p class="text-base font-semibold truncate" id="sidebarUserName">User Name</p>
+                        <p class="text-sm text-slate-400" id="sidebarUserRole">Staff Member</p>
                     </div>
                 </div>
                 <button onclick="logout()"
@@ -254,9 +254,23 @@
                 const user = checkAuth();
                 if (!user) return; // Redirects handled in auth.js
 
-                // Role Logic
-                if (user.role !== 'hod') document.getElementById('approvalsLink').classList.add('hidden');
-                if (user.role !== 'it' && user.role !== 'admin') document.getElementById('itReviewLink').classList.add('hidden');
+                // Update user info in sidebar
+                document.getElementById('sidebarUserName').textContent = user.fullName;
+                document.getElementById('sidebarUserInitial').textContent = user.fullName.charAt(0).toUpperCase();
+                document.getElementById('sidebarUserRole').textContent = user.role === 'hod' ? 'Head of Department' : 
+                                                                          user.role === 'it' ? 'IT Administrator' :
+                                                                          user.role === 'admin' ? 'System Administrator' : 'Staff Member';
+
+                // Role Logic - Show/hide navigation based on role
+                if (user.role === 'hod') {
+                    document.getElementById('hodReviewLink').classList.remove('hidden');
+                }
+                if (user.role === 'it' || user.role === 'admin') {
+                    document.getElementById('itReviewLink').classList.remove('hidden');
+                }
+                if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
+                    document.getElementById('reportsLink').classList.remove('hidden');
+                }
 
                 // Load Data
                 if (typeof loadStatistics === 'function') loadStatistics();

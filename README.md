@@ -14,6 +14,36 @@ A modern, responsive web application for managing organizational change requests
 
 ---
 
+## � Recent Updates
+
+### Version 2.0 - Enhanced Role Management (February 2026)
+
+**New Features:**
+- ✅ **Review Requests Page**: Comprehensive HOD interface for managing department requests
+  - Multiple action options (clarify, accept, reject, mark as existing)
+  - Advanced filtering by status, priority, and staff member
+  - Department-specific view (HODs only see their department)
+  - Real-time statistics dashboard
+- ✅ **Centralized User Info**: Consistent user information display across all pages
+  - Automatic role display (Staff Member, Head of Department, IT Administrator, System Administrator)
+  - User initials in avatar circle
+  - Department information
+- ✅ **Enhanced Access Control**: 
+  - IT Review page restricted to IT personnel and Admin only
+  - Reports page accessible to HOD, IT, and Admin only
+  - Role-based navigation visibility
+- ✅ **Improved Navigation**: Dynamic menu items based on user role
+- ✅ **Better UX**: Renamed "HOD Review" to "Review Requests" for clarity
+
+**Technical Improvements:**
+- Centralized user info management in `app.js`
+- Consistent ID naming across all pages
+- Improved role-based routing and access control
+- Enhanced mock data with 150+ test requests
+- Better code organization and maintainability
+
+---
+
 ## 🎯 Overview
 
 The **Vision Group Change Management System (CMS)** is a full-featured web application designed to streamline the change request workflow within organizations. Built with modern web technologies and a mobile-first approach, it provides an intuitive interface for submitting, reviewing, approving, and tracking change requests across departments.
@@ -34,20 +64,30 @@ The **Vision Group Change Management System (CMS)** is a full-featured web appli
 ### 🔐 Authentication & Authorization
 - Multi-role login system (Staff, HOD, IT, Admin)
 - Mock authentication for demonstration purposes
-- Session-based access control
+- Session-based access control with localStorage
 - Role-specific navigation and features
+- Automatic user info display across all pages
+- Dynamic role-based UI updates
 
 ### 📋 Request Management
 - **Submit Requests**: 3-step wizard for creating change requests
 - **My Requests**: Personal dashboard for tracking submitted requests
-- **Approvals**: HOD-specific interface for reviewing department requests
-- **IT Review**: Technical assessment and implementation tracking
+- **Review Requests**: Department head interface for reviewing staff requests with multiple action options
+  - Ask for clarification from staff members
+  - Accept requests (forwards to IT review)
+  - Reject requests with reasons
+  - Mark as "Already in Development"
+  - Mark as "Already in Use"
+  - Department-specific filtering (HODs only see their department)
+  - Advanced filtering by status, priority, and staff member
+- **IT Review**: Technical assessment and implementation tracking (IT/Admin only)
 
 ### 📊 Analytics & Reporting
 - Visual dashboards with Chart.js integration
 - Status distribution charts and trend analysis
 - Exportable reports in CSV format
 - Department-wise breakdown and metrics
+- Role-based report access (HOD, IT, Admin only)
 
 ### 📱 Mobile Experience
 - Responsive sidebar with smooth slide-in animations
@@ -61,6 +101,8 @@ The **Vision Group Change Management System (CMS)** is a full-featured web appli
 - Phosphor Icons for consistent iconography
 - Smooth transitions and micro-animations
 - Dark sidebar with glassmorphism effects
+- Consistent user info display across all pages
+- Role-based navigation visibility
 
 ---
 
@@ -108,13 +150,14 @@ CMS/
 │   └── vision-group-logo.png
 ├── js/
 │   ├── api.js             # API abstraction layer
-│   ├── app.js             # Main application logic
+│   ├── app.js             # Main application logic & user info management
 │   ├── auth.js            # Authentication utilities
-│   ├── mock-data.js       # Mock backend data
+│   ├── hod-review.js      # Review Requests page logic
+│   ├── mock-data.js       # Mock backend data (150 requests)
 │   └── utils.js           # Helper functions
 ├── pages/
-│   ├── approvals.html     # HOD approval interface
 │   ├── dashboard.html     # Main dashboard
+│   ├── hod-review.html    # Review requests interface
 │   ├── it-review.html     # IT review interface
 │   ├── my-requests.html   # User's requests
 │   ├── reports.html       # Analytics & reporting
@@ -174,10 +217,44 @@ CMS/
 
 | Role | Username | Password | Access Level |
 |------|----------|----------|--------------|
-| Staff | `staff` | `password` | Submit requests, view own requests |
-| HOD | `hod` | `password` | Approve department requests |
-| IT | `it` | `password` | Review technical implementations |
-| Admin | `admin` | `password` | Full system access |
+| Staff | `staff` | `staff123` | Submit requests, view own requests |
+| HOD | `hod` | `hod123` | Review department requests, view reports |
+| IT | `it` | `it123` | Review technical implementations, view reports |
+| Admin | `admin` | `admin123` | Full system access, view reports |
+
+### Role-Based Access
+
+**Staff Member:**
+- ✅ Dashboard
+- ✅ Submit Request
+- ✅ My Requests
+- ❌ Review Requests (HOD only)
+- ❌ IT Review (IT/Admin only)
+- ❌ Reports (HOD/IT/Admin only)
+
+**Head of Department (HOD):**
+- ✅ Dashboard
+- ✅ Submit Request
+- ✅ My Requests
+- ✅ Review Requests (department-specific)
+- ❌ IT Review (IT/Admin only)
+- ✅ Reports
+
+**IT Administrator:**
+- ✅ Dashboard
+- ✅ Submit Request
+- ✅ My Requests
+- ❌ Review Requests (HOD only)
+- ✅ IT Review
+- ✅ Reports
+
+**System Administrator:**
+- ✅ Dashboard
+- ✅ Submit Request
+- ✅ My Requests
+- ❌ Review Requests (HOD only)
+- ✅ IT Review
+- ✅ Reports
 
 ### Workflow
 
@@ -188,19 +265,28 @@ CMS/
    - Track request status in "My Requests"
 
 2. **Head of Department**:
-   - Review pending requests in "Approvals"
-   - Approve or reject with comments
-   - View department analytics
+   - Review pending requests in "Review Requests"
+   - Take multiple actions:
+     - Ask staff for clarification
+     - Accept and forward to IT
+     - Reject with reason
+     - Mark as already in development or in use
+   - View department-specific requests only
+   - Filter by status, priority, and staff member
+   - Track approval statistics
+   - Access reports and analytics
 
 3. **IT Department**:
    - Access "IT Review" for approved requests
    - Update implementation status
    - Manage technical assessments
+   - Access reports and analytics
 
 4. **Admin**:
-   - Access all features
+   - Access IT Review features
    - View comprehensive reports
    - Export data for analysis
+   - Full system visibility
 
 ---
 

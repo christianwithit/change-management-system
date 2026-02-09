@@ -86,10 +86,10 @@
                     <span>My Requests</span>
                 </a>
 
-                <a href="approvals.html" id="approvalsLink"
+                <a href="hod-review.html" id="hodReviewLink"
                     class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
-                    <i class="ph ph-check-circle text-xl mr-3"></i>
-                    <span>Approvals</span>
+                    <i class="ph ph-check-square text-xl mr-3"></i>
+                    <span>Review Requests</span>
                 </a>
                 <a href="it-review.html" id="itReviewLink"
                     class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
@@ -105,13 +105,13 @@
 
             <div class="p-4 border-t border-slate-800">
                 <div class="flex items-center gap-3 mb-4">
-                    <div
+                    <div id="sidebarUserInitial"
                         class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
                         U
                     </div>
                     <div class="overflow-hidden">
-                        <p class="text-base font-semibold truncate">User Name</p>
-                        <p class="text-sm text-slate-400">Staff Member</p>
+                        <p class="text-base font-semibold truncate" id="sidebarUserName">User Name</p>
+                        <p class="text-sm text-slate-400" id="sidebarUserRole">Staff Member</p>
                     </div>
                 </div>
                 <button onclick="logout()"
@@ -290,11 +290,19 @@
             const user = checkAuth();
             if (!user) return;
 
-            if (user.role !== 'hod') {
-                document.getElementById('approvalsLink').style.display = 'none';
+            // Check if user has access to reports (HOD, IT, or Admin only)
+            if (user.role !== 'hod' && user.role !== 'it' && user.role !== 'admin') {
+                alert('Access denied. This page is only for HODs, IT personnel, and Administrators.');
+                window.location.href = 'dashboard.html';
+                return;
             }
-            if (user.role !== 'it' && user.role !== 'admin') {
-                document.getElementById('itReviewLink').style.display = 'none';
+
+            // Show navigation links based on role
+            if (user.role === 'hod') {
+                document.getElementById('hodReviewLink').style.display = 'flex';
+            }
+            if (user.role === 'it' || user.role === 'admin') {
+                document.getElementById('itReviewLink').style.display = 'flex';
             }
 
             populateDepartmentFilter();
