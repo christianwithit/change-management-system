@@ -44,6 +44,11 @@ const API = {
             trainingConducted: false,
             completionReportGenerated: false,
             
+            // Timeline Data (NEW - for warning system)
+            timelineStartDate: '2026-02-01',
+            timelineDuration: 12,
+            timelineDeadline: '2026-02-12', // Due in 2 days - should show warning
+            
             // Solution Review & Acknowledgment
             solutionDelivered: false,
             acknowledgmentStatus: 'Pending', // Pending, Acknowledged
@@ -115,8 +120,8 @@ const API = {
             dateSubmitted: '2026-01-25',
             
             // Workflow Status
-            status: 'Technical Review',
-            workflowStage: 'Technical Review',
+            status: 'Development',
+            workflowStage: 'Development',
             
             // HOD Review
             hodApproval: 'Approved',
@@ -126,23 +131,28 @@ const API = {
             clarificationNotes: null,
             
             // Technical Review
-            itStatus: 'Under Review',
-            itDecision: null,
-            itReviewDate: null,
-            feasibilityNotes: 'Evaluating barcode scanner options and integration requirements',
+            itStatus: 'Accepted',
+            itDecision: 'Accepted',
+            itReviewDate: '2026-01-27',
+            feasibilityNotes: 'Feasible - barcode scanner integration approved',
             
             // Methodology & Development
-            methodology: null,
-            deliverables: null,
-            estimatedTime: null,
-            estimatedCost: null,
-            risks: null,
+            methodology: 'Integrate barcode scanners with inventory system',
+            deliverables: 'Scanner integration, mobile app, training',
+            estimatedTime: '3 weeks',
+            estimatedCost: '3,000,000 UGX',
+            risks: 'Hardware compatibility - mitigated by testing',
             
             // Development Progress
-            developmentStatus: 'Not Started',
+            developmentStatus: 'Development',
             documentationUploaded: false,
             trainingConducted: false,
             completionReportGenerated: false,
+            
+            // Timeline Data (NEW - OVERDUE)
+            timelineStartDate: '2026-02-01',
+            timelineDuration: 7,
+            timelineDeadline: '2026-02-07', // 3 days overdue - should show critical warning
             
             // Solution Review & Acknowledgment
             solutionDelivered: false,

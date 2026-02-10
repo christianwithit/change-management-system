@@ -16,6 +16,38 @@ A modern, responsive web application for managing organizational change requests
 
 ## � Recent Updates
 
+### Version 2.1 - Advanced Timeline Features (February 2026)
+
+**New Timeline Capabilities:**
+- ✅ **Grid-Based Timeline Layout**: Pills stretch across dates with precise CSS Grid alignment
+  - Dynamic grid columns based on project date ranges
+  - Pills span exact grid columns matching their start/end dates
+  - Low-opacity status colors with solid 4px left borders
+  - Start/end dates displayed inside pills with icons
+- ✅ **Zoom Levels**: Three view modes for different planning horizons
+  - **Day View**: 100px columns for detailed daily tracking (1-2 months)
+  - **Week View**: 120px columns showing week numbers (2-6 months)
+  - **Month View**: 150px columns for quarterly planning (6+ months)
+  - Reduces horizontal scrolling by up to 90%
+- ✅ **Smart Filters**: Real-time filtering to focus on what matters
+  - Filter by Overdue, Due Soon (72 hours), or On Track
+  - Instant filtering without page reload
+  - Visual feedback when no tasks match filters
+- ✅ **Collapsible Groups**: Organize projects by category
+  - Group by Department, Status, Priority, or None
+  - Click headers to expand/collapse with smooth animations
+  - Project count badges per group
+  - Reduces vertical clutter significantly
+- ✅ **Event Delegation**: Efficient click handling with `data-project-id` attributes
+- ✅ **Smooth Hover Effects**: Pills scale and lift with enhanced shadows
+
+**Technical Improvements:**
+- CSS Grid with `repeat(N, minmax(100px, 1fr))` for perfect alignment
+- Grid column calculation: `grid-column: start / end` syntax
+- Zoom-aware date range calculation (day/week/month units)
+- Filter logic applied before rendering for optimal performance
+- Grouping with smooth CSS transitions
+
 ### Version 2.0 - Enhanced Role Management (February 2026)
 
 **New Features:**
@@ -39,7 +71,7 @@ A modern, responsive web application for managing organizational change requests
 - Centralized user info management in `app.js`
 - Consistent ID naming across all pages
 - Improved role-based routing and access control
-- Enhanced mock data with 150+ test requests
+- Enhanced mock data with 146 test requests
 - Better code organization and maintainability
 
 ---
@@ -81,6 +113,14 @@ The **Vision Group Change Management System (CMS)** is a full-featured web appli
   - Department-specific filtering (HODs only see their department)
   - Advanced filtering by status, priority, and staff member
 - **IT Review**: Technical assessment and implementation tracking (IT/Admin only)
+- **Development Projects**: Comprehensive project management with advanced timeline
+  - Visual timeline with grid-based layout
+  - Three zoom levels (Day/Week/Month views)
+  - Smart filters (Overdue/Due Soon/On Track)
+  - Collapsible grouping (Department/Status/Priority)
+  - Task scheduling with start dates and deadlines
+  - Development logs and milestone tracking
+  - Status updates and progress monitoring
 
 ### 📊 Analytics & Reporting
 - Visual dashboards with Chart.js integration
@@ -151,12 +191,22 @@ CMS/
 ├── js/
 │   ├── api.js             # API abstraction layer
 │   ├── app.js             # Main application logic & user info management
+│   ├── approvals.js       # Approvals page logic
 │   ├── auth.js            # Authentication utilities
+│   ├── dashboard.js       # Dashboard page logic
+│   ├── development.js     # Development projects & timeline
 │   ├── hod-review.js      # Review Requests page logic
-│   ├── mock-data.js       # Mock backend data (150 requests)
+│   ├── it-review.js       # IT review page logic
+│   ├── mock-data.js       # Mock backend data (146 requests)
+│   ├── my-requests.js     # My requests page logic
+│   ├── reports.js         # Reports page logic
+│   ├── request-detail.js  # Request detail page logic
+│   ├── submit-request.js  # Submit request wizard logic
 │   └── utils.js           # Helper functions
 ├── pages/
+│   ├── approvals.html     # Approvals interface
 │   ├── dashboard.html     # Main dashboard
+│   ├── development.html   # Development projects & timeline
 │   ├── hod-review.html    # Review requests interface
 │   ├── it-review.html     # IT review interface
 │   ├── my-requests.html   # User's requests
@@ -168,6 +218,8 @@ CMS/
 ├── index.html             # Login page
 ├── package.json           # Dependencies & scripts
 ├── tailwind.config.js     # Tailwind configuration
+├── DUE_DATE_WARNING_SYSTEM.md
+├── WARNING_SYSTEM_VISUAL_GUIDE.md
 └── README.md
 ```
 
@@ -246,6 +298,7 @@ CMS/
 - ✅ My Requests
 - ❌ Review Requests (HOD only)
 - ✅ IT Review
+- ✅ Development Projects (with advanced timeline)
 - ✅ Reports
 
 **System Administrator:**
@@ -254,6 +307,7 @@ CMS/
 - ✅ My Requests
 - ❌ Review Requests (HOD only)
 - ✅ IT Review
+- ✅ Development Projects (with advanced timeline)
 - ✅ Reports
 
 ### Workflow
@@ -280,10 +334,18 @@ CMS/
    - Access "IT Review" for approved requests
    - Update implementation status
    - Manage technical assessments
+   - Navigate to "Development Projects" for active work
+   - Use timeline zoom levels (Day/Week/Month) to view projects
+   - Filter timeline by urgency (Overdue/Due Soon/On Track)
+   - Group projects by Department, Status, or Priority
+   - Accept tasks and set start dates/deadlines
+   - Track development logs and milestones
+   - Update project status and progress
    - Access reports and analytics
 
 4. **Admin**:
    - Access IT Review features
+   - Access Development Projects with full timeline capabilities
    - View comprehensive reports
    - Export data for analysis
    - Full system visibility

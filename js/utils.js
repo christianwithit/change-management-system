@@ -294,6 +294,91 @@ function updateUserInfo(user) {
     }
 }
 
+// Check for due date warnings/notifications
+window.checkDueDateNotifications = function() {
+    const user = window.getCurrentUser();
+    if (!user || (user.role !== 'it' && user.role !== 'admin')) return [];
+    
+    const projects = window.API.getRequests().filter(r => 
+        r.timelineDeadline && r.developmentStatus !== 'Completed'
+    );
+    
+    const warnings = [];
+    const today = new Date('2026-02-10'); // Current date from system
+    
+    projects.forEach(project => {
+        const deadline = new Date(project.timelineDeadline);
+        const daysUntil = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntil < 0) {
+            warnings.push({
+                type: 'overdue',
+                severity: 'critical',
+                project: project,
+                daysUntil: daysUntil,
+                message: `${Math.abs(daysUntil)} day${Math.abs(daysUntil) !== 1 ? 's' : ''} overdue`
+            });
+        } else if (daysUntil <= 3) {
+            warnings.push({
+                type: 'due-soon',
+                severity: daysUntil === 0 ? 'high' : 'medium',
+                project: project,
+                daysUntil: daysUntil,
+                message: daysUntil === 0 ? 'Due TODAY' : `Due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`
+            });
+        }
+    });
+    
+    // Sort by severity: overdue first, then by days until due
+    warnings.sort((a, b) => {
+        if (a.severity === 'critical' && b.severity !== 'critical') return -1;
+        if (a.severity !== 'critical' && b.severity === 'critical') return 1;
+        return a.daysUntil - b.daysUntil;
+    });
+    
+    return warnings;
+};
+
+// Get warning status for a specific task (for timeline pills)
+window.getTaskWarningStatus = function(deadline) {
+    if (!deadline) return { status: 'none', text: '', color: 'green', icon: 'ph-check-circle' };
+    
+    const today = new Date('2026-02-10');
+    const dueDate = new Date(deadline);
+    const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntil < 0) {
+        return { 
+            status: 'overdue', 
+            text: `${Math.abs(daysUntil)} DAY${Math.abs(daysUntil) !== 1 ? 'S' : ''} OVERDUE`, 
+            color: 'red',
+            icon: 'ph-x-circle'
+        };
+    }
+    if (daysUntil === 0) {
+        return { 
+            status: 'warning', 
+            text: 'DUE TODAY', 
+            color: 'yellow',
+            icon: 'ph-warning-circle'
+        };
+    }
+    if (daysUntil <= 3) {
+        return { 
+            status: 'warning', 
+            text: `DUE IN ${daysUntil} DAY${daysUntil !== 1 ? 'S' : ''}`, 
+            color: 'yellow',
+            icon: 'ph-warning-circle'
+        };
+    }
+    return { 
+        status: 'on-track', 
+        text: '', 
+        color: 'green',
+        icon: 'ph-check-circle'
+    };
+};
+
 // Export functions
 window.utils = {
     formatDate,

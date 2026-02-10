@@ -48,6 +48,245 @@
         .tab {
             cursor: pointer;
         }
+
+        /* Timeline Styles - Grid-Based Layout */
+        .timeline-container {
+            position: relative;
+            overflow-x: auto;
+            overflow-y: visible;
+        }
+
+        .timeline-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .timeline-container::-webkit-scrollbar-track {
+            background: #f3f4f6;
+            border-radius: 4px;
+        }
+
+        .timeline-container::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 4px;
+        }
+
+        .timeline-container::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        .timeline-header-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            border-bottom: 2px solid #e5e7eb;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .timeline-label-col {
+            padding: 12px;
+            font-weight: 600;
+            border-right: 2px solid #e5e7eb;
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 21;
+        }
+
+        .timeline-calendar-col {
+            display: grid;
+            position: relative;
+        }
+
+        .timeline-day-marker {
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 11px;
+            border-right: 1px solid #f3f4f6;
+        }
+
+        .timeline-day-marker.today {
+            background: rgba(220, 38, 38, 0.05);
+            font-weight: 700;
+            color: #dc2626;
+        }
+
+        .timeline-task-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            border-bottom: 1px solid #f3f4f6;
+            min-height: 90px;
+            position: relative;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .timeline-task-row:hover {
+            background: #f9fafb;
+        }
+
+        .timeline-task-info {
+            padding: 12px;
+            border-right: 2px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .timeline-task-row:hover .timeline-task-info {
+            background: #f9fafb;
+        }
+
+        .timeline-task-canvas {
+            position: relative;
+            padding: 25px 0;
+            display: grid;
+        }
+
+        .timeline-day-column {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            border-right: 1px solid #f9fafb;
+        }
+
+        .timeline-day-column.today {
+            background: rgba(220, 38, 38, 0.05);
+            border-right: 2px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .timeline-pill {
+            height: 48px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            align-self: center;
+        }
+
+        .timeline-pill-start,
+        .timeline-pill-end {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .timeline-pill-center {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .timeline-pill:hover {
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .timeline-pill.status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            color: #065f46;
+        }
+
+        .timeline-pill.status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+
+        .timeline-pill.status-overdue {
+            background: rgba(220, 38, 38, 0.1);
+            border-left: 4px solid #dc2626;
+            color: #991b1b;
+        }
+
+        /* Timeline Group Headers */
+        .timeline-group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .timeline-group-header:hover {
+            background: #f3f4f6;
+        }
+
+        .timeline-group-header i {
+            transition: transform 0.2s;
+        }
+
+        .timeline-group-header.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .timeline-group-content {
+            max-height: 5000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+        .timeline-group-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .timeline-action-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 200px;
+            overflow: hidden;
+        }
+
+        .timeline-action-menu button {
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .timeline-action-menu button:hover {
+            background: #f3f4f6;
+        }
+
+        .timeline-action-menu button:not(:last-child) {
+            border-bottom: 1px solid #f3f4f6;
+        }
     </style>
 </head>
 
@@ -247,7 +486,7 @@
             </div>
 
             <!-- Tabs -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
+            <div id="development-container" class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
                 <div class="border-b border-gray-100 flex">
                     <div class="tab px-6 py-4 font-medium text-visionRed border-b-2 border-visionRed"
                         data-action="switch-tab" data-tab="active">
@@ -261,11 +500,74 @@
                         data-action="switch-tab" data-tab="all">
                         All Projects
                     </div>
+                    <div class="tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
+                        data-action="switch-tab" data-tab="timeline">
+                        Timeline
+                    </div>
+                </div>
+
+                <!-- Timeline Controls (shown only in timeline view) -->
+                <div id="timeline-controls" class="hidden border-b border-gray-100 p-4 bg-gray-50">
+                    <div class="flex flex-wrap gap-4 items-center justify-between">
+                        <!-- Zoom Level Controls -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-semibold text-gray-700">View:</span>
+                            <div class="inline-flex rounded-lg border border-gray-300 bg-white">
+                                <button data-action="set-zoom" data-zoom="day"
+                                    class="zoom-btn px-4 py-2 text-sm font-medium text-white bg-visionRed rounded-l-lg transition-colors">
+                                    Day
+                                </button>
+                                <button data-action="set-zoom" data-zoom="week"
+                                    class="zoom-btn px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors border-l border-gray-300">
+                                    Week
+                                </button>
+                                <button data-action="set-zoom" data-zoom="month"
+                                    class="zoom-btn px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors border-l border-gray-300 rounded-r-lg">
+                                    Month
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Smart Filters -->
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-sm font-semibold text-gray-700">Show:</span>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" data-timeline-filter="overdue" checked
+                                    class="w-4 h-4 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                                <span class="text-sm text-gray-700">Overdue</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" data-timeline-filter="due-soon" checked
+                                    class="w-4 h-4 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                                <span class="text-sm text-gray-700">Due Soon</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" data-timeline-filter="on-track" checked
+                                    class="w-4 h-4 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                                <span class="text-sm text-gray-700">On Track</span>
+                            </label>
+                        </div>
+
+                        <!-- Group By -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-semibold text-gray-700">Group by:</span>
+                            <select id="timeline-group-by"
+                                class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-visionRed focus:outline-none bg-white">
+                                <option value="none">None</option>
+                                <option value="department">Department</option>
+                                <option value="status">Status</option>
+                                <option value="priority">Priority</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="p-6">
                     <div id="projectsList" class="space-y-4">
                         <!-- Populated by JavaScript -->
+                    </div>
+                    <div id="timeline-view" class="hidden">
+                        <!-- Timeline view populated by JavaScript -->
                     </div>
                 </div>
             </div>
@@ -320,6 +622,54 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Accept Task Modal -->
+    <div id="acceptTaskModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Accept Task & Schedule</h3>
+                <button data-action="close-modal" data-modal="acceptTaskModal"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div id="acceptTaskProjectInfo"></div>
+
+                <div>
+                    <label for="taskStartDate" class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
+                    <input type="date" id="taskStartDate" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label for="taskDuration" class="block text-sm font-medium text-gray-700 mb-2">Estimated Duration (days) *</label>
+                    <input type="number" id="taskDuration" min="1" required placeholder="e.g., 14"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                </div>
+
+                <div id="calculatedDeadline" class="bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
+                    <p class="text-sm text-gray-600">Calculated Deadline:</p>
+                    <p class="text-lg font-bold text-gray-800" id="deadlineDisplay"></p>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end bg-gray-50/50">
+                <button data-action="close-modal" data-modal="acceptTaskModal"
+                    class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all border border-gray-200">
+                    Cancel
+                </button>
+                <button data-action="submit-accept-task"
+                    class="px-6 py-2.5 bg-visionRed hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                    Accept Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Action Menu -->
+    <div id="timelineActionMenu" class="timeline-action-menu hidden">
+        <!-- Populated by JavaScript -->
     </div>
 
     <!-- Development Logs Modal -->

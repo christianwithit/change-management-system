@@ -6,6 +6,15 @@ let allProjects = [];
 let filteredProjects = [];
 let currentProject = null;
 
+// Timeline state
+let timelineZoom = 'day'; // 'day', 'week', 'month'
+let timelineFilters = {
+    overdue: true,
+    'due-soon': true,
+    'on-track': true
+};
+let timelineGroupBy = 'none'; // 'none', 'department', 'status', 'priority'
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', function () {
     const user = checkAuth();
@@ -42,6 +51,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Initialize event listeners
 function initializeEventListeners() {
+    // Use event delegation on the main container
+    const container = document.getElementById('development-container');
+    if (container) {
+        container.addEventListener('click', handleContainerClick);
+    }
+
+    // Timeline rows delegation
+    document.addEventListener('click', handleTimelineClick);
+
     document.addEventListener('click', handleDocumentClick);
 
     // Filter change handlers
@@ -49,10 +67,70 @@ function initializeEventListeners() {
     document.getElementById('filterDepartment').addEventListener('change', applyFilters);
     document.getElementById('filterPriority').addEventListener('change', applyFilters);
 
+    // Calculate deadline on input change
+    const startDateInput = document.getElementById('taskStartDate');
+    const durationInput = document.getElementById('taskDuration');
+    if (startDateInput) startDateInput.addEventListener('change', calculateDeadline);
+    if (durationInput) durationInput.addEventListener('input', calculateDeadline);
+
     // Overlay click
     const overlay = document.querySelector('.sidebar-overlay');
     if (overlay) {
         overlay.addEventListener('click', closeMobileSidebar);
+    }
+}
+
+// Handle timeline clicks (event delegation)
+function handleTimelineClick(e) {
+    const pillElement = e.target.closest('[data-project-id]');
+    
+    if (pillElement && pillElement.classList.contains('timeline-pill')) {
+        const projectId = pillElement.dataset.projectId;
+        showTimelineActionMenu(projectId, e);
+        return;
+    }
+
+    // Close action menu if clicking outside
+    const actionMenu = document.getElementById('timelineActionMenu');
+    if (actionMenu && !actionMenu.contains(e.target)) {
+        actionMenu.classList.add('hidden');
+    }
+}
+
+// Handle clicks within the development container (event delegation)
+function handleContainerClick(e) {
+    const target = e.target.closest('[data-action]');
+    if (!target) {
+        // Check if clicking on timeline task bar
+        if (e.target.closest('.timeline-task-bar')) {
+            const taskBar = e.target.closest('.timeline-task-bar');
+            showTimelinePopover(taskBar.dataset.projectId, e);
+            return;
+        }
+        return;
+    }
+
+    const action = target.dataset.action;
+
+    switch(action) {
+        case 'switch-tab':
+            switchTab(target.dataset.tab);
+            break;
+        case 'view-project-detail':
+            viewProjectDetail(target.dataset.projectId);
+            break;
+        case 'open-update-status-modal':
+            openUpdateStatusModal(target.dataset.projectId);
+            break;
+        case 'open-milestones-modal':
+            openMilestonesModal(target.dataset.projectId);
+            break;
+        case 'open-logs-modal':
+            openLogsModal(target.dataset.projectId);
+            break;
+        case 'open-accept-task-modal':
+            openAcceptTaskModal(target.dataset.projectId);
+            break;
     }
 }
 
@@ -109,6 +187,62 @@ function handleDocumentClick(e) {
         case 'submit-log-entry':
             submitLogEntry();
             break;
+        case 'submit-accept-task':
+            submitAcceptTask();
+            break;
+        case 'set-zoom':
+            setTimelineZoom(target.dataset.zoom);
+            break;
+        case 'toggle-timeline-group':
+            toggleTimelineGroup(target.dataset.groupId);
+            break;
+    }
+}
+
+// Timeline zoom control
+function setTimelineZoom(zoom) {
+    timelineZoom = zoom;
+    
+    // Update button styles
+    document.querySelectorAll('.zoom-btn').forEach(btn => {
+        if (btn.dataset.zoom === zoom) {
+            btn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+            btn.classList.add('text-white', 'bg-visionRed');
+        } else {
+            btn.classList.remove('text-white', 'bg-visionRed');
+            btn.classList.add('text-gray-700', 'hover:bg-gray-100');
+        }
+    });
+    
+    renderTimeline();
+}
+
+// Timeline filter change handler
+function handleTimelineFilterChange() {
+    document.querySelectorAll('[data-timeline-filter]').forEach(checkbox => {
+        const filter = checkbox.dataset.timelineFilter;
+        timelineFilters[filter] = checkbox.checked;
+    });
+    renderTimeline();
+}
+
+// Timeline group by change handler
+function handleTimelineGroupByChange() {
+    const select = document.getElementById('timeline-group-by');
+    if (select) {
+        timelineGroupBy = select.value;
+        renderTimeline();
+    }
+}
+
+// Toggle timeline group
+function toggleTimelineGroup(groupId) {
+    const header = document.querySelector(`[data-group-id="${groupId}"]`);
+    const content = document.getElementById(`group-content-${groupId}`);
+    
+    if (header && content) {
+        header.classList.toggle('collapsed');
+        content.classList.toggle('collapsed');
     }
 }
 
@@ -254,7 +388,33 @@ function switchTab(tab) {
         activeTab.classList.add('text-visionRed', 'border-b-2', 'border-visionRed');
     }
 
-    displayProjects();
+    // Show/hide appropriate view
+    const projectsList = document.getElementById('projectsList');
+    const timelineView = document.getElementById('timeline-view');
+    const timelineControls = document.getElementById('timeline-controls');
+
+    if (tab === 'timeline') {
+        projectsList.classList.add('hidden');
+        timelineView.classList.remove('hidden');
+        if (timelineControls) timelineControls.classList.remove('hidden');
+        
+        // Add event listeners for timeline controls
+        document.querySelectorAll('[data-timeline-filter]').forEach(checkbox => {
+            checkbox.addEventListener('change', handleTimelineFilterChange);
+        });
+        
+        const groupBySelect = document.getElementById('timeline-group-by');
+        if (groupBySelect) {
+            groupBySelect.addEventListener('change', handleTimelineGroupByChange);
+        }
+        
+        renderTimeline();
+    } else {
+        projectsList.classList.remove('hidden');
+        timelineView.classList.add('hidden');
+        if (timelineControls) timelineControls.classList.add('hidden');
+        displayProjects();
+    }
 }
 
 // Display projects
@@ -376,6 +536,12 @@ function displayProjects() {
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
                         <i class="ph ph-clock-clockwise"></i> View Logs
                     </button>
+                    ${!project.timelineStartDate ? `
+                    <button data-action="open-accept-task-modal" data-project-id="${project.id}"
+                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
+                        <i class="ph ph-check-circle"></i> Accept Task
+                    </button>
+                    ` : ''}
                     <button data-action="open-update-status-modal" data-project-id="${project.id}"
                             class="px-4 py-2 bg-visionRed hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
                         <i class="ph ph-arrows-clockwise"></i> Update Status
@@ -851,4 +1017,620 @@ function submitLogEntry() {
 
     // Refresh logs display
     displayLogs(currentProject.id);
+}
+
+// ============ TIMELINE FUNCTIONALITY ============
+
+// Render timeline view with grid-based layout
+function renderTimeline() {
+    const timelineView = document.getElementById('timeline-view');
+    
+    // Get projects with timeline data (accepted tasks)
+    let timelineProjects = filteredProjects.filter(p => 
+        p.timelineStartDate && p.timelineDuration
+    );
+
+    if (timelineProjects.length === 0) {
+        timelineView.innerHTML = `
+            <div class="text-center py-12">
+                <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="ph ph-calendar-blank"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">No scheduled tasks</h3>
+                <p class="text-gray-500">Accept tasks to see them on the timeline</p>
+            </div>
+        `;
+        return;
+    }
+
+    const today = new Date('2026-02-10');
+    today.setHours(0, 0, 0, 0);
+
+    // Apply timeline filters
+    timelineProjects = timelineProjects.filter(project => {
+        const deadline = new Date(project.timelineDeadline);
+        deadline.setHours(0, 0, 0, 0);
+        const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilDeadline < 0 && !timelineFilters.overdue) return false;
+        if (daysUntilDeadline >= 0 && daysUntilDeadline <= 3 && !timelineFilters['due-soon']) return false;
+        if (daysUntilDeadline > 3 && !timelineFilters['on-track']) return false;
+        
+        return true;
+    });
+
+    if (timelineProjects.length === 0) {
+        timelineView.innerHTML = `
+            <div class="text-center py-12">
+                <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="ph ph-filter"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">No tasks match filters</h3>
+                <p class="text-gray-500">Adjust your filters to see more tasks</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Check for warnings
+    const warnings = window.checkDueDateNotifications();
+    const timelineWarnings = warnings.filter(w => 
+        timelineProjects.some(p => p.id === w.project.id)
+    );
+
+    // Group projects if needed
+    const groupedProjects = groupTimelineProjects(timelineProjects);
+
+    // Calculate date range based on zoom level
+    const dateRange = calculateDateRange(timelineProjects, timelineZoom);
+    const { dates, totalUnits } = dateRange;
+
+    // Build timeline HTML
+    let html = '';
+    
+    // Add warning banner if there are warnings
+    if (timelineWarnings.length > 0) {
+        const criticalCount = timelineWarnings.filter(w => w.severity === 'critical').length;
+        html += `
+            <div class="bg-amber-50 border-l-4 border-amber-500 rounded-lg shadow-sm p-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="ph ph-warning text-xl text-amber-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-base font-bold text-slate-900">
+                            ${timelineWarnings.length} Task${timelineWarnings.length !== 1 ? 's' : ''} Need${timelineWarnings.length === 1 ? 's' : ''} Attention
+                        </h3>
+                        <p class="text-sm text-slate-700 mt-1">
+                            ${criticalCount > 0 ? `${criticalCount} overdue, ` : ''}${timelineWarnings.length - criticalCount} due soon
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += '<div class="timeline-container">';
+    
+    // Header row with dates - using CSS Grid
+    const gridCols = `repeat(${totalUnits}, minmax(${getColumnWidth()}, 1fr))`;
+    html += '<div class="timeline-header-row">';
+    html += '<div class="timeline-label-col">Project</div>';
+    html += `<div class="timeline-calendar-col" style="grid-template-columns: ${gridCols};">`;
+    
+    html += renderTimelineHeader(dates);
+    
+    html += '</div></div>';
+
+    // Task rows with grouping
+    html += '<div id="timeline-rows">';
+    
+    if (timelineGroupBy === 'none') {
+        html += renderTimelineProjects(timelineProjects, dates, totalUnits, gridCols, today);
+    } else {
+        Object.keys(groupedProjects).forEach((groupName, index) => {
+            const groupId = `group-${index}`;
+            const projects = groupedProjects[groupName];
+            
+            html += `
+                <div class="timeline-group-header" data-action="toggle-timeline-group" data-group-id="${groupId}">
+                    <i class="ph ph-caret-down text-lg"></i>
+                    <span>${groupName}</span>
+                    <span class="text-sm text-gray-500">(${projects.length})</span>
+                </div>
+                <div id="group-content-${groupId}" class="timeline-group-content">
+                    ${renderTimelineProjects(projects, dates, totalUnits, gridCols, today)}
+                </div>
+            `;
+        });
+    }
+    
+    html += '</div></div>';
+    timelineView.innerHTML = html;
+}
+
+// Group timeline projects
+function groupTimelineProjects(projects) {
+    if (timelineGroupBy === 'none') {
+        return { 'All Projects': projects };
+    }
+    
+    const grouped = {};
+    
+    projects.forEach(project => {
+        let groupKey;
+        
+        switch(timelineGroupBy) {
+            case 'department':
+                groupKey = project.department || 'Unknown';
+                break;
+            case 'status':
+                groupKey = project.developmentStatus || 'Unknown';
+                break;
+            case 'priority':
+                groupKey = project.priority || 'Unknown';
+                break;
+            default:
+                groupKey = 'All Projects';
+        }
+        
+        if (!grouped[groupKey]) {
+            grouped[groupKey] = [];
+        }
+        grouped[groupKey].push(project);
+    });
+    
+    return grouped;
+}
+
+// Calculate date range based on zoom level
+function calculateDateRange(projects, zoom) {
+    let earliestDate = null;
+    let latestDate = null;
+    
+    projects.forEach(project => {
+        const startDate = new Date(project.timelineStartDate);
+        const endDate = new Date(project.timelineDeadline);
+        
+        if (!earliestDate || startDate < earliestDate) {
+            earliestDate = new Date(startDate);
+        }
+        if (!latestDate || endDate > latestDate) {
+            latestDate = new Date(endDate);
+        }
+    });
+    
+    // Add buffer
+    latestDate.setDate(latestDate.getDate() + 7);
+    
+    const dates = [];
+    let totalUnits = 0;
+    
+    if (zoom === 'day') {
+        const currentDate = new Date(earliestDate);
+        while (currentDate <= latestDate) {
+            dates.push(new Date(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
+            totalUnits++;
+        }
+    } else if (zoom === 'week') {
+        // Start from beginning of week
+        const currentDate = new Date(earliestDate);
+        currentDate.setDate(currentDate.getDate() - currentDate.getDay());
+        
+        while (currentDate <= latestDate) {
+            dates.push(new Date(currentDate));
+            currentDate.setDate(currentDate.getDate() + 7);
+            totalUnits++;
+        }
+    } else if (zoom === 'month') {
+        // Start from beginning of month
+        const currentDate = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
+        
+        while (currentDate <= latestDate) {
+            dates.push(new Date(currentDate));
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            totalUnits++;
+        }
+    }
+    
+    return { dates, totalUnits, earliestDate, latestDate };
+}
+
+// Get column width based on zoom
+function getColumnWidth() {
+    switch(timelineZoom) {
+        case 'day': return '100px';
+        case 'week': return '120px';
+        case 'month': return '150px';
+        default: return '100px';
+    }
+}
+
+// Render timeline header
+function renderTimelineHeader(dates) {
+    const today = new Date('2026-02-10');
+    today.setHours(0, 0, 0, 0);
+    
+    let html = '';
+    
+    dates.forEach(date => {
+        let isToday = false;
+        let label = '';
+        
+        if (timelineZoom === 'day') {
+            isToday = date.toDateString() === today.toDateString();
+            const dayNum = date.getDate();
+            const monthShort = date.toLocaleDateString('en-US', { month: 'short' });
+            label = `<div class="text-xs text-gray-500">${monthShort}</div><div class="font-semibold">${dayNum}</div>`;
+        } else if (timelineZoom === 'week') {
+            const weekEnd = new Date(date);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            isToday = today >= date && today <= weekEnd;
+            const weekNum = getWeekNumber(date);
+            const monthShort = date.toLocaleDateString('en-US', { month: 'short' });
+            label = `<div class="text-xs text-gray-500">${monthShort}</div><div class="font-semibold">W${weekNum}</div>`;
+        } else if (timelineZoom === 'month') {
+            isToday = date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+            const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+            const year = date.getFullYear();
+            label = `<div class="font-semibold">${monthName}</div><div class="text-xs text-gray-500">${year}</div>`;
+        }
+        
+        html += `<div class="timeline-day-marker ${isToday ? 'today' : ''}">${label}</div>`;
+    });
+    
+    return html;
+}
+
+// Get week number
+function getWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// Render timeline projects
+function renderTimelineProjects(projects, dates, totalUnits, gridCols, today) {
+    let html = '';
+    
+    projects.forEach(project => {
+        const startDate = new Date(project.timelineStartDate);
+        const deadline = new Date(project.timelineDeadline);
+        
+        // Calculate grid column positions based on zoom
+        const { gridColumnStart, gridColumnEnd } = calculateGridPosition(
+            startDate, deadline, dates, timelineZoom
+        );
+        
+        // Determine status color and get warning info
+        const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+        const statusClass = getTimelineStatusClassByDays(daysUntilDeadline);
+        const statusIcon = getTimelineStatusIcon(statusClass);
+        
+        // Get warning status for badge
+        const warning = window.getTaskWarningStatus(project.timelineDeadline);
+        
+        html += `
+            <div class="timeline-task-row">
+                <div class="timeline-task-info">
+                    <div class="font-semibold text-sm text-gray-800 truncate">${project.title}</div>
+                    <div class="text-xs text-gray-500 mt-1">${project.id}</div>
+                    <div class="text-xs text-gray-600 mt-1">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusClass(project.developmentStatus)}">
+                            ${project.developmentStatus}
+                        </span>
+                    </div>
+                </div>
+                <div class="timeline-task-canvas" style="grid-template-columns: ${gridCols};">
+                    ${generateDayColumnsForGrid(dates, today, totalUnits)}
+                    <div class="timeline-pill ${statusClass}" 
+                         data-project-id="${project.id}"
+                         style="grid-column: ${gridColumnStart} / ${gridColumnEnd};">
+                        <div class="timeline-pill-start">
+                            <i class="ph ph-play-circle text-base"></i>
+                            <span class="font-medium">${formatShortDate(startDate)}</span>
+                        </div>
+                        <div class="timeline-pill-center">
+                            <i class="ph ${statusIcon} text-base"></i>
+                            ${warning.text ? `<span class="text-xs font-bold ml-2">• ${warning.text}</span>` : ''}
+                        </div>
+                        <div class="timeline-pill-end">
+                            <span class="font-medium">${formatShortDate(deadline)}</span>
+                            <i class="ph ph-flag-checkered text-base"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    return html;
+}
+
+// Calculate grid position based on zoom level
+function calculateGridPosition(startDate, endDate, dates, zoom) {
+    let gridColumnStart = 1;
+    let gridColumnEnd = 2;
+    
+    if (zoom === 'day') {
+        const earliestDate = dates[0];
+        const startDayIndex = Math.floor((startDate - earliestDate) / (1000 * 60 * 60 * 24));
+        const endDayIndex = Math.floor((endDate - earliestDate) / (1000 * 60 * 60 * 24));
+        gridColumnStart = startDayIndex + 1;
+        gridColumnEnd = endDayIndex + 2;
+    } else if (zoom === 'week') {
+        // Find which week the start and end dates fall into
+        for (let i = 0; i < dates.length; i++) {
+            const weekStart = dates[i];
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            
+            if (startDate >= weekStart && startDate <= weekEnd && gridColumnStart === 1) {
+                gridColumnStart = i + 1;
+            }
+            if (endDate >= weekStart && endDate <= weekEnd) {
+                gridColumnEnd = i + 2;
+                break;
+            }
+        }
+    } else if (zoom === 'month') {
+        // Find which month the start and end dates fall into
+        for (let i = 0; i < dates.length; i++) {
+            const monthStart = dates[i];
+            const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
+            
+            if (startDate >= monthStart && startDate <= monthEnd && gridColumnStart === 1) {
+                gridColumnStart = i + 1;
+            }
+            if (endDate >= monthStart && endDate <= monthEnd) {
+                gridColumnEnd = i + 2;
+                break;
+            }
+        }
+    }
+    
+    return { gridColumnStart, gridColumnEnd };
+}
+
+// Generate day columns for grid layout with "today" highlight
+function generateDayColumnsForGrid(dates, today, totalDays) {
+    let html = '';
+    
+    dates.forEach((date, index) => {
+        const isToday = date.toDateString() === today.toDateString();
+        // Grid columns are 1-indexed
+        const gridColumn = index + 1;
+        html += `<div class="timeline-day-column ${isToday ? 'today' : ''}" style="grid-column: ${gridColumn};"></div>`;
+    });
+    return html;
+}
+
+// Generate day columns for date range with "today" highlight
+function generateDayColumnsForDateRange(dates, today) {
+    let html = '';
+    const totalDays = dates.length;
+    
+    dates.forEach((date, index) => {
+        const isToday = date.toDateString() === today.toDateString();
+        const leftPercent = (index / totalDays) * 100;
+        const widthPercent = (1 / totalDays) * 100;
+        html += `<div class="timeline-day-column ${isToday ? 'today' : ''}" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>`;
+    });
+    return html;
+}
+
+// Get timeline status class based on days until deadline
+function getTimelineStatusClassByDays(daysUntilDeadline) {
+    if (daysUntilDeadline < 0) {
+        return 'status-overdue'; // Red - Overdue
+    } else if (daysUntilDeadline <= 3) {
+        return 'status-warning'; // Amber - Due within 72 hours
+    } else {
+        return 'status-success'; // Emerald - On track
+    }
+}
+
+// Generate day columns with "today" highlight (legacy - kept for compatibility)
+function generateDayColumns(daysInMonth, currentDay) {
+    let html = '';
+    for (let day = 1; day <= daysInMonth; day++) {
+        const isToday = day === currentDay;
+        const leftPercent = ((day - 1) / daysInMonth) * 100;
+        html += `<div class="timeline-day-column ${isToday ? 'today' : ''}" style="left: ${leftPercent}%;"></div>`;
+    }
+    return html;
+}
+
+// Get timeline status class based on deadline (legacy - kept for compatibility)
+function getTimelineStatusClass(project, currentDay, deadlineDay) {
+    const daysUntilDeadline = deadlineDay - currentDay;
+    return getTimelineStatusClassByDays(daysUntilDeadline);
+}
+
+// Get status icon
+function getTimelineStatusIcon(statusClass) {
+    const icons = {
+        'status-success': 'ph-check-circle',
+        'status-warning': 'ph-warning-circle',
+        'status-overdue': 'ph-x-circle'
+    };
+    return icons[statusClass] || 'ph-circle';
+}
+
+// Format date for pill display
+function formatShortDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// Show timeline action menu
+function showTimelineActionMenu(projectId, event) {
+    const project = allProjects.find(p => p.id === projectId);
+    if (!project) return;
+
+    const menu = document.getElementById('timelineActionMenu');
+    
+    menu.innerHTML = `
+        <button data-action="open-update-status-modal" data-project-id="${projectId}">
+            <i class="ph ph-arrows-clockwise text-lg"></i>
+            <span>Update Progress</span>
+        </button>
+        <button data-action="open-accept-task-modal" data-project-id="${projectId}">
+            <i class="ph ph-calendar-dots text-lg"></i>
+            <span>Edit Dates</span>
+        </button>
+        <button data-action="view-project-detail" data-project-id="${projectId}">
+            <i class="ph ph-eye text-lg"></i>
+            <span>View Details</span>
+        </button>
+    `;
+
+    // Position menu near cursor
+    menu.style.left = `${event.clientX + 10}px`;
+    menu.style.top = `${event.clientY + 10}px`;
+    
+    menu.classList.remove('hidden');
+
+    // Prevent immediate close
+    event.stopPropagation();
+}
+
+// Get timeline status color based on deadline (legacy function for compatibility)
+function getTimelineStatusColor(project, currentDate) {
+    const deadline = new Date(project.timelineDeadline);
+    const today = new Date(currentDate);
+    today.setHours(0, 0, 0, 0);
+    deadline.setHours(0, 0, 0, 0);
+
+    const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+
+    if (daysUntilDeadline < 0) {
+        return 'red';
+    } else if (daysUntilDeadline <= 3) {
+        return 'yellow';
+    } else {
+        return 'green';
+    }
+}
+
+// Show timeline popover (legacy - replaced by action menu)
+function showTimelinePopover(projectId, event) {
+    showTimelineActionMenu(projectId, event);
+}
+
+// Timeline drag functionality (removed - simplified design)
+let dragState = {
+    isDragging: false,
+    projectId: null,
+    startX: 0,
+    originalDuration: 0
+};
+
+function handleTimelineDragStart(e) {
+    // Removed drag functionality for cleaner design
+}
+
+function handleTimelineDrag(e) {
+    // Removed drag functionality for cleaner design
+}
+
+function handleTimelineDragEnd(e) {
+    // Removed drag functionality for cleaner design
+}
+
+// Open accept task modal
+function openAcceptTaskModal(projectId) {
+    currentProject = allProjects.find(p => p.id === projectId);
+    if (!currentProject) return;
+
+    const modalInfo = document.getElementById('acceptTaskProjectInfo');
+    modalInfo.innerHTML = `
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p class="text-sm text-gray-600 mb-1">Project ID: <strong class="text-gray-800">${currentProject.id}</strong></p>
+            <p class="font-bold text-gray-800">${currentProject.title}</p>
+        </div>
+    `;
+
+    // Set default start date to today
+    const today = new Date('2026-02-10');
+    document.getElementById('taskStartDate').value = today.toISOString().split('T')[0];
+    document.getElementById('taskStartDate').min = today.toISOString().split('T')[0];
+    document.getElementById('taskDuration').value = '';
+    document.getElementById('calculatedDeadline').classList.add('hidden');
+
+    const modal = document.getElementById('acceptTaskModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+// Calculate deadline
+function calculateDeadline() {
+    const startDate = document.getElementById('taskStartDate').value;
+    const duration = parseInt(document.getElementById('taskDuration').value);
+
+    if (startDate && duration > 0) {
+        const start = new Date(startDate);
+        const deadline = new Date(start);
+        deadline.setDate(start.getDate() + duration - 1);
+
+        document.getElementById('deadlineDisplay').textContent = deadline.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        document.getElementById('calculatedDeadline').classList.remove('hidden');
+    } else {
+        document.getElementById('calculatedDeadline').classList.add('hidden');
+    }
+}
+
+// Submit accept task
+function submitAcceptTask() {
+    if (!currentProject) return;
+
+    const startDate = document.getElementById('taskStartDate').value;
+    const duration = parseInt(document.getElementById('taskDuration').value);
+
+    if (!startDate) {
+        utils.showAlert('Please select a start date', 'warning');
+        return;
+    }
+
+    if (!duration || duration < 1) {
+        utils.showAlert('Please enter a valid duration', 'warning');
+        return;
+    }
+
+    // Calculate deadline
+    const start = new Date(startDate);
+    const deadline = new Date(start);
+    deadline.setDate(start.getDate() + duration - 1);
+
+    // Update project with timeline data
+    API.updateRequest(currentProject.id, {
+        timelineStartDate: startDate,
+        timelineDuration: duration,
+        timelineDeadline: deadline.toISOString().split('T')[0],
+        developmentStatus: 'Development',
+        developmentStartDate: startDate
+    });
+
+    // Add log entry
+    API.addDevelopmentLog(currentProject.id, {
+        logType: 'Milestone',
+        remarks: `Task accepted and scheduled. Start: ${startDate}, Duration: ${duration} days, Deadline: ${deadline.toISOString().split('T')[0]}`,
+        daysSinceStart: 0
+    });
+
+    utils.showAlert('Task accepted and scheduled successfully', 'success');
+    closeModal('acceptTaskModal');
+
+    setTimeout(() => {
+        loadProjects();
+        switchTab('timeline');
+    }, 500);
 }

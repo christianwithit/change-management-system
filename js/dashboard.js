@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', function () {
     loadStatistics();
     loadQuickActions(user.role);
     loadRecentRequests();
+    
+    // Check for due date warnings (IT/Admin only)
+    if (user.role === 'it' || user.role === 'admin') {
+        showDueDateWarnings();
+    }
 });
 
 // Initialize all event listeners using event delegation
@@ -298,3 +303,39 @@ function loadRecentRequests() {
         `;
     }).join('');
 }
+
+// Show due date warnings for IT/Admin
+function showDueDateWarnings() {
+    const warnings = window.checkDueDateNotifications();
+    
+    if (warnings.length === 0) return;
+    
+    // Show toast notification
+    const criticalCount = warnings.filter(w => w.severity === 'critical').length;
+    const message = criticalCount > 0 
+        ? `🔴 ${criticalCount} overdue task${criticalCount > 1 ? 's' : ''} + ${warnings.length - criticalCount} due soon`
+        : `⚠️ ${warnings.length} task${warnings.length > 1 ? 's' : ''} need attention`;
+    
+    window.showToast(message, 'warning');
+    
+    // Show warning card on dashboard
+    const container = document.getElementById('dueDateWarnings');
+    const list = document.getElementById('warningsList');
+    
+    if (!container || !list) return;
+    
+    list.innerHTML = warnings.map(w => {
+        const icon = w.severity === 'critical' ? 'ph-x-circle text-red-600' : 'ph-warning-circle text-amber-600';
+        return `
+            <div class="flex items-center gap-2 text-sm">
+                <i class="ph ${icon}"></i>
+                <span class="font-medium text-slate-800">${w.project.id}:</span>
+                <span class="text-slate-700">${w.project.title}</span>
+                <span class="font-medium ${w.severity === 'critical' ? 'text-red-700' : 'text-amber-700'}">(${w.message})</span>
+            </div>
+        `;
+    }).join('');
+    
+    container.classList.remove('hidden');
+}
+
