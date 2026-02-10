@@ -5,7 +5,42 @@
     "watch:css": "tailwindcss -i ./src/input.css -o ./css/output.css --watch"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/cli": "^4.1.18",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0",
     "tailwindcss": "^4.1.18"
-  }
+  },
+  "name": "cms",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "index.js",
+  "dependencies": {
+    "detect-libc": "^2.1.2",
+    "enhanced-resolve": "^5.19.0",
+    "graceful-fs": "^4.2.11",
+    "is-extglob": "^2.1.1",
+    "is-glob": "^4.0.3",
+    "jiti": "^2.6.1",
+    "lightningcss": "^1.30.2",
+    "lightningcss-win32-x64-msvc": "^1.30.2",
+    "magic-string": "^0.30.21",
+    "mri": "^1.2.0",
+    "node-addon-api": "^7.1.1",
+    "picocolors": "^1.1.1",
+    "picomatch": "^4.0.3",
+    "source-map-js": "^1.2.1",
+    "tapable": "^2.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christianwithit/change-management-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/christianwithit/change-management-system/issues"
+  },
+  "homepage": "https://github.com/christianwithit/change-management-system#readme"
 }

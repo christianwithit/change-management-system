@@ -1,3 +1,4 @@
+/* global getCurrentUser, API, utils */
 // Main application logic
 
 // Initialize app when DOM is loaded
@@ -44,21 +45,15 @@ function updateUserInfo() {
     });
 
     // Update user role with proper display name
-    const roleDisplayName = getRoleDisplayName(user.role);
-    const userRoleElements = document.querySelectorAll('#sidebarUserRole, #userRole');
+    const roleDisplayName = window.getRoleDisplayName ? window.getRoleDisplayName(user.role) : getRoleDisplayNameLocal(user.role);
+    const userRoleElements = document.querySelectorAll('#sidebarUserRole, #userRole, #userDept');
     userRoleElements.forEach(el => {
         if (el) el.textContent = roleDisplayName;
     });
-
-    // Update user department
-    const userDeptElements = document.querySelectorAll('#userDept');
-    userDeptElements.forEach(el => {
-        if (el) el.textContent = user.department;
-    });
 }
 
-// Get display name for user role
-function getRoleDisplayName(role) {
+// Local fallback for role display name (in case utils.js isn't loaded)
+function getRoleDisplayNameLocal(role) {
     const roleNames = {
         'staff': 'Staff Member',
         'hod': 'Head of Department',
@@ -107,7 +102,8 @@ function initializeMobileSidebar() {
     }
 }
 
-function toggleMobileSidebar() {
+// Global function for mobile sidebar toggle (called from HTML onclick)
+window.toggleMobileSidebar = function() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
 
@@ -129,7 +125,7 @@ function toggleMobileSidebar() {
             }, 300); // Match transition duration
         }
     }
-}
+};
 
 function closeMobileSidebar() {
     const sidebar = document.querySelector('.sidebar');
@@ -147,10 +143,10 @@ function closeMobileSidebar() {
     }
 }
 
-// Navigation handling
-function navigateTo(page) {
+// Global navigation function (called from HTML onclick)
+window.navigateTo = function(page) {
     window.location.href = page;
-}
+};
 
 // Smart Sidebar Highlighting
 function setActiveNav() {
@@ -179,30 +175,8 @@ function setActiveNav() {
     });
 }
 
-// Tab switching
-function switchTab(tabName) {
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-
-    // Remove active class from all tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-
-    // Show selected tab content
-    const selectedContent = document.getElementById(tabName);
-    if (selectedContent) {
-        selectedContent.classList.add('active');
-    }
-
-    // Add active class to clicked tab
-    event.target.classList.add('active');
-}
-
-// Handle file upload preview
-function handleFileUpload(input) {
+// Global function for handling file uploads (called from HTML onchange)
+window.handleFileUpload = function(input) {
     const files = input.files;
     const fileList = document.getElementById('fileList');
 
@@ -221,22 +195,17 @@ function handleFileUpload(input) {
             fileList.appendChild(fileItem);
         });
     }
-}
+};
 
-// Print functionality
-function printPage() {
-    window.print();
-}
-
-// Refresh data
-function refreshData() {
+// Global function for refreshing data (called from HTML onclick)
+window.refreshData = function() {
     location.reload();
-}
+};
 
-// Export current view
-function exportCurrentView(format = 'csv') {
+// Global function for exporting current view (called from HTML onclick)
+window.exportCurrentView = function(format = 'csv') {
     const data = API.getRequests();
     if (format === 'csv') {
         utils.exportToCSV(data, `cms-export-${new Date().toISOString().split('T')[0]}.csv`);
     }
-}
+};

@@ -45,24 +45,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Check if user is logged in
-function checkAuth() {
+// Global function to check if user is logged in (called from HTML scripts)
+window.checkAuth = function() {
     const user = localStorage.getItem('currentUser');
     if (!user) {
         window.location.href = '../index.html';
         return null;
     }
     return JSON.parse(user);
-}
+};
 
-// Logout function
-function logout() {
+// Global logout function (called from HTML onclick)
+window.logout = function() {
     localStorage.removeItem('currentUser');
     window.location.href = '../index.html';
-}
+};
 
-// Get current user
-function getCurrentUser() {
+// Global function to get current user (called from HTML scripts)
+window.getCurrentUser = function() {
     const user = localStorage.getItem('currentUser');
     return user ? JSON.parse(user) : null;
-}
+};

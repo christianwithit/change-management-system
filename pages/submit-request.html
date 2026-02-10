@@ -84,7 +84,7 @@
 
         <!-- Mobile Sidebar Overlay -->
         <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
-            onclick="toggleMobileSidebar()"></div>
+            data-action="toggle-sidebar"></div>
 
         <!-- Sidebar -->
         <aside
@@ -145,7 +145,7 @@
                         <p class="text-sm text-slate-400" id="sidebarUserRole">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()"
+                <button data-action="logout"
                     class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
@@ -158,7 +158,7 @@
             <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
                 <div class="flex items-center gap-4">
                     <!-- Mobile Toggle Button -->
-                    <button onclick="toggleMobileSidebar()"
+                    <button data-action="toggle-sidebar"
                         class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <i class="ph ph-list text-2xl"></i>
                     </button>
@@ -169,7 +169,7 @@
                             change request.</p>
                     </div>
                 </div>
-                <button onclick="navigateTo('dashboard.html')"
+                <button data-action="navigate" data-page="dashboard.html"
                     class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-semibold text-base border border-slate-200 min-h-[48px]">
                     <i class="ph ph-arrow-left text-xl"></i> Back to Dashboard
                 </button>
@@ -273,11 +273,11 @@
                             </div>
 
                             <div class="flex gap-3 pt-4 border-t border-slate-200">
-                                <button type="button" onclick="resetForm()"
+                                <button type="button" data-action="reset-form"
                                     class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 min-h-[48px]">
                                     Reset Form
                                 </button>
-                                <button type="button" onclick="nextStep(2)"
+                                <button type="button" data-action="next-step" data-step="2"
                                     class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
                                     Next: Impact Analysis <i class="ph ph-arrow-right text-xl"></i>
                                 </button>
@@ -318,11 +318,11 @@
                             </div>
 
                             <div class="flex gap-3 pt-4 border-t border-slate-200">
-                                <button type="button" onclick="previousStep(1)"
+                                <button type="button" data-action="previous-step" data-step="1"
                                     class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 flex items-center gap-2 min-h-[48px]">
                                     <i class="ph ph-arrow-left text-xl"></i> Back
                                 </button>
-                                <button type="button" onclick="nextStep(3)"
+                                <button type="button" data-action="next-step" data-step="3"
                                     class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-base flex items-center justify-center gap-2 min-h-[48px]">
                                     Next: Confirmation <i class="ph ph-arrow-right text-xl"></i>
                                 </button>
@@ -335,7 +335,7 @@
                                 <label
                                     class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2 block">Supporting
                                     Documents (Optional)</label>
-                                <div onclick="document.getElementById('fileInput').click()"
+                                <div data-action="upload-file"
                                     class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-visionRed hover:bg-red-50/30 transition-all">
                                     <input type="file" id="fileInput" multiple class="hidden"
                                         onchange="handleFileUpload(this)" accept=".pdf,.doc,.docx,.xls,.xlsx">
@@ -358,7 +358,7 @@
                             </div>
 
                             <div class="flex gap-3 pt-4 border-t border-slate-200">
-                                <button type="button" onclick="previousStep(2)"
+                                <button type="button" data-action="previous-step" data-step="2"
                                     class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-base transition-all border border-slate-200 flex items-center gap-2 min-h-[48px]">
                                     <i class="ph ph-arrow-left text-xl"></i> Back
                                 </button>
@@ -375,193 +375,12 @@
         </main>
     </div>
 
-    <script src="../js/auth.js"></script>
-    <script src="../js/mock-data.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="../js/utils.js"></script>
-    <script src="../js/app.js"></script>
-    <script>
-        let currentStep = 1;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const user = checkAuth();
-            if (!user) return;
-
-            // Show navigation based on role
-            if (user.role === 'hod') {
-                document.getElementById('hodReviewLink').style.display = 'flex';
-            }
-            if (user.role === 'it' || user.role === 'admin') {
-                document.getElementById('itReviewLink').style.display = 'flex';
-            }
-            if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
-                document.getElementById('reportsLink').style.display = 'flex';
-            }
-
-            // Populate dropdowns
-            populateChangeTypes();
-            populateDepartments();
-
-            // Handle form submission
-            document.getElementById('submitRequestForm').addEventListener('submit', handleSubmit);
-        });
-
-        function populateChangeTypes() {
-            const select = document.getElementById('type');
-            const types = API.getChangeTypes();
-
-            types.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                select.appendChild(option);
-            });
-        }
-
-        function populateDepartments() {
-            const select = document.getElementById('department');
-            const departments = API.getDepartments();
-
-            departments.forEach(dept => {
-                const option = document.createElement('option');
-                option.value = dept;
-                option.textContent = dept;
-                select.appendChild(option);
-            });
-        }
-
-        // Form Stepper Functions
-        function nextStep(step) {
-            // Validate current step fields
-            const currentStepEl = document.getElementById(`formStep${currentStep}`);
-            const requiredFields = currentStepEl.querySelectorAll('[required]');
-            let isValid = true;
-
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.style.borderColor = '#CF2E2E';
-                    isValid = false;
-                } else {
-                    field.style.borderColor = '#D1D5DB';
-                }
-            });
-
-            if (!isValid) {
-                showToast('Please fill in all required fields', 'error');
-                return;
-            }
-
-            // Hide current step
-            document.getElementById(`formStep${currentStep}`).classList.remove('active');
-
-            // Show next step
-            document.getElementById(`formStep${step}`).classList.add('active');
-
-            // Update stepper UI
-            updateStepper(step);
-
-            currentStep = step;
-
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function previousStep(step) {
-            // Hide current step
-            document.getElementById(`formStep${currentStep}`).classList.remove('active');
-
-            // Show previous step
-            document.getElementById(`formStep${step}`).classList.add('active');
-
-            // Update stepper UI
-            updateStepper(step);
-
-            currentStep = step;
-
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function updateStepper(activeStep) {
-            // Reset all steps
-            for (let i = 1; i <= 3; i++) {
-                const circle = document.getElementById(`step${i}Circle`);
-                const connector = document.getElementById(`connector${i}`);
-
-                if (i < activeStep) {
-                    // Completed step
-                    circle.className = 'w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xl mb-2 transition-all';
-                    circle.innerHTML = '<i class="ph ph-check text-2xl"></i>';
-                    if (connector) connector.classList.add('completed');
-                } else if (i === activeStep) {
-                    // Active step
-                    circle.className = 'w-14 h-14 rounded-full bg-visionRed text-white ring-4 ring-red-100 flex items-center justify-center font-bold text-xl mb-2 transition-all';
-                    circle.textContent = i;
-                } else {
-                    // Inactive step
-                    circle.className = 'w-14 h-14 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xl mb-2 transition-all';
-                    circle.textContent = i;
-                    if (connector) connector.classList.remove('completed');
-                }
-            }
-        }
-
-        function handleSubmit(e) {
-            e.preventDefault();
-
-            const submitBtn = document.getElementById('submitBtn');
-            const originalContent = submitBtn.innerHTML;
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="ph ph-spinner animate-spin text-xl"></i> Processing...';
-            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-
-            // Simulate async operation
-            setTimeout(() => {
-                const user = getCurrentUser();
-                const formData = new FormData(e.target);
-
-                const requestData = {
-                    title: formData.get('title'),
-                    type: formData.get('type'),
-                    department: formData.get('department'),
-                    section: formData.get('section'),
-                    description: formData.get('description'),
-                    justification: formData.get('justification'),
-                    expectedBenefits: formData.get('benefits'),
-                    priority: formData.get('priority'),
-                    requestor: user.fullName
-                };
-
-                // Create request
-                const newRequest = API.createRequest(requestData);
-
-                if (newRequest) {
-                    showToast('Request Submitted Successfully!', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
-                } else {
-                    showToast('Failed to submit request. Please try again.', 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalContent;
-                    submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
-                }
-            }, 1500);
-        }
-
-        function resetForm() {
-            if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
-                document.getElementById('submitRequestForm').reset();
-                document.getElementById('fileList').innerHTML = '';
-                currentStep = 1;
-                document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
-                document.getElementById('formStep1').classList.add('active');
-                updateStepper(1);
-            }
-        }
-    </script>
+    <script src="../js/auth.js?v=20260209171500"></script>
+    <script src="../js/mock-data.js?v=20260209171500"></script>
+    <script src="../js/api.js?v=20260209171500"></script>
+    <script src="../js/utils.js?v=20260209171500"></script>
+    <script src="../js/app.js?v=20260209171500"></script>
+    <script src="../js/submit-request.js?v=20260209171500"></script>
 </body>
 
 </html>

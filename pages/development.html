@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Projects | Vision Group CMS</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/output.css">
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+            transition: width 0.3s ease;
+        }
+
+        .tab {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-visionGray text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden bg-gray-50">
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
+
+        <!-- Sidebar -->
+        <aside
+            class="sidebar w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
+            <div class="h-20 flex items-center px-6 border-b border-slate-800">
+                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo"
+                        class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">CMS Portal</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-squares-four text-xl mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="submit-request.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-plus-circle text-xl mr-3"></i>
+                    <span>Submit Request</span>
+                </a>
+                <a href="my-requests.html"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
+                    <i class="ph ph-clipboard-text text-xl mr-3"></i>
+                    <span>My Requests</span>
+                </a>
+
+                <a href="hod-review.html" id="hodReviewLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                    <i class="ph ph-check-square text-xl mr-3"></i>
+                    <span>Review Requests</span>
+                </a>
+                <a href="it-review.html" id="itReviewLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                    <i class="ph ph-wrench text-xl mr-3"></i>
+                    <span>IT Review</span>
+                </a>
+                <a href="development.html"
+                    class="flex items-center px-4 py-3 bg-white/10 text-white rounded-lg border-l-2 border-visionRed transition-all">
+                    <i class="ph ph-code text-xl mr-3"></i>
+                    <span class="font-medium">Development</span>
+                </a>
+                <a href="reports.html" id="reportsLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                    <i class="ph ph-chart-line-up text-xl mr-3"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <div id="sidebarUserInitial"
+                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                        U
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-base font-semibold truncate" id="sidebarUserName">User Name</p>
+                        <p class="text-sm text-slate-400" id="sidebarUserRole">IT Team</p>
+                    </div>
+                </div>
+                <button data-action="logout"
+                    class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                    <i class="ph ph-sign-out text-xl"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 ml-0 p-4 md:p-8 overflow-y-auto h-full w-full">
+
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
+                <div class="flex items-center gap-4">
+                    <button data-action="toggle-mobile-sidebar"
+                        class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-visionBlack">Development Projects</h2>
+                        <p class="text-gray-500 text-sm mt-1">Manage and track project development progress</p>
+                    </div>
+                </div>
+
+                <button data-action="refresh"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200 w-full md:w-auto justify-center">
+                    <i class="ph ph-arrows-clockwise"></i> Refresh
+                </button>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 fade-in">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Active Projects</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="activeCount">0</h3>
+                    </div>
+                    <div
+                        class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-folder-open"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">In Progress</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="inProgressCount">0</h3>
+                    </div>
+                    <div
+                        class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-gear-six"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">On Hold</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="onHoldCount">0</h3>
+                    </div>
+                    <div
+                        class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-pause-circle"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Completed</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-1" id="completedCount">0</h3>
+                    </div>
+                    <div
+                        class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="ph ph-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6 fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Status</label>
+                        <select id="filterStatus"
+                            class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-visionRed focus:outline-none">
+                            <option value="">All Statuses</option>
+                            <option value="Not Started">Not Started</option>
+                            <option value="Requirements Analysis">Requirements Analysis</option>
+                            <option value="Design">Design</option>
+                            <option value="Development">Development</option>
+                            <option value="Testing">Testing</option>
+                            <option value="UAT">UAT</option>
+                            <option value="Deployment">Deployment</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Department</label>
+                        <select id="filterDepartment"
+                            class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-visionRed focus:outline-none">
+                            <option value="">All Departments</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700 mb-2 block">Priority</label>
+                        <select id="filterPriority"
+                            class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-visionRed focus:outline-none">
+                            <option value="">All Priorities</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button data-action="apply-filters"
+                            class="w-full bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md transition-all font-medium">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
+                <div class="border-b border-gray-100 flex">
+                    <div class="tab px-6 py-4 font-medium text-visionRed border-b-2 border-visionRed"
+                        data-action="switch-tab" data-tab="active">
+                        Active Projects
+                    </div>
+                    <div class="tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
+                        data-action="switch-tab" data-tab="completed">
+                        Completed
+                    </div>
+                    <div class="tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
+                        data-action="switch-tab" data-tab="all">
+                        All Projects
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <div id="projectsList" class="space-y-4">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="updateStatusModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Update Project Status</h3>
+                <button data-action="close-modal" data-modal="updateStatusModal"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div id="modalProjectInfo"></div>
+
+                <div>
+                    <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">New Status *</label>
+                    <select id="newStatus" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                        <option value="">Select new status</option>
+                        <option value="Not Started">Not Started</option>
+                        <option value="Requirements Analysis">Requirements Analysis</option>
+                        <option value="Design">Design</option>
+                        <option value="Development">Development</option>
+                        <option value="Testing">Testing</option>
+                        <option value="UAT">User Acceptance Testing</option>
+                        <option value="Deployment">Deployment</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="statusRemarks" class="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                    <textarea id="statusRemarks" rows="4" placeholder="Add notes about this status change..."
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end bg-gray-50/50">
+                <button data-action="close-modal" data-modal="updateStatusModal"
+                    class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all border border-gray-200">
+                    Cancel
+                </button>
+                <button data-action="submit-status-update"
+                    class="px-6 py-2.5 bg-visionRed hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                    Update Status
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Development Logs Modal -->
+    <div id="logsModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Development Logs</h3>
+                <button data-action="close-modal" data-modal="logsModal"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <div id="modalLogsProjectInfo" class="mb-6"></div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-semibold text-gray-800">Project Timeline</h4>
+                    <button data-action="open-add-log-modal"
+                        class="px-4 py-2 bg-visionRed hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm">
+                        <i class="ph ph-plus"></i> Add Log Entry
+                    </button>
+                </div>
+
+                <div id="logsTimeline" class="space-y-4">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+                <button data-action="close-modal" data-modal="logsModal"
+                    class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all border border-gray-200">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Log Entry Modal -->
+    <div id="addLogModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[60]">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Add Log Entry</h3>
+                <button data-action="close-modal" data-modal="addLogModal"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <label for="logType" class="block text-sm font-medium text-gray-700 mb-2">Log Type *</label>
+                    <select id="logType" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all">
+                        <option value="">Select log type</option>
+                        <option value="Update">Progress Update</option>
+                        <option value="Note">Note</option>
+                        <option value="Issue">Issue/Blocker</option>
+                        <option value="Milestone">Milestone Achieved</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="logDescription" class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                    <textarea id="logDescription" rows="4" required
+                        placeholder="Describe the update, note, or issue..."
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-visionRed focus:ring-1 focus:ring-red-100 outline-none transition-all resize-none"></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end bg-gray-50/50">
+                <button data-action="close-modal" data-modal="addLogModal"
+                    class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all border border-gray-200">
+                    Cancel
+                </button>
+                <button data-action="submit-log-entry"
+                    class="px-6 py-2.5 bg-visionRed hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                    Add Log Entry
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestones Modal -->
+    <div id="milestonesModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Project Milestones</h3>
+                <button data-action="close-modal" data-modal="milestonesModal"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div id="modalMilestoneProjectInfo"></div>
+
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-gray-800 mb-3">Track Project Milestones</h4>
+                    
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-visionRed transition-all cursor-pointer">
+                        <input type="checkbox" id="milestone_documentation" 
+                            class="mt-1 w-5 h-5 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">Documentation Uploaded</div>
+                            <div class="text-sm text-gray-500">Technical documentation and user guides completed</div>
+                            <div id="doc_date" class="text-xs text-green-600 mt-1 hidden"></div>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-visionRed transition-all cursor-pointer">
+                        <input type="checkbox" id="milestone_training" 
+                            class="mt-1 w-5 h-5 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">Training Conducted</div>
+                            <div class="text-sm text-gray-500">User training sessions completed</div>
+                            <div id="training_date" class="text-xs text-green-600 mt-1 hidden"></div>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-visionRed transition-all cursor-pointer">
+                        <input type="checkbox" id="milestone_solution" 
+                            class="mt-1 w-5 h-5 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">Solution Delivered</div>
+                            <div class="text-sm text-gray-500">Final solution deployed and operational</div>
+                            <div id="solution_date" class="text-xs text-green-600 mt-1 hidden"></div>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-visionRed transition-all cursor-pointer">
+                        <input type="checkbox" id="milestone_report" 
+                            class="mt-1 w-5 h-5 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">Completion Report Generated</div>
+                            <div class="text-sm text-gray-500">Final project report and handover documentation</div>
+                            <div id="report_date" class="text-xs text-green-600 mt-1 hidden"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end bg-gray-50/50">
+                <button data-action="close-modal" data-modal="milestonesModal"
+                    class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all border border-gray-200">
+                    Cancel
+                </button>
+                <button data-action="submit-milestones"
+                    class="px-6 py-2.5 bg-visionRed hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                    Save Milestones
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/development.js"></script>
+</body>
+
+</html>

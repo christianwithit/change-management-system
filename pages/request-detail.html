@@ -47,8 +47,7 @@
     <div class="flex h-screen overflow-hidden bg-gray-50">
 
         <!-- Mobile Sidebar Overlay -->
-        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
-            onclick="toggleMobileSidebar()"></div>
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
 
         <!-- Sidebar -->
         <aside
@@ -109,7 +108,7 @@
                         <p class="text-sm text-slate-400" id="sidebarUserRole">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()"
+                <button data-action="logout"
                     class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
@@ -122,7 +121,7 @@
             <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
                 <div class="flex items-center gap-4">
                     <!-- Mobile Toggle Button -->
-                    <button onclick="toggleMobileSidebar()"
+                    <button data-action="toggle-mobile-sidebar"
                         class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <i class="ph ph-list text-2xl"></i>
                     </button>
@@ -133,11 +132,11 @@
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="window.print()"
+                    <button data-action="print"
                         class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
                         <i class="ph ph-printer"></i> Print
                     </button>
-                    <button onclick="history.back()"
+                    <button data-action="back"
                         class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-slate-200">
                         <i class="ph ph-arrow-left"></i> Back
                     </button>
@@ -153,19 +152,19 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
                 <div class="border-b border-gray-100 flex">
                     <button class="tab-button px-6 py-4 font-medium text-visionRed border-b-2 border-visionRed"
-                        onclick="switchTab('details')">
+                        data-action="switch-tab" data-tab="details">
                         Details
                     </button>
                     <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
-                        onclick="switchTab('timeline')">
+                        data-action="switch-tab" data-tab="timeline">
                         Timeline
                     </button>
                     <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
-                        onclick="switchTab('documents')">
+                        data-action="switch-tab" data-tab="documents">
                         Documents
                     </button>
                     <button class="tab-button px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
-                        onclick="switchTab('comments')">
+                        data-action="switch-tab" data-tab="comments">
                         Comments
                     </button>
                 </div>
@@ -227,213 +226,7 @@
     <script src="../js/api.js"></script>
     <script src="../js/utils.js"></script>
     <script src="../js/app.js"></script>
-    <script>
-        let currentRequest = null;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const user = checkAuth();
-            if (!user) return;
-
-            if (user.role === 'hod') {
-                document.getElementById('hodReviewLink').style.display = 'flex';
-            }
-            if (user.role === 'it' || user.role === 'admin') {
-                document.getElementById('itReviewLink').style.display = 'flex';
-            }
-            if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
-                document.getElementById('reportsLink').style.display = 'flex';
-            }
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const requestId = urlParams.get('id');
-
-            if (requestId) {
-                loadRequestDetails(requestId);
-            } else {
-                showToast('Request ID not found', 'error');
-                setTimeout(() => window.location.href = 'my-requests.html', 2000);
-            }
-        });
-
-        function loadRequestDetails(id) {
-            currentRequest = API.getRequest(id);
-
-            if (!currentRequest) {
-                showToast('Request not found', 'error');
-                setTimeout(() => window.location.href = 'my-requests.html', 2000);
-                return;
-            }
-
-            displayRequestHeader();
-            displayRequestDetails();
-            displayTimeline();
-        }
-
-        function displayRequestHeader() {
-            const header = document.getElementById('requestHeader');
-            header.innerHTML = `
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">${currentRequest.title}</h2>
-                            <p class="text-gray-500 font-medium">${currentRequest.id}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${currentRequest.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                    currentRequest.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                        currentRequest.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
-                            'bg-orange-100 text-orange-700'
-                }">
-                                ${currentRequest.status}
-                            </span>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${currentRequest.priority === 'High' ? 'bg-red-100 text-red-700' :
-                    currentRequest.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-blue-100 text-blue-700'
-                }">
-                                ${currentRequest.priority}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Requestor</label>
-                            <span class="text-gray-800 font-medium">${currentRequest.requestor}</span>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Department</label>
-                            <span class="text-gray-800 font-medium">${currentRequest.department}</span>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Section</label>
-                            <span class="text-gray-800 font-medium">${currentRequest.section}</span>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Date Submitted</label>
-                            <span class="text-gray-800 font-medium">${utils.formatDate(currentRequest.dateSubmitted)}</span>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">Type</label>
-                            <span class="text-gray-800 font-medium">${currentRequest.type}</span>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1 block">HOD Approval</label>
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${currentRequest.hodApproval === 'Approved' ? 'bg-green-100 text-green-700' :
-                    currentRequest.hodApproval === 'Rejected' ? 'bg-red-100 text-red-700' :
-                        'bg-orange-100 text-orange-700'
-                }">
-                                ${currentRequest.hodApproval}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function displayRequestDetails() {
-            const content = document.getElementById('detailsContent');
-            content.innerHTML = `
-                <div>
-                    <label class="text-sm font-bold uppercase tracking-wider text-gray-700 mb-2 block">Description</label>
-                    <p class="text-gray-700 leading-relaxed">${currentRequest.description}</p>
-                </div>
-                <div>
-                    <label class="text-sm font-bold uppercase tracking-wider text-gray-700 mb-2 block">Business Justification</label>
-                    <p class="text-gray-700 leading-relaxed">${currentRequest.justification}</p>
-                </div>
-                <div>
-                    <label class="text-sm font-bold uppercase tracking-wider text-gray-700 mb-2 block">Expected Benefits</label>
-                    <p class="text-gray-700 leading-relaxed">${currentRequest.expectedBenefits}</p>
-                </div>
-                <div>
-                    <label class="text-sm font-bold uppercase tracking-wider text-gray-700 mb-2 block">IT Status</label>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${currentRequest.itStatus === 'Completed' ? 'bg-green-100 text-green-700' :
-                    currentRequest.itStatus === 'In Progress' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-700'
-                }">
-                        ${currentRequest.itStatus || 'Pending'}
-                    </span>
-                </div>
-            `;
-        }
-
-        function displayTimeline() {
-            const timeline = document.getElementById('timelineContent');
-            const events = [
-                {
-                    date: currentRequest.dateSubmitted,
-                    title: 'Request Submitted',
-                    description: `Submitted by ${currentRequest.requestor}`,
-                    icon: 'ph-paper-plane-tilt',
-                    color: 'blue'
-                }
-            ];
-
-            if (currentRequest.hodApproval === 'Approved') {
-                events.push({
-                    date: currentRequest.dateSubmitted,
-                    title: 'HOD Approved',
-                    description: 'Request approved by Head of Department',
-                    icon: 'ph-check-circle',
-                    color: 'green'
-                });
-            }
-
-            if (currentRequest.itStatus === 'In Progress') {
-                events.push({
-                    date: currentRequest.dateSubmitted,
-                    title: 'IT Development Started',
-                    description: 'IT team has started working on this request',
-                    icon: 'ph-gear-six',
-                    color: 'purple'
-                });
-            }
-
-            if (currentRequest.status === 'Completed') {
-                events.push({
-                    date: currentRequest.dateSubmitted,
-                    title: 'Request Completed',
-                    description: 'Change has been implemented and delivered',
-                    icon: 'ph-check-circle',
-                    color: 'green'
-                });
-            }
-
-            timeline.innerHTML = events.map((event, index) => `
-                <div class="flex gap-4">
-                    <div class="flex flex-col items-center">
-                        <div class="w-10 h-10 rounded-full bg-${event.color}-100 text-${event.color}-600 flex items-center justify-center">
-                            <i class="ph ${event.icon} text-xl"></i>
-                        </div>
-                        ${index < events.length - 1 ? '<div class="w-0.5 h-full bg-gray-200 my-2"></div>' : ''}
-                    </div>
-                    <div class="flex-1 pb-8">
-                        <div class="text-sm text-gray-500 mb-1">${utils.formatDate(event.date)}</div>
-                        <h4 class="font-bold text-gray-800 mb-1">${event.title}</h4>
-                        <p class="text-gray-600">${event.description}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-
-            document.querySelectorAll('.tab-button').forEach(tab => {
-                tab.classList.remove('text-visionRed', 'border-b-2', 'border-visionRed');
-                tab.classList.add('text-gray-500', 'hover:text-gray-700');
-            });
-
-            const selectedContent = document.getElementById(tabName);
-            if (selectedContent) {
-                selectedContent.classList.add('active');
-            }
-
-            event.target.classList.remove('text-gray-500', 'hover:text-gray-700');
-            event.target.classList.add('text-visionRed', 'border-b-2', 'border-visionRed');
-        }
-    </script>
+    <script src="../js/request-detail.js"></script>
 </body>
 
 </html>

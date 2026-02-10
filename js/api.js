@@ -341,7 +341,7 @@ const API = {
     },
     
     // Get statistics
-    getStats: function(userRole) {
+    getStats: function() {
         const stats = {
             total: this.requests.length,
             pending: this.requests.filter(r => r.workflowStage === 'HOD Review' && r.hodApproval === 'Pending').length,
@@ -404,6 +404,50 @@ const API = {
             return requestors[Math.floor(Math.random() * requestors.length)];
         }
         return 'User Name';
+    },
+
+    // Development Projects
+    getDevelopmentProjects: function() {
+        return this.requests.filter(r => 
+            r.itDecision === 'Accepted' || r.developmentStatus
+        );
+    },
+
+    // Development Logs (Phase 3)
+    developmentLogs: [],
+
+    // Add development log (Phase 3)
+    addDevelopmentLog: function(requestId, logData) {
+        const project = this.getRequest(requestId);
+        if (!project) return null;
+        
+        const log = {
+            id: `LOG-${String(this.developmentLogs.length + 1).padStart(3, '0')}`,
+            requestId,
+            changeDate: new Date().toISOString().split('T')[0],
+            loggedBy: 'IT Team',
+            ...logData
+        };
+        this.developmentLogs.push(log);
+        
+        // Also store in localStorage for persistence
+        localStorage.setItem('developmentLogs', JSON.stringify(this.developmentLogs));
+        
+        return log;
+    },
+
+    // Get logs for a request (Phase 3)
+    getDevelopmentLogs: function(requestId) {
+        // Load from localStorage if available
+        const stored = localStorage.getItem('developmentLogs');
+        if (stored) {
+            try {
+                this.developmentLogs = JSON.parse(stored);
+            } catch (e) {
+                console.error('Error loading logs:', e);
+            }
+        }
+        return this.developmentLogs.filter(log => log.requestId === requestId);
     }
 };
 

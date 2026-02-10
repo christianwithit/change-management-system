@@ -43,8 +43,7 @@
     <div class="flex h-screen overflow-hidden bg-gray-50">
 
         <!-- Mobile Sidebar Overlay -->
-        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
-            onclick="toggleMobileSidebar()"></div>
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
 
         <!-- Sidebar -->
         <aside
@@ -87,6 +86,11 @@
                     <i class="ph ph-wrench text-xl mr-3"></i>
                     <span class="font-medium">IT Review</span>
                 </a>
+                <a href="development.html" id="developmentLink"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group hidden">
+                    <i class="ph ph-code text-xl mr-3"></i>
+                    <span>Development</span>
+                </a>
                 <a href="reports.html"
                     class="flex items-center px-4 py-3 text-slate-400 hover:bg-white/10 hover:text-white rounded-lg transition-all group">
                     <i class="ph ph-chart-line-up text-xl mr-3"></i>
@@ -105,7 +109,7 @@
                         <p class="text-sm text-slate-400" id="sidebarUserRole">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()"
+                <button data-action="logout"
                     class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
@@ -118,7 +122,7 @@
             <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
                 <div class="flex items-center gap-4">
                     <!-- Mobile Toggle Button -->
-                    <button onclick="toggleMobileSidebar()"
+                    <button data-action="toggle-mobile-sidebar"
                         class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <i class="ph ph-list text-2xl"></i>
                     </button>
@@ -130,7 +134,7 @@
                     </div>
                 </div>
 
-                <button onclick="location.reload()"
+                <button data-action="refresh"
                     class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200 w-full md:w-auto justify-center">
                     <i class="ph ph-arrows-clockwise"></i> Refresh
                 </button>
@@ -174,15 +178,15 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
                 <div class="border-b border-gray-100 flex">
                     <div class="tab px-6 py-4 font-medium text-visionRed border-b-2 border-visionRed"
-                        onclick="switchStage('review')">
+                        data-action="switch-stage" data-stage="review">
                         Awaiting Review
                     </div>
                     <div class="tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
-                        onclick="switchStage('progress')">
+                        data-action="switch-stage" data-stage="progress">
                         In Progress
                     </div>
                     <div class="tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"
-                        onclick="switchStage('completed')">
+                        data-action="switch-stage" data-stage="completed">
                         Completed
                     </div>
                 </div>
@@ -202,7 +206,7 @@
         <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <h3 class="font-bold text-gray-800">IT Review & Methodology</h3>
-                <button onclick="utils.hideModal('itReviewModal')"
+                <button data-action="close-modal" data-modal="itReviewModal"
                     class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
                     &times;
                 </button>
@@ -268,11 +272,11 @@
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end bg-gray-50/50">
-                <button onclick="utils.hideModal('itReviewModal')"
+                <button data-action="close-modal" data-modal="itReviewModal"
                     class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all border border-gray-200">
                     Cancel
                 </button>
-                <button onclick="submitITReview()"
+                <button data-action="submit-it-review"
                     class="px-6 py-2.5 bg-visionRed hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
                     Submit Review
                 </button>
@@ -285,225 +289,7 @@
     <script src="../js/api.js"></script>
     <script src="../js/utils.js"></script>
     <script src="../js/app.js"></script>
-    <script>
-        let currentStage = 'review';
-        let currentReviewRequest = null;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const user = checkAuth();
-            if (!user) return;
-
-            // Check if user has access to IT Review (IT or Admin only)
-            if (user.role !== 'it' && user.role !== 'admin') {
-                alert('Access denied. This page is only for IT personnel and Administrators.');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
-            // Show navigation links based on role
-            if (user.role === 'hod') {
-                document.getElementById('hodReviewLink').style.display = 'flex';
-            }
-            if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
-                document.getElementById('reportsLink').style.display = 'flex';
-            }
-
-            document.getElementById('itDecision').addEventListener('change', function () {
-                const methodologySection = document.getElementById('methodologySection');
-                if (this.value === 'Accepted') {
-                    methodologySection.classList.remove('hidden');
-                } else {
-                    methodologySection.classList.add('hidden');
-                }
-            });
-
-            loadITRequests();
-        });
-
-        function loadITRequests() {
-            const allRequests = API.getRequests();
-
-            const reviewRequests = allRequests.filter(r => r.status === 'IT Review');
-            const progressRequests = allRequests.filter(r => r.itStatus === 'In Progress');
-            const completedRequests = allRequests.filter(r => r.status === 'Completed');
-
-            document.getElementById('reviewCount').textContent = reviewRequests.length;
-            document.getElementById('progressCount').textContent = progressRequests.length;
-            document.getElementById('completedCount').textContent = completedRequests.length;
-
-            displayRequests(currentStage);
-        }
-
-        function switchStage(stage) {
-            currentStage = stage;
-
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('text-visionRed', 'border-b-2', 'border-visionRed');
-                tab.classList.add('text-gray-500', 'hover:text-gray-700');
-            });
-            event.target.classList.remove('text-gray-500', 'hover:text-gray-700');
-            event.target.classList.add('text-visionRed', 'border-b-2', 'border-visionRed');
-
-            displayRequests(stage);
-        }
-
-        function displayRequests(stage) {
-            const allRequests = API.getRequests();
-            let requests = [];
-
-            if (stage === 'review') {
-                requests = allRequests.filter(r => r.status === 'IT Review');
-            } else if (stage === 'progress') {
-                requests = allRequests.filter(r => r.itStatus === 'In Progress');
-            } else if (stage === 'completed') {
-                requests = allRequests.filter(r => r.status === 'Completed');
-            }
-
-            const container = document.getElementById('requestsList');
-
-            if (requests.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12">
-                        <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                            <i class="ph ph-clipboard-text"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">No requests in this stage</h3>
-                        <p class="text-gray-500">Requests will appear here when they reach this stage</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = requests.map(request => `
-                <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-visionRed transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-800 text-lg mb-1">${request.title}</h4>
-                            <p class="text-sm text-gray-500 mb-2">${request.id} • ${request.type}</p>
-                            <p class="text-gray-700">${request.description}</p>
-                        </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${request.priority === 'High' ? 'bg-red-100 text-red-700' :
-                    request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-blue-100 text-blue-700'
-                }">
-                            ${request.priority}
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                        <i class="ph ph-building"></i>
-                        <span><strong>${request.department}</strong> • ${request.requestor} • ${utils.formatDate(request.dateSubmitted)}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="viewRequestDetail('${request.id}')" 
-                                class="px-4 py-2 bg-white hover:bg-gray-100 text-gray-700 rounded-lg text-sm font-medium transition-all border border-gray-300">
-                            View Details
-                        </button>
-                        ${stage === 'review' ? `
-                            <button onclick="openITReviewModal('${request.id}')" 
-                                    class="px-4 py-2 bg-visionRed hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
-                                Review & Define Methodology
-                            </button>
-                        ` : ''}
-                        ${stage === 'progress' ? `
-                            <button onclick="markAsCompleted('${request.id}')" 
-                                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
-                                Mark as Completed
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openITReviewModal(requestId) {
-            currentReviewRequest = API.getRequest(requestId);
-
-            const modalInfo = document.getElementById('modalRequestInfo');
-            modalInfo.innerHTML = `
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p class="text-sm text-gray-600 mb-1">Request ID: <strong class="text-gray-800">${currentReviewRequest.id}</strong></p>
-                    <p class="font-bold text-gray-800">${currentReviewRequest.title}</p>
-                </div>
-            `;
-
-            document.getElementById('itReviewModal').classList.remove('hidden');
-            document.getElementById('itReviewModal').classList.add('flex');
-        }
-
-        function submitITReview() {
-            if (!currentReviewRequest) return;
-
-            const decision = document.getElementById('itDecision').value;
-            const methodology = document.getElementById('methodology').value;
-            const deliverables = document.getElementById('deliverables').value;
-            const estimatedTime = document.getElementById('estimatedTime').value;
-            const estimatedCost = document.getElementById('estimatedCost').value;
-            const risks = document.getElementById('risks').value;
-            const comments = document.getElementById('itComments').value;
-
-            if (!decision) {
-                utils.showAlert('Please select an IT decision', 'warning');
-                return;
-            }
-
-            if (decision === 'Accepted' && (!methodology || !deliverables)) {
-                utils.showAlert('Please provide methodology and deliverables for accepted requests', 'warning');
-                return;
-            }
-
-            const updates = {
-                itDecision: decision,
-                itComments: comments
-            };
-
-            if (decision === 'Accepted') {
-                updates.itStatus = 'In Progress';
-                updates.status = 'Approved';
-                updates.methodology = methodology;
-                updates.deliverables = deliverables;
-                updates.estimatedTime = estimatedTime;
-                updates.estimatedCost = estimatedCost;
-                updates.risks = risks;
-            } else if (decision === 'Rejected') {
-                updates.status = 'Rejected';
-                updates.itStatus = 'Rejected';
-            } else if (decision === 'Deferred') {
-                updates.status = 'Deferred';
-                updates.itStatus = 'Deferred';
-            }
-
-            API.updateRequest(currentReviewRequest.id, updates);
-
-            utils.showAlert('IT review submitted successfully!', 'success');
-            utils.hideModal('itReviewModal');
-
-            document.getElementById('itDecision').value = '';
-            document.getElementById('methodology').value = '';
-            document.getElementById('deliverables').value = '';
-            document.getElementById('estimatedTime').value = '';
-            document.getElementById('estimatedCost').value = '';
-            document.getElementById('risks').value = '';
-            document.getElementById('itComments').value = '';
-
-            setTimeout(() => loadITRequests(), 500);
-        }
-
-        function markAsCompleted(requestId) {
-            if (confirm('Mark this request as completed?')) {
-                API.updateRequest(requestId, {
-                    status: 'Completed',
-                    itStatus: 'Completed'
-                });
-
-                utils.showAlert('Request marked as completed!', 'success');
-                setTimeout(() => loadITRequests(), 500);
-            }
-        }
-
-        function viewRequestDetail(id) {
-            window.location.href = `request-detail.html?id=${id}`;
-        }
-    </script>
+    <script src="../js/it-review.js"></script>
 </body>
 
 </html>

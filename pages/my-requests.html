@@ -68,8 +68,7 @@
     <div class="flex h-screen overflow-hidden bg-gray-50">
 
         <!-- Mobile Sidebar Overlay -->
-        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
-            onclick="toggleMobileSidebar()"></div>
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
 
         <!-- Sidebar -->
         <aside
@@ -130,7 +129,7 @@
                         <p class="text-sm text-slate-400" id="sidebarUserRole">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()"
+                <button data-action="logout"
                     class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
@@ -143,7 +142,7 @@
             <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
                 <div class="flex items-center gap-4">
                     <!-- Mobile Toggle Button -->
-                    <button onclick="toggleMobileSidebar()"
+                    <button data-action="toggle-mobile-sidebar"
                         class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <i class="ph ph-list text-2xl"></i>
                     </button>
@@ -154,11 +153,11 @@
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="exportCurrentView()"
+                    <button data-action="export-view"
                         class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200">
                         <i class="ph ph-download-simple"></i> Export
                     </button>
-                    <button onclick="navigateTo('submit-request.html')"
+                    <button data-action="navigate" data-page="submit-request.html"
                         class="bg-visionRed hover:bg-red-700 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-medium">
                         <i class="ph ph-plus font-bold"></i> New Request
                     </button>
@@ -205,7 +204,7 @@
                         <i class="ph ph-folder-open text-6xl text-gray-400 mb-4"></i>
                         <h3 class="text-xl font-bold text-gray-800 mb-2">No requests found</h3>
                         <p class="text-gray-500 mb-6">You haven't submitted any change requests yet</p>
-                        <button onclick="navigateTo('submit-request.html')"
+                        <button data-action="navigate" data-page="submit-request.html"
                             class="bg-visionRed hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all font-medium inline-flex items-center gap-2">
                             <i class="ph ph-plus"></i> Create New Request
                         </button>

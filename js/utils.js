@@ -1,5 +1,16 @@
 // Utility functions
 
+// Get role display name
+window.getRoleDisplayName = function(role) {
+    const roleNames = {
+        'staff': 'Staff Member',
+        'hod': 'Head of Department',
+        'it': 'IT Administrator',
+        'admin': 'System Administrator'
+    };
+    return roleNames[role] || 'Staff Member';
+};
+
 // Format date
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -66,11 +77,11 @@ function hideModal(modalId) {
 
 // Show alert (legacy - use showToast instead)
 function showAlert(message, type = 'info') {
-    showToast(message, type);
+    window.showToast(message, type);
 }
 
-// Toast Notification System
-function showToast(message, type = 'success') {
+// Global Toast Notification System (called from HTML scripts)
+window.showToast = function(message, type = 'success') {
     const toast = document.createElement('div');
     const iconMap = {
         success: 'ph-check-circle',
@@ -104,7 +115,7 @@ function showToast(message, type = 'success') {
         toast.style.animation = 'slideOut 0.3s ease-out forwards';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
-}
+};
 
 // Confirm action
 function confirmAction(message) {
@@ -139,7 +150,7 @@ function validateForm(formId) {
 // Export data to CSV
 function exportToCSV(data, filename) {
     if (!data || !data.length) {
-        showAlert('No data to export', 'warning');
+        window.showToast('No data to export', 'warning');
         return;
     }
     
@@ -232,10 +243,10 @@ function sortTable(tableId, columnIndex, ascending = true) {
     rows.forEach(row => tbody.appendChild(row));
 }
 
-// Initialize page
+// Initialize page (not currently used but kept for future use)
 function initializePage() {
     // Check authentication
-    const user = checkAuth();
+    const user = window.checkAuth();
     if (!user) return;
     
     // Update user info in sidebar
@@ -262,7 +273,7 @@ function initializePage() {
     });
 }
 
-// Update user info in sidebar
+// Update user info in sidebar (not currently used but kept for future use)
 function updateUserInfo(user) {
     const userNameElement = document.querySelector('.user-details h4');
     const userRoleElement = document.querySelector('.user-details p');
@@ -292,7 +303,6 @@ window.utils = {
     showModal,
     hideModal,
     showAlert,
-    showToast,
     confirmAction,
     generateId,
     validateForm,
@@ -303,3 +313,6 @@ window.utils = {
     initializePage,
     updateUserInfo
 };
+
+// Add showToast to utils after it's defined on window
+window.utils.showToast = window.showToast;

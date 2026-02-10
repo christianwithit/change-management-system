@@ -1,9 +1,11 @@
+/* global checkAuth, MOCK_DATA */
 // HOD Review Page Logic
 
 let currentUser = null;
 let allRequests = [];
 let filteredRequests = [];
 let currentRequest = null;
+let currentAction = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     currentUser = checkAuth();
@@ -18,21 +20,110 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update user info in sidebar
     document.getElementById('userName').textContent = currentUser.fullName;
-    document.getElementById('userDept').textContent = currentUser.department;
+    document.getElementById('userDept').textContent = window.getRoleDisplayName ? window.getRoleDisplayName(currentUser.role) : 'Head of Department';
     document.getElementById('userInitials').textContent = currentUser.fullName.charAt(0);
 
     // Show navigation links based on role
     if (currentUser.role === 'it' || currentUser.role === 'admin') {
         document.getElementById('itReviewLink').classList.remove('hidden');
+        document.getElementById('developmentLink').classList.remove('hidden');
     }
     if (currentUser.role === 'hod' || currentUser.role === 'it' || currentUser.role === 'admin') {
         document.getElementById('reportsLink').classList.remove('hidden');
     }
 
+    // Initialize event listeners
+    initializeEventListeners();
+
     // Load data
     loadRequests();
     populateStaffFilter();
 });
+
+// Initialize event listeners
+function initializeEventListeners() {
+    document.addEventListener('click', handleDocumentClick);
+    
+    // Overlay click
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', closeMobileSidebar);
+    }
+}
+
+// Central event handler
+function handleDocumentClick(e) {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+
+    const action = target.dataset.action;
+
+    switch(action) {
+        case 'toggle-mobile-sidebar':
+            toggleMobileSidebar();
+            break;
+        case 'logout':
+            handleLogout();
+            break;
+        case 'refresh':
+            loadRequests();
+            break;
+        case 'apply-filters':
+            applyFilters();
+            break;
+        case 'open-review-modal':
+            openReviewModal(target.dataset.requestId);
+            break;
+        case 'close-modal':
+            closeModal();
+            break;
+        case 'show-action-form':
+            showActionForm(target.dataset.formAction);
+            break;
+        case 'hide-action-form':
+            hideActionForm();
+            break;
+        case 'submit-action':
+            submitAction();
+            break;
+    }
+}
+
+// Mobile sidebar
+function toggleMobileSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    if (sidebar) sidebar.classList.toggle('-translate-x-full');
+    if (overlay) {
+        if (overlay.classList.contains('hidden')) {
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        } else {
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+    }
+}
+
+function closeMobileSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    if (sidebar) sidebar.classList.add('-translate-x-full');
+    if (overlay) {
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+    }
+}
+
+// Logout
+function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('currentUser');
+        window.location.href = '../index.html';
+    }
+}
 
 function loadRequests() {
     // Get all requests for HOD's department
@@ -67,6 +158,7 @@ function populateStaffFilter() {
     });
 }
 
+// Apply filters
 function applyFilters() {
     const statusFilter = document.getElementById('filterStatus').value;
     const priorityFilter = document.getElementById('filterPriority').value;
@@ -117,14 +209,14 @@ function renderRequestsTable() {
 
         return `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="px-6 py-4 font-mono text-sm text-slate-600">${request.id}</td>
+                <td class="px-6 py-4 text-sm text-slate-600 font-medium">${request.id}</td>
                 <td class="px-6 py-4 font-medium text-slate-900">${request.title}</td>
                 <td class="px-6 py-4 text-slate-700">${request.requestor}</td>
                 <td class="px-6 py-4">${priorityBadge}</td>
                 <td class="px-6 py-4">${statusBadge}</td>
                 <td class="px-6 py-4 text-slate-600">${request.dateSubmitted}</td>
                 <td class="px-6 py-4 text-right">
-                    <button onclick="openReviewModal('${request.id}')"
+                    <button data-action="open-review-modal" data-request-id="${request.id}"
                         class="bg-visionRed hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all">
                         Review
                     </button>
@@ -154,6 +246,7 @@ function getPriorityBadge(priority) {
     return badges[priority] || badges['Medium'];
 }
 
+// Open review modal
 function openReviewModal(requestId) {
     currentRequest = allRequests.find(r => r.id === requestId);
     if (!currentRequest) return;
@@ -172,7 +265,7 @@ function openReviewModal(requestId) {
                 <div class="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <span class="text-slate-600">Request ID:</span>
-                        <span class="font-mono font-medium text-slate-900 ml-2">${currentRequest.id}</span>
+                        <span class="font-medium text-slate-900 ml-2">${currentRequest.id}</span>
                     </div>
                     <div>
                         <span class="text-slate-600">Priority:</span>
@@ -231,27 +324,27 @@ function openReviewModal(requestId) {
             <div class="border-t pt-6">
                 <h4 class="font-semibold text-lg text-slate-800 mb-4">Take Action</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <button onclick="showActionForm('clarification')"
+                    <button data-action="show-action-form" data-form-action="clarification"
                         class="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all">
                         <i class="ph ph-chat-circle-dots text-xl"></i>
                         Ask for Clarification
                     </button>
-                    <button onclick="showActionForm('approve')"
+                    <button data-action="show-action-form" data-form-action="approve"
                         class="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all">
                         <i class="ph ph-check-circle text-xl"></i>
                         Accept Request
                     </button>
-                    <button onclick="showActionForm('reject')"
+                    <button data-action="show-action-form" data-form-action="reject"
                         class="flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all">
                         <i class="ph ph-x-circle text-xl"></i>
                         Reject Request
                     </button>
-                    <button onclick="showActionForm('in_development')"
+                    <button data-action="show-action-form" data-form-action="in_development"
                         class="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-all">
                         <i class="ph ph-gear-six text-xl"></i>
                         Already in Development
                     </button>
-                    <button onclick="showActionForm('in_use')"
+                    <button data-action="show-action-form" data-form-action="in_use"
                         class="flex items-center justify-center gap-2 px-4 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-all md:col-span-2">
                         <i class="ph ph-check-square text-xl"></i>
                         Already in Use
@@ -281,11 +374,11 @@ function openReviewModal(requestId) {
                             placeholder="Enter your comments here..."></textarea>
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="submitAction()"
+                        <button data-action="submit-action"
                             class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all">
                             Submit
                         </button>
-                        <button onclick="hideActionForm()"
+                        <button data-action="hide-action-form"
                             class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-medium transition-all">
                             Cancel
                         </button>
@@ -303,8 +396,7 @@ function openReviewModal(requestId) {
     modal.classList.add('active');
 }
 
-let currentAction = null;
-
+// Show action form
 function showActionForm(action) {
     currentAction = action;
     const actionForm = document.getElementById('actionForm');
@@ -343,11 +435,13 @@ function showActionForm(action) {
     document.getElementById('actionReason').value = '';
 }
 
+// Hide action form
 function hideActionForm() {
     document.getElementById('actionForm').classList.add('hidden');
     currentAction = null;
 }
 
+// Submit action
 function submitAction() {
     const comment = document.getElementById('actionComment').value.trim();
     const reason = document.getElementById('actionReason').value;
@@ -392,12 +486,9 @@ function submitAction() {
     loadRequests();
 }
 
+// Close modal
 function closeModal() {
     document.getElementById('reviewModal').classList.remove('active');
     currentRequest = null;
     currentAction = null;
-}
-
-function refreshData() {
-    loadRequests();
 }

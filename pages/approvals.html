@@ -68,8 +68,7 @@
     <div class="flex h-screen overflow-hidden bg-gray-50">
 
         <!-- Mobile Sidebar Overlay -->
-        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"
-            onclick="toggleMobileSidebar()"></div>
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
 
         <!-- Sidebar -->
         <aside
@@ -130,7 +129,7 @@
                         <p class="text-sm text-slate-400">Staff Member</p>
                     </div>
                 </div>
-                <button onclick="logout()"
+                <button data-action="logout"
                     class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
                     <i class="ph ph-sign-out text-xl"></i> Logout
                 </button>
@@ -143,7 +142,7 @@
             <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
                 <div class="flex items-center gap-4">
                     <!-- Mobile Toggle Button -->
-                    <button onclick="toggleMobileSidebar()"
+                    <button data-action="toggle-mobile-sidebar"
                         class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <i class="ph ph-list text-2xl"></i>
                     </button>
@@ -154,7 +153,7 @@
                     </div>
                 </div>
 
-                <button onclick="location.reload()"
+                <button data-action="refresh"
                     class="bg-white hover:bg-slate-50 text-slate-700 px-4 md:px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-slate-200 w-full md:w-auto justify-center">
                     <i class="ph ph-arrows-clockwise"></i> Refresh
                 </button>
@@ -228,7 +227,7 @@
         <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
                 <h2 class="text-lg font-semibold text-slate-800 tracking-tight">Review Request</h2>
-                <button onclick="utils.hideModal('approvalModal')"
+                <button data-action="close-modal" data-modal="approvalModal"
                     class="text-slate-400 hover:text-slate-600 text-2xl leading-none">
                     &times;
                 </button>
@@ -244,15 +243,15 @@
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-slate-200 flex gap-3 justify-end bg-slate-50/50">
-                <button onclick="utils.hideModal('approvalModal')"
+                <button data-action="close-modal" data-modal="approvalModal"
                     class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-all border border-slate-200">
                     Cancel
                 </button>
-                <button onclick="rejectRequest()"
+                <button data-action="reject-request"
                     class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
                     Reject
                 </button>
-                <button onclick="approveRequest()"
+                <button data-action="approve-request"
                     class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
                     Approve
                 </button>
@@ -265,166 +264,7 @@
     <script src="../js/api.js"></script>
     <script src="../js/utils.js"></script>
     <script src="../js/app.js"></script>
-    <script>
-        let currentReviewRequest = null;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const user = checkAuth();
-            if (!user) return;
-
-            // Check if user is HOD
-            if (user.role !== 'hod') {
-                utils.showAlert('Access denied. This page is for Heads of Department only.', 'danger');
-                setTimeout(() => window.location.href = 'dashboard.html', 2000);
-                return;
-            }
-
-            // Hide IT Review link if not IT
-            if (user.role !== 'it' && user.role !== 'admin') {
-                document.getElementById('itReviewLink').style.display = 'none';
-            }
-
-            loadPendingApprovals();
-        });
-
-        function loadPendingApprovals() {
-            const user = getCurrentUser();
-            const allRequests = API.getRequests();
-
-            const pendingRequests = allRequests.filter(r =>
-                r.status === 'Pending HOD Approval' &&
-                r.department === user.department
-            );
-
-            const approvedToday = allRequests.filter(r =>
-                r.hodApproval === 'Approved' &&
-                r.department === user.department
-            ).length;
-
-            const rejected = allRequests.filter(r =>
-                r.status === 'Rejected' &&
-                r.department === user.department
-            ).length;
-
-            document.getElementById('pendingCount').textContent = pendingRequests.length;
-            document.getElementById('approvedToday').textContent = approvedToday;
-            document.getElementById('rejectedCount').textContent = rejected;
-
-            displayPendingRequests(pendingRequests);
-        }
-
-        function displayPendingRequests(requests) {
-            const container = document.getElementById('pendingRequestsList');
-            const emptyState = document.getElementById('emptyState');
-            const pendingContainer = document.getElementById('pendingRequestsContainer');
-
-            if (requests.length === 0) {
-                emptyState.classList.remove('hidden');
-                pendingContainer.innerHTML = '';
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            pendingContainer.innerHTML = '<div id="pendingRequestsList" class="space-y-4"></div>';
-            const listContainer = document.getElementById('pendingRequestsList');
-
-            listContainer.innerHTML = requests.map(request => `
-                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 hover:border-visionRed transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-slate-800 text-lg mb-1">${request.title}</h4>
-                            <p class="text-sm text-slate-500 mb-2">${request.id} • ${request.type}</p>
-                            <p class="text-slate-700">${request.description}</p>
-                        </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${request.priority === 'High' ? 'bg-red-100/50 text-red-700 border-red-200' :
-                    request.priority === 'Medium' ? 'bg-amber-100/50 text-amber-700 border-amber-200' :
-                        'bg-blue-100/50 text-blue-700 border-blue-200'
-                }">
-                            ${request.priority}
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2 text-sm text-slate-600 mb-4">
-                        <i class="ph ph-user"></i>
-                        <span class="font-medium text-slate-900">${request.requestor}</span> • ${request.section} • ${utils.formatDate(request.dateSubmitted)}
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="viewRequestDetail('${request.id}')" 
-                                class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-medium transition-all border border-slate-300">
-                            View Full Details
-                        </button>
-                        <button onclick="openApprovalModal('${request.id}', 'approve')" 
-                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow flex items-center gap-1">
-                            <i class="ph ph-check"></i> Approve
-                        </button>
-                        <button onclick="openApprovalModal('${request.id}', 'reject')" 
-                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow flex items-center gap-1">
-                            <i class="ph ph-x"></i> Reject
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openApprovalModal(requestId, action) {
-            currentReviewRequest = API.getRequest(requestId);
-
-            const modalDetails = document.getElementById('modalRequestDetails');
-            modalDetails.innerHTML = `
-                <div class="bg-blue-50/50 border border-blue-200 rounded-lg p-4 space-y-2">
-                    <div><span class="text-sm text-slate-600">Request ID:</span> <strong class="font-medium text-slate-900">${currentReviewRequest.id}</strong></div>
-                    <div><span class="text-sm text-slate-600">Title:</span> <strong class="font-medium text-slate-900">${currentReviewRequest.title}</strong></div>
-                    <div><span class="text-sm text-slate-600">Requestor:</span> <strong class="font-medium text-slate-900">${currentReviewRequest.requestor}</strong> (${currentReviewRequest.section})</div>
-                    <div><span class="text-sm text-slate-600">Business Justification:</span> <p class="text-slate-700 mt-1">${currentReviewRequest.justification}</p></div>
-                </div>
-            `;
-
-            document.getElementById('approvalModal').classList.remove('hidden');
-            document.getElementById('approvalModal').classList.add('flex');
-        }
-
-        function approveRequest() {
-            if (!currentReviewRequest) return;
-
-            const comments = document.getElementById('approvalComments').value;
-
-            API.updateRequest(currentReviewRequest.id, {
-                status: 'IT Review',
-                hodApproval: 'Approved',
-                hodComments: comments
-            });
-
-            showToast('Request approved successfully!', 'success');
-            utils.hideModal('approvalModal');
-            document.getElementById('approvalComments').value = '';
-            setTimeout(() => loadPendingApprovals(), 500);
-        }
-
-        function rejectRequest() {
-            if (!currentReviewRequest) return;
-
-            const comments = document.getElementById('approvalComments').value;
-
-            if (!comments.trim()) {
-                showToast('Please provide a reason for rejection', 'warning');
-                return;
-            }
-
-            API.updateRequest(currentReviewRequest.id, {
-                status: 'Rejected',
-                hodApproval: 'Rejected',
-                hodComments: comments
-            });
-
-            showToast('Request rejected', 'info');
-            utils.hideModal('approvalModal');
-            document.getElementById('approvalComments').value = '';
-            setTimeout(() => loadPendingApprovals(), 500);
-        }
-
-        function viewRequestDetail(id) {
-            window.location.href = `request-detail.html?id=${id}`;
-        }
-    </script>
+    <script src="../js/approvals.js"></script>
 </body>
 
 </html>
