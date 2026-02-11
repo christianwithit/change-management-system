@@ -196,6 +196,21 @@ function handleDocumentClick(e) {
         case 'toggle-timeline-group':
             toggleTimelineGroup(target.dataset.groupId);
             break;
+        case 'toggle-status-details':
+            toggleStatusGuideDetails();
+            break;
+    }
+}
+
+// Toggle status guide details
+function toggleStatusGuideDetails() {
+    const details = document.getElementById('status-guide-details');
+    const icon = document.getElementById('status-guide-icon');
+    
+    if (details && icon) {
+        details.classList.toggle('hidden');
+        icon.classList.toggle('ph-caret-down');
+        icon.classList.toggle('ph-caret-up');
     }
 }
 
