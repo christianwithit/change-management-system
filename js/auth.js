@@ -1,9 +1,19 @@
 // Mock user database - In production, this would be handled by backend API
 const MOCK_USERS = {
-    'staff': { password: 'staff123', role: 'staff', fullName: 'Staff Member', department: 'General' },
-    'hod': { password: 'hod123', role: 'hod', fullName: 'Head of Department', department: 'IT Department' },
-    'it': { password: 'it123', role: 'it', fullName: 'IT Administrator', department: 'IT Department' },
-    'admin': { password: 'admin123', role: 'admin', fullName: 'System Administrator', department: 'Administration' }
+    'staff': { 
+        password: 'staff123', 
+        role: 'staff', 
+        fullName: 'Staff Member', 
+        department: 'General', 
+        staffId: 2 },
+    'hod': { 
+        password: 'hod123', 
+        role: 'hod', 
+        fullName: 'Head of Department', 
+        department: 'Marketing', 
+        staffId: 3 },
+    'it': { password: 'it123', role: 'it', fullName: 'IT Administrator', department: 'IT Department', staffId: 3 },
+    'admin': { password: 'admin123', role: 'admin', fullName: 'System Administrator', department: 'Administration', staffId: 4 }
 };
 
 // Authentication handling
@@ -28,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         role: userAccount.role,
                         fullName: userAccount.fullName,
                         department: userAccount.department,
+                        staffId: userAccount.staffId,
                         loginTime: new Date().toISOString()
                     };
 
