@@ -254,17 +254,17 @@ function displayRequests(requests) {
 
     tbody.innerHTML = requests.map(request => {
     const priorityClass = request.priority === 'High' ? 'bg-red-100 text-red-700' :
-        request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-        'bg-blue-100 text-blue-700';
+    request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+    'bg-blue-100 text-blue-700';
 
-    const { label: statusLabel, class: statusClass } = getDisplayStatus(request);
+    const { label: displayStatus, class: statusClass } = getDisplayStatus(request);  // ✅ renamed to displayStatus
 
     const departmentName = request.department?.department_name || 'N/A';
     const formattedDate = new Date(request.createdAt).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
-    });
+});
 
     return `
         <tr class="hover:bg-gray-50 transition-colors">
