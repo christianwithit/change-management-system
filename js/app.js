@@ -218,3 +218,32 @@ window.exportCurrentView = function(format = 'csv') {
         utils.exportToCSV(data, `cms-export-${new Date().toISOString().split('T')[0]}.csv`);
     }
 };
+
+// Global helper: Get display status for a request (staff-friendly labels)
+window.getDisplayStatus = function(request) {
+    const hodReview = request.change_ms_hod_review;
+    const status = request.request_status;
+
+    if (status === 'Rejected' && hodReview?.already_in_progress) {
+        return { label: 'Already in Progress', class: 'bg-purple-100 text-purple-700' };
+    }
+    if (status === 'Rejected' && hodReview?.already_exists) {
+        return { label: 'Already Exists', class: 'bg-slate-100 text-slate-700' };
+    }
+    if (status === 'Rejected') {
+        return { label: 'Rejected', class: 'bg-red-100 text-red-700' };
+    }
+    if (status === 'Completed') {
+        return { label: 'Completed', class: 'bg-green-100 text-green-700' };
+    }
+    if (status === 'Development') {
+        return { label: 'In Development', class: 'bg-purple-100 text-purple-700' };
+    }
+    if (status === 'IT Review') {
+        return { label: 'IT Review', class: 'bg-blue-100 text-blue-700' };
+    }
+    if (status === 'Pending HOD approval') {
+        return { label: 'Pending HOD Approval', class: 'bg-orange-100 text-orange-700' };
+    }
+    return { label: status, class: 'bg-gray-100 text-gray-700' };
+};

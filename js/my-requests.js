@@ -1,12 +1,44 @@
-/* global checkAuth, getCurrentUser, API, utils */
+/* global checkAuth, getCurrentUser, apiClient, showToast, utils */
 // My Requests Page Logic
 
 let allRequests = [];
 
+// Helper: Get display status for a request
+function getDisplayStatus(request) {
+    const hodReview = request.change_ms_hod_review;
+    const status = request.request_status;
+
+    if (status === 'Rejected' && hodReview?.already_in_progress) {
+        return { label: 'Already in Progress', class: 'bg-purple-100 text-purple-700' };
+    }
+    if (status === 'Rejected' && hodReview?.already_exists) {
+        return { label: 'Already Exists', class: 'bg-slate-100 text-slate-700' };
+    }
+    if (status === 'Rejected') {
+        return { label: 'Rejected', class: 'bg-red-100 text-red-700' };
+    }
+    if (status === 'Completed') {
+        return { label: 'Completed', class: 'bg-green-100 text-green-700' };
+    }
+    if (status === 'Development') {
+        return { label: 'In Development', class: 'bg-purple-100 text-purple-700' };
+    }
+    if (status === 'IT Review') {
+        return { label: 'IT Review', class: 'bg-blue-100 text-blue-700' };
+    }
+    if (status === 'Pending HOD approval') {
+        return { label: 'Pending HOD Approval', class: 'bg-orange-100 text-orange-700' };
+    }
+    return { label: status, class: 'bg-gray-100 text-gray-700' };
+}
+
 // Initialize page
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const user = checkAuth();
     if (!user) return;
+
+    // Update page header based on role
+    updatePageHeader(user);
 
     // Show navigation based on role
     if (user.role === 'hod') {
@@ -26,8 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeEventListeners();
 
     // Load data
-    populateDepartmentFilter();
-    loadRequests();
+    await populateDepartmentFilter();
+    await loadRequests();
 });
 
 // Initialize event listeners
@@ -39,9 +71,12 @@ function initializeEventListeners() {
     const statusFilter = document.getElementById('statusFilter');
     const departmentFilter = document.getElementById('departmentFilter');
 
-    if (searchInput) {
+    if (searchInput && utils && utils.debounce) {
         searchInput.addEventListener('input', utils.debounce(filterRequests, 300));
+    } else if (searchInput) {
+        searchInput.addEventListener('input', filterRequests);
     }
+    
     if (statusFilter) {
         statusFilter.addEventListener('change', filterRequests);
     }
@@ -123,34 +158,80 @@ function handleLogout() {
     }
 }
 
+// Update page header based on role
+function updatePageHeader(user) {
+    const header = document.querySelector('h2');
+    const subtext = document.querySelector('header p');
+    
+    if (user.role === 'hod') {
+        if (header) header.textContent = 'Department Change Requests';
+        if (subtext) subtext.textContent = `Track and manage all change requests from ${user.department}.`;
+    } else if (user.role === 'it' || user.role === 'admin') {
+        if (header) header.textContent = 'All Change Requests';
+        if (subtext) subtext.textContent = 'Track and manage all change requests across the organization.';
+    }
+}
+
 // Populate department filter
-function populateDepartmentFilter() {
+async function populateDepartmentFilter() {
     const select = document.getElementById('departmentFilter');
     if (!select) return;
 
-    const departments = API.getDepartments();
-    departments.forEach(dept => {
-        const option = document.createElement('option');
-        option.value = dept;
-        option.textContent = dept;
-        select.appendChild(option);
-    });
+    try {
+        const response = await apiClient.getDepartments();
+        const departments = response.data || response;
+        
+        departments.forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept.id;
+            option.textContent = dept.attributes?.department_name || dept.department_name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Failed to load departments:', error);
+    }
 }
 
-// Load requests
-function loadRequests() {
+// Load requests from backend
+// Load requests from backend
+// Load requests from backend
+async function loadRequests() {
     const user = getCurrentUser();
-    allRequests = API.getRequests();
-
-    if (user.role === 'staff') {
-        allRequests = allRequests.filter(r => r.requestor === user.fullName);
-    } else if (user.role === 'hod') {
-        allRequests = allRequests.filter(r => r.department === user.department);
+    
+    if (!user.staffId && user.role === 'staff') {
+        console.error('User does not have staffId');
+        showToast('Unable to load requests: User ID missing', 'error');
+        return;
     }
 
-    displayRequests(allRequests);
-}
+    try {
+        let response;
+        
+        if (user.role === 'staff') {
+            // Staff: Get only their own requests
+            response = await apiClient.getChangeRequestsByStaff(user.staffId);
+            allRequests = response.data || response;
+        } else if (user.role === 'hod') {
+            // HOD: Get ALL requests from their department
+            response = await apiClient.getAllChangeRequests();
+            let allRequestsData = response.data || response;
+            allRequests = allRequestsData.filter(r => 
+                r.department?.department_name === user.department
+            );
+        } else {
+            // IT/Admin: Get all requests
+            response = await apiClient.getAllChangeRequests();
+            allRequests = response.data || response;
+        }
 
+        displayRequests(allRequests);
+        
+    } catch (error) {
+        console.error('Failed to load requests:', error);
+        showToast('Failed to load requests', 'error');
+        displayRequests([]);
+    }
+}
 // Display requests
 function displayRequests(requests) {
     const tbody = document.getElementById('requestsBody');
@@ -172,65 +253,73 @@ function displayRequests(requests) {
     if (tableContainer) tableContainer.classList.remove('hidden');
 
     tbody.innerHTML = requests.map(request => {
-        const priorityClass = request.priority === 'High' ? 'bg-red-100 text-red-700' :
-            request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-            'bg-blue-100 text-blue-700';
+    const priorityClass = request.priority === 'High' ? 'bg-red-100 text-red-700' :
+    request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+    'bg-blue-100 text-blue-700';
 
-        const statusClass = request.status === 'Completed' ? 'bg-green-100 text-green-700' :
-            request.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-            request.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
-            'bg-orange-100 text-orange-700';
+    const { label: displayStatus, class: statusClass } = getDisplayStatus(request);  // ✅ renamed to displayStatus
 
-        return `
-            <tr class="hover:bg-gray-50 transition-colors">
-                <td class="px-6 py-4"><strong class="text-gray-800">${request.id}</strong></td>
-                <td class="px-6 py-4 font-medium text-gray-800">${request.title}</td>
-                <td class="px-6 py-4"><span class="text-gray-600 text-sm">${request.type}</span></td>
-                <td class="px-6 py-4 text-gray-700">${request.department}</td>
-                <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${priorityClass}">
-                        ${request.priority}
-                    </span>
-                </td>
-                <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
-                        ${request.status}
-                    </span>
-                </td>
-                <td class="px-6 py-4 text-gray-600 text-sm">${utils.formatDate(request.dateSubmitted)}</td>
-                <td class="px-6 py-4 text-right">
-                    <button data-action="view-request" data-request-id="${request.id}"
-                        class="bg-visionRed hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
-                        View Details
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join('');
+    const departmentName = request.department?.department_name || 'N/A';
+    const formattedDate = new Date(request.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+});
+
+    return `
+        <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4"><strong class="text-gray-800">${request.id}</strong></td>
+            <td class="px-6 py-4 font-medium text-gray-800">${request.title}</td>
+            <td class="px-6 py-4"><span class="text-gray-600 text-sm">${request.change_type}</span></td>
+            <td class="px-6 py-4 text-gray-700">${departmentName}</td>
+            <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${priorityClass}">
+                    ${request.priority}
+                </span>
+            </td>
+            <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+                    ${displayStatus}
+                </span>
+            </td>
+            <td class="px-6 py-4 text-gray-600 text-sm">${formattedDate}</td>
+            <td class="px-6 py-4 text-right">
+                <button data-action="view-request" data-request-id="${request.id}"
+                    class="bg-visionRed hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
+                    View Details
+                </button>
+            </td>
+        </tr>
+    `;
+}).join('');
 }
 
 // Filter requests
 function filterRequests() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const statusFilter = document.getElementById('statusFilter').value;
-    const departmentFilter = document.getElementById('departmentFilter').value;
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const departmentFilter = document.getElementById('departmentFilter');
+    
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const statusValue = statusFilter ? statusFilter.value : '';
+    const departmentValue = departmentFilter ? departmentFilter.value : '';
 
     let filtered = allRequests;
 
     if (searchTerm) {
         filtered = filtered.filter(r =>
-            r.id.toLowerCase().includes(searchTerm) ||
+            String(r.id).toLowerCase().includes(searchTerm) ||
             r.title.toLowerCase().includes(searchTerm) ||
             r.description.toLowerCase().includes(searchTerm)
         );
     }
 
-    if (statusFilter) {
-        filtered = filtered.filter(r => r.status === statusFilter);
+    if (statusValue) {
+        filtered = filtered.filter(r => r.request_status === statusValue);
     }
 
-    if (departmentFilter) {
-        filtered = filtered.filter(r => r.department === departmentFilter);
+    if (departmentValue) {
+        filtered = filtered.filter(r => r.department?.id === parseInt(departmentValue));
     }
 
     displayRequests(filtered);
@@ -243,6 +332,9 @@ function viewRequest(id) {
 
 // Export current view
 function exportCurrentView() {
-    const data = API.getRequests();
-    utils.exportToCSV(data, `cms-export-${new Date().toISOString().split('T')[0]}.csv`);
+    if (typeof showToast === 'function') {
+        showToast('Export feature coming soon!', 'info');
+    } else {
+        alert('Export feature coming soon!');
+    }
 }

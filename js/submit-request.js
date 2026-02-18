@@ -1,8 +1,10 @@
-/* global checkAuth, getCurrentUser, API, showToast */
+/* global checkAuth, getCurrentUser, apiClient, showToast */
 
 let currentStep = 1;
+let uploadedFiles = [];
+let allSections = []; // Store all sections for lookup
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const user = checkAuth();
     if (!user) return;
 
@@ -19,7 +21,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Populate dropdowns
     populateChangeTypes();
-    populateDepartments();
+    await populateDepartments();
+    
+    // Set up department change listener to filter sections
+    const departmentSelect = document.getElementById('department');
+    departmentSelect.addEventListener('change', async function() {
+        await loadSectionsForDepartment(this.value);
+    });
 
     // Handle form submission
     document.getElementById('submitRequestForm').addEventListener('submit', handleSubmit);
@@ -51,6 +59,24 @@ function handleDocumentClick(e) {
         case 'upload-file':
             document.getElementById('fileInput').click();
             break;
+        case 'navigate':
+            const page = target.dataset.page;
+            if (page) window.location.href = page;
+            break;
+        case 'toggle-sidebar':
+            toggleSidebar();
+            break;
+    }
+}
+
+// Sidebar toggle for mobile
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    if (sidebar && overlay) {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
     }
 }
 
@@ -62,11 +88,23 @@ function handleLogout() {
     }
 }
 
+// Populate change types from enum (hardcoded)
 function populateChangeTypes() {
     const select = document.getElementById('type');
-    const types = API.getChangeTypes();
-
-    types.forEach(type => {
+    const changeTypes = [
+        'Enhancement to Existing System',
+        'New System Proposal',
+        'Process Automation',
+        'Performance Improvement',
+        'Security Enhancement',
+        'Integration Request',
+        'Infrastructure Upgrade',
+        'Data Migration',
+        'System Replacement',
+        'Mobile Application'
+    ];
+    
+    changeTypes.forEach(type => {
         const option = document.createElement('option');
         option.value = type;
         option.textContent = type;
@@ -74,16 +112,77 @@ function populateChangeTypes() {
     });
 }
 
-function populateDepartments() {
+async function populateDepartments() {
     const select = document.getElementById('department');
-    const departments = API.getDepartments();
+    
+    try {
+        const response = await apiClient.getDepartments();
+        
+        // Handle Strapi's response format
+        const departments = response.data || response;
+        
+        departments.forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept.id;
+            option.textContent = dept.attributes?.department_name || dept.department_name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Failed to load departments:', error);
+        showToast('Failed to load departments', 'error');
+    }
+}
 
-    departments.forEach(dept => {
-        const option = document.createElement('option');
-        option.value = dept;
-        option.textContent = dept;
-        select.appendChild(option);
+// Load sections for selected department (for validation/lookup)
+async function loadSectionsForDepartment(departmentId) {
+    const sectionInput = document.getElementById('section');
+    
+    if (!departmentId) {
+        sectionInput.placeholder = "Select department first";
+        sectionInput.disabled = true;
+        allSections = [];
+        return;
+    }
+    
+    sectionInput.disabled = false;
+    sectionInput.placeholder = "Enter your section name";
+    
+    try {
+        const response = await apiClient.getSectionsByDepartment(departmentId);
+        allSections = response.data || response;
+        
+        if (allSections.length === 0) {
+            console.log('No sections found for this department');
+        } else {
+            console.log('Available sections:', allSections.map(s => s.attributes?.section_name || s.section_name));
+        }
+    } catch (error) {
+        console.error('Failed to load sections:', error);
+        allSections = [];
+    }
+}
+
+// Find section ID by name
+function findSectionIdByName(sectionName) {
+    if (!sectionName) return null;
+    
+    const normalizedInput = sectionName.trim().toLowerCase();
+    
+    // Try exact match first
+    let section = allSections.find(s => {
+        const name = s.attributes?.section_name || s.section_name;
+        return name.toLowerCase() === normalizedInput;
     });
+    
+    // Try partial match if no exact match
+    if (!section) {
+        section = allSections.find(s => {
+            const name = s.attributes?.section_name || s.section_name;
+            return name.toLowerCase().includes(normalizedInput) || normalizedInput.includes(name.toLowerCase());
+        });
+    }
+    
+    return section ? section.id : null;
 }
 
 // Form Stepper Functions
@@ -162,7 +261,7 @@ function updateStepper(activeStep) {
     }
 }
 
-function handleSubmit(e) {
+async function handleSubmit(e) {
     e.preventDefault();
 
     const submitBtn = document.getElementById('submitBtn');
@@ -170,74 +269,122 @@ function handleSubmit(e) {
 
     // Show loading state
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="ph ph-spinner animate-spin text-xl"></i> Processing...';
+    submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Submitting...';
     submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
 
-    // Simulate async operation
-    setTimeout(() => {
+    try {
         const user = getCurrentUser();
         const formData = new FormData(e.target);
+        const sectionName = formData.get('section');
 
-        const requestData = {
-            title: formData.get('title'),
-            type: formData.get('type'),
-            department: formData.get('department'),
-            section: formData.get('section'),
-            description: formData.get('description'),
-            justification: formData.get('justification'),
-            expectedBenefits: formData.get('benefits'),
-            priority: formData.get('priority'),
-            requestor: user.fullName
-        };
-
-        // Create request
-        const newRequest = API.createRequest(requestData);
-
-        if (newRequest) {
-            showToast('Request Submitted Successfully!', 'success');
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1000);
-        } else {
-            showToast('Failed to submit request. Please try again.', 'error');
+        // Convert section name to section ID
+        const sectionId = findSectionIdByName(sectionName);
+        
+        if (!sectionId) {
+            showToast(`Section "${sectionName}" not found. Please check the section name or contact your department head.`, 'error');
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalContent;
             submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            return;
         }
-    }, 1500);
+
+        // Prepare data matching backend schema
+        const requestData = {
+            title: formData.get('title'),
+            justification: formData.get('justification'),
+            description: formData.get('description'),
+            priority: formData.get('priority'),
+            expected_benefits: formData.get('benefits'),
+            change_type: formData.get('type'),
+            change_ms_section: sectionId,  // Send section ID
+            department: parseInt(formData.get('department')),
+            staff: user.staffId || 2
+        };
+
+        console.log('Section name entered:', sectionName);
+        console.log('Section ID found:', sectionId);
+        console.log('Submitting request:', requestData);
+
+        // Send to backend
+        const response = await apiClient.createChangeRequest(requestData);
+
+        console.log('Response:', response);
+
+        // Show success message
+        showToast('Request Submitted Successfully!', 'success');
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1500);
+
+    } catch (error) {
+        console.error('Submit error:', error);
+        showToast(error.message || 'Failed to submit request. Please try again.', 'error');
+        
+        // Restore button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalContent;
+        submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+    }
 }
 
 function resetForm() {
     if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
         document.getElementById('submitRequestForm').reset();
         document.getElementById('fileList').innerHTML = '';
+        uploadedFiles = [];
+        allSections = [];
         currentStep = 1;
         document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
         document.getElementById('formStep1').classList.add('active');
         updateStepper(1);
+        
+        // Reset all field borders
+        document.querySelectorAll('input, textarea, select').forEach(field => {
+            field.style.borderColor = '#D1D5DB';
+        });
     }
 }
 
 // File upload handler (called from onchange attribute on file input)
 function handleFileUpload(input) {
     const fileList = document.getElementById('fileList');
-    fileList.innerHTML = '';
-
+    
     if (input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200 mt-2';
-            fileItem.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <i class="ph ph-file text-xl text-slate-600"></i>
-                    <span class="text-sm font-medium text-slate-700">${file.name}</span>
-                    <span class="text-xs text-slate-500">(${(file.size / 1024).toFixed(1)} KB)</span>
-                </div>
-            `;
-            fileList.appendChild(fileItem);
-        });
+        uploadedFiles = Array.from(input.files);
+        displayUploadedFiles();
     }
 }
 
-// Make handleFileUpload globally accessible for the onchange attribute
+function displayUploadedFiles() {
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '';
+
+    uploadedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200 mt-2';
+        fileItem.innerHTML = `
+            <div class="flex items-center gap-3">
+                <i class="ph ph-file text-2xl text-slate-600"></i>
+                <div>
+                    <p class="font-semibold text-sm text-slate-700">${file.name}</p>
+                    <p class="text-xs text-slate-500">${(file.size / 1024).toFixed(2)} KB</p>
+                </div>
+            </div>
+            <button type="button" onclick="removeFile(${index})" class="text-red-600 hover:text-red-800 p-2">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        `;
+        fileList.appendChild(fileItem);
+    });
+}
+
+function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    displayUploadedFiles();
+}
+
+// Make functions globally accessible
 window.handleFileUpload = handleFileUpload;
+window.removeFile = removeFile;
