@@ -16,6 +16,22 @@ A modern, responsive web application for managing organizational change requests
 
 ## � Recent Updates
 
+### Version 2.2 - Timeline Status Guide (February 2026)
+
+**New Timeline Features:**
+- ✅ **Timeline Status Guide**: Visual legend explaining timeline color coding
+  - Compact header with color-coded indicators (Red/Yellow/Green)
+  - Expandable details section with comprehensive descriptions
+  - Icons for each status type (Overdue, Due Soon, On Track)
+  - Smooth toggle animation for showing/hiding details
+  - Integrated into timeline controls for easy reference
+  - Helps users quickly understand project urgency levels
+
+**Status Definitions:**
+- 🔴 **Overdue**: Tasks past their deadline requiring immediate attention
+- 🟡 **Due Soon**: Tasks approaching deadline within 7 days
+- 🟢 **On Track**: Tasks with sufficient time remaining
+
 ### Version 2.1 - Advanced Timeline Features (February 2026)
 
 **New Timeline Capabilities:**

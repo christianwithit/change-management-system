@@ -131,6 +131,9 @@ function handleContainerClick(e) {
         case 'open-accept-task-modal':
             openAcceptTaskModal(target.dataset.projectId);
             break;
+        case 'open-initiate-handover-modal':
+            openInitiateHandoverModal(target.dataset.projectId);
+            break;
     }
 }
 
@@ -541,6 +544,39 @@ function displayProjects() {
                         </div>
                     </div>
                 </div>
+
+                <!-- Handover Initiation Banner (for completed projects) -->
+                ${project.developmentStatus === 'Completed' && !project.handoverInitiated ? `
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg mb-4">
+                    <div class="flex items-center gap-3">
+                        <i class="ph ph-check-circle text-green-600 text-2xl"></i>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-green-800">Project Completed</h4>
+                            <p class="text-sm text-green-700">Ready for formal handover and deployment</p>
+                        </div>
+                        <button data-action="open-initiate-handover-modal" data-project-id="${project.id}"
+                            class="bg-visionRed hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                            <i class="ph ph-file-text"></i> Initiate Handover
+                        </button>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${project.handoverInitiated ? `
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg mb-4">
+                    <div class="flex items-center gap-3">
+                        <i class="ph ph-file-text text-blue-600 text-2xl"></i>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-blue-800">Handover In Progress</h4>
+                            <p class="text-sm text-blue-700">Awaiting stakeholder sign-offs</p>
+                        </div>
+                        <a href="handover-detail.html?id=${project.handoverId}"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                            <i class="ph ph-eye"></i> View Handover
+                        </a>
+                    </div>
+                </div>
+                ` : ''}
 
                 <div class="flex gap-2 flex-wrap">
                     <button data-action="view-project-detail" data-project-id="${project.id}"
@@ -1649,3 +1685,184 @@ function submitAcceptTask() {
         switchTab('timeline');
     }, 500);
 }
+
+// ============ HANDOVER FUNCTIONS (Phase 1) ============
+
+// Open initiate handover modal
+function openInitiateHandoverModal(projectId) {
+    currentProject = allProjects.find(p => p.id === projectId);
+    if (!currentProject) return;
+
+    const user = getCurrentUser();
+    
+    const modal = document.getElementById('initiateHandoverModal');
+    if (!modal) {
+        // Create modal if it doesn't exist
+        createInitiateHandoverModal();
+    }
+    
+    const modalInfo = document.getElementById('modalHandoverProjectInfo');
+    modalInfo.innerHTML = `
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p class="text-sm text-gray-600 mb-1">Project ID: <strong class="text-gray-800">${currentProject.id}</strong></p>
+            <p class="font-bold text-gray-800">${currentProject.title}</p>
+            <p class="text-sm text-gray-600 mt-2">Department: ${currentProject.department}</p>
+        </div>
+    `;
+
+    document.getElementById('initiateHandoverModal').classList.remove('hidden');
+    document.getElementById('initiateHandoverModal').classList.add('flex');
+}
+
+// Create initiate handover modal
+function createInitiateHandoverModal() {
+    const modalHTML = `
+        <div id="initiateHandoverModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 text-xl">Initialize Handover Document</h3>
+                    <button data-action="close-modal" data-modal="initiateHandoverModal"
+                        class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                        &times;
+                    </button>
+                </div>
+                <div class="p-6 space-y-5">
+                    <div id="modalHandoverProjectInfo"></div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="ph ph-info text-blue-600"></i>
+                            System Specifications
+                        </h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Server Environment</label>
+                                <input type="text" id="serverEnvironment" 
+                                    placeholder="e.g., VPS at IP: 170.187.146.79"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-visionRed focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Public URL</label>
+                                <input type="text" id="publicURL" 
+                                    placeholder="e.g., https://system.visiongroup.co.ug"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-visionRed focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">SSL/HTTPS Status</label>
+                                <select id="sslStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-visionRed focus:outline-none">
+                                    <option value="Enabled">Enabled</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not Required">Not Required</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Database Location</label>
+                                <input type="text" id="databaseLocation" 
+                                    placeholder="e.g., Same VPS instance"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-visionRed focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Backup Strategy</label>
+                                <textarea id="backupStrategy" rows="2"
+                                    placeholder="e.g., Scheduled incremental backups"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-visionRed focus:outline-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="ph ph-check-square text-green-600"></i>
+                            Sign-off Workflow
+                        </h4>
+                        <p class="text-sm text-gray-600 mb-3">This handover will require sign-offs from the following stakeholders:</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="ph ph-check-circle text-green-600"></i>
+                                <span class="font-medium">1. Project Developer</span>
+                                <span class="text-gray-500">(Auto-signed)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="ph ph-circle text-gray-400"></i>
+                                <span class="font-medium">2. Project Manager</span>
+                                <span class="text-gray-500">(Felix Ssembajjwe Bashabe)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="ph ph-circle text-gray-400"></i>
+                                <span class="font-medium">3. Information Security</span>
+                                <span class="text-gray-500">(Emmanuel Cliff Mughanwa)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="ph ph-circle text-gray-400"></i>
+                                <span class="font-medium">4. Head of Technology</span>
+                                <span class="text-gray-500">(Paul Ikanza)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="ph ph-circle text-gray-400"></i>
+                                <span class="font-medium">5. End User (HR)</span>
+                                <span class="text-gray-500">(Agatha Joyday Gloria)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i class="ph ph-circle text-gray-400"></i>
+                                <span class="font-medium">6. End User (HOD)</span>
+                                <span class="text-gray-500">(Marjorie Nalubowa)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button data-action="close-modal" data-modal="initiateHandoverModal"
+                            class="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-all">
+                            Cancel
+                        </button>
+                        <button onclick="submitInitiateHandover()"
+                            class="flex-1 bg-visionRed hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                            <i class="ph ph-file-text"></i> Initialize Handover
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Submit initiate handover
+window.submitInitiateHandover = function() {
+    if (!currentProject) return;
+
+    const user = getCurrentUser();
+    
+    const handoverData = {
+        initiatedBy: user.fullName,
+        systemSpecs: {
+            serverEnvironment: document.getElementById('serverEnvironment').value,
+            publicURL: document.getElementById('publicURL').value,
+            sslStatus: document.getElementById('sslStatus').value,
+            databaseLocation: document.getElementById('databaseLocation').value,
+            backupStrategy: document.getElementById('backupStrategy').value
+        }
+    };
+
+    // Create handover
+    const handover = API.createHandover(currentProject.id, handoverData);
+
+    if (handover) {
+        utils.showAlert('Handover document created successfully!', 'success');
+        closeModal('initiateHandoverModal');
+
+        // Clear form
+        document.getElementById('serverEnvironment').value = '';
+        document.getElementById('publicURL').value = '';
+        document.getElementById('sslStatus').value = 'Enabled';
+        document.getElementById('databaseLocation').value = '';
+        document.getElementById('backupStrategy').value = '';
+
+        setTimeout(() => {
+            loadProjects();
+        }, 500);
+    } else {
+        utils.showAlert('Failed to create handover document', 'error');
+    }
+};

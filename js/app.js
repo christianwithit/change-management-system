@@ -83,6 +83,15 @@ function updateNavigationVisibility(user) {
         }
     }
 
+    // Show Development for IT and Admin
+    const developmentLink = document.getElementById('developmentLink');
+    if (developmentLink) {
+        if (user.role === 'it' || user.role === 'admin') {
+            developmentLink.classList.remove('hidden');
+            developmentLink.style.display = 'flex';
+        }
+    }
+
     // Show Reports for HOD, IT, and Admin
     const reportsLink = document.getElementById('reportsLink');
     if (reportsLink) {

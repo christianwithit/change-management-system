@@ -458,6 +458,253 @@ const API = {
             }
         }
         return this.developmentLogs.filter(log => log.requestId === requestId);
+    },
+
+    // ============ HANDOVER METHODS (Phase 1) ============
+    
+    handovers: [],
+
+    // Create handover document
+    createHandover: function(projectId, handoverData) {
+        const project = this.getRequest(projectId);
+        if (!project) return null;
+
+        const handover = {
+            id: `HO-${new Date().getFullYear()}-${String(this.handovers.length + 1).padStart(3, '0')}`,
+            projectId: projectId,
+            projectTitle: project.title,
+            projectDepartment: project.department,
+            initiatedBy: handoverData.initiatedBy,
+            initiatedDate: new Date().toISOString().split('T')[0],
+            status: 'in-progress', // in-progress, completed, rejected
+            attempt: 1,
+            
+            // System specifications
+            systemSpecs: handoverData.systemSpecs || {},
+            
+            // Signatures (6 roles for IT system implementation)
+            signatures: [
+                {
+                    sequence: 1,
+                    role: 'Project Developer',
+                    assignedTo: handoverData.initiatedBy,
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    status: 'approved', // Auto-approved
+                    stage: 'completed',
+                    signedDate: new Date().toISOString(),
+                    signedBy: handoverData.initiatedBy,
+                    ipAddress: '127.0.0.1',
+                    checklistResponses: {
+                        source_code_uploaded: true,
+                        system_tested: true,
+                        documentation_completed: true,
+                        training_materials_prepared: true
+                    },
+                    comments: 'Project completed and ready for handover',
+                    conditions: []
+                },
+                {
+                    sequence: 2,
+                    role: 'Project Manager',
+                    assignedTo: 'Felix Ssembajjwe Bashabe',
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    status: 'pending',
+                    stage: 'active', // Can sign now
+                    signedDate: null,
+                    signedBy: null,
+                    ipAddress: null,
+                    checklistResponses: {},
+                    comments: null,
+                    conditions: []
+                },
+                {
+                    sequence: 3,
+                    role: 'Information Security',
+                    assignedTo: 'Emmanuel Cliff Mughanwa',
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    status: 'pending',
+                    stage: 'active', // Can sign now (parallel with PM)
+                    signedDate: null,
+                    signedBy: null,
+                    ipAddress: null,
+                    checklistResponses: {},
+                    comments: null,
+                    conditions: []
+                },
+                {
+                    sequence: 4,
+                    role: 'Head of Technology',
+                    assignedTo: 'Paul Ikanza',
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    status: 'pending',
+                    stage: 'locked', // Unlocks after PM + Security
+                    signedDate: null,
+                    signedBy: null,
+                    ipAddress: null,
+                    checklistResponses: {},
+                    comments: null,
+                    conditions: []
+                },
+                {
+                    sequence: 5,
+                    role: 'End User (HR)',
+                    assignedTo: 'Agatha Joyday Gloria',
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    status: 'pending',
+                    stage: 'locked', // Unlocks after Head of Tech
+                    signedDate: null,
+                    signedBy: null,
+                    ipAddress: null,
+                    checklistResponses: {},
+                    comments: null,
+                    conditions: []
+                },
+                {
+                    sequence: 6,
+                    role: 'End User (HOD)',
+                    assignedTo: 'Marjorie Nalubowa',
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    status: 'pending',
+                    stage: 'locked', // Unlocks after Head of Tech
+                    signedDate: null,
+                    signedBy: null,
+                    ipAddress: null,
+                    checklistResponses: {},
+                    comments: null,
+                    conditions: []
+                }
+            ]
+        };
+
+        this.handovers.push(handover);
+        
+        // Update project
+        this.updateRequest(projectId, {
+            handoverInitiated: true,
+            handoverId: handover.id
+        });
+        
+        // Save to localStorage
+        localStorage.setItem('handovers', JSON.stringify(this.handovers));
+        
+        return handover;
+    },
+
+    // Get all handovers
+    getAllHandovers: function() {
+        // Load from localStorage if available
+        const stored = localStorage.getItem('handovers');
+        if (stored) {
+            try {
+                this.handovers = JSON.parse(stored);
+            } catch (e) {
+                console.error('Error loading handovers:', e);
+            }
+        }
+        return this.handovers;
+    },
+
+    // Get single handover
+    getHandover: function(handoverId) {
+        this.getAllHandovers(); // Load from storage
+        return this.handovers.find(h => h.id === handoverId);
+    },
+
+    // Get handover by project ID
+    getHandoverByProject: function(projectId) {
+        this.getAllHandovers(); // Load from storage
+        return this.handovers.find(h => h.projectId === projectId);
+    },
+
+    // Get handovers pending user's signature
+    getMyPendingHandovers: function(userName) {
+        this.getAllHandovers(); // Load from storage
+        return this.handovers.filter(handover => {
+            return handover.signatures.some(sig => 
+                sig.assignedTo === userName && 
+                sig.status === 'pending' && 
+                sig.stage === 'active'
+            );
+        });
+    },
+
+    // Update handover signature
+    updateHandoverSignature: function(handoverId, signatureSequence, signatureData) {
+        const handover = this.getHandover(handoverId);
+        if (!handover) return null;
+
+        const sigIndex = handover.signatures.findIndex(s => s.sequence === signatureSequence);
+        if (sigIndex === -1) return null;
+
+        // Update signature
+        handover.signatures[sigIndex] = {
+            ...handover.signatures[sigIndex],
+            ...signatureData,
+            signedDate: new Date().toISOString(),
+            ipAddress: '127.0.0.1' // In production, get real IP
+        };
+
+        // Check if this was a rejection
+        if (signatureData.status === 'rejected') {
+            handover.status = 'rejected';
+            
+            // Update project status back to development
+            this.updateRequest(handover.projectId, {
+                status: 'Revision Required',
+                developmentStatus: 'In Progress',
+                handoverInitiated: false
+            });
+        } else {
+            // Check if we need to unlock next stages
+            this.updateHandoverStages(handover);
+            
+            // Check if handover is complete
+            const allApproved = handover.signatures.every(sig => 
+                sig.status === 'approved' || sig.status === 'approved-with-conditions'
+            );
+            
+            if (allApproved) {
+                handover.status = 'completed';
+                handover.completedDate = new Date().toISOString().split('T')[0];
+                
+                // Update project to deployed
+                this.updateRequest(handover.projectId, {
+                    status: 'Deployed',
+                    deploymentDate: new Date().toISOString().split('T')[0]
+                });
+            }
+        }
+
+        // Save to localStorage
+        localStorage.setItem('handovers', JSON.stringify(this.handovers));
+        
+        return handover;
+    },
+
+    // Update handover stages (unlock next signatures)
+    updateHandoverStages: function(handover) {
+        // Check if PM (seq 2) and Security (seq 3) both approved
+        const pmSig = handover.signatures.find(s => s.sequence === 2);
+        const secSig = handover.signatures.find(s => s.sequence === 3);
+        
+        if (pmSig.status === 'approved' && secSig.status === 'approved') {
+            // Unlock Head of Tech (seq 4)
+            const headTechSig = handover.signatures.find(s => s.sequence === 4);
+            if (headTechSig.stage === 'locked') {
+                headTechSig.stage = 'active';
+            }
+        }
+
+        // Check if Head of Tech (seq 4) approved
+        const headTechSig = handover.signatures.find(s => s.sequence === 4);
+        if (headTechSig.status === 'approved') {
+            // Unlock End Users (seq 5 and 6)
+            const hrSig = handover.signatures.find(s => s.sequence === 5);
+            const hodSig = handover.signatures.find(s => s.sequence === 6);
+            
+            if (hrSig.stage === 'locked') hrSig.stage = 'active';
+            if (hodSig.stage === 'locked') hodSig.stage = 'active';
+        }
     }
 };
 

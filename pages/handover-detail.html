@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handover Document | Vision Group CMS</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/output.css">
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Digital Document Style */
+        .digital-document {
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Certified Stamp */
+        .certified-stamp {
+            border: 3px solid #10b981;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            transform: rotate(-5deg);
+        }
+    </style>
+</head>
+
+<body class="bg-visionGray text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden bg-gray-50">
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
+
+        <!-- Sidebar -->
+        <aside
+            class="sidebar w-64 bg-visionBlack text-white flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
+            <div class="h-20 flex items-center px-6 border-b border-slate-800">
+                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-3 p-2">
+                    <img src="../images/vision-group-logo.png" alt="Vision Group Logo"
+                        class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">VISION GROUP</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">CMS Portal</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group min-h-[48px]">
+                    <i class="ph ph-squares-four text-2xl mr-3"></i>
+                    <span class="text-base">Dashboard</span>
+                </a>
+                <a href="submit-request.html"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group min-h-[48px]">
+                    <i class="ph ph-plus-circle text-2xl mr-3"></i>
+                    <span class="text-base">Submit Request</span>
+                </a>
+                <a href="my-requests.html"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group min-h-[48px]">
+                    <i class="ph ph-clipboard-text text-2xl mr-3"></i>
+                    <span class="text-base">My Requests</span>
+                </a>
+
+                <a href="hod-review.html" id="hodReviewLink"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
+                    <i class="ph ph-check-square text-2xl mr-3"></i>
+                    <span class="text-base">Review Requests</span>
+                </a>
+                <a href="it-review.html" id="itReviewLink"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
+                    <i class="ph ph-wrench text-2xl mr-3"></i>
+                    <span class="text-base">IT Review</span>
+                </a>
+                <a href="development.html" id="developmentLink"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
+                    <i class="ph ph-code text-2xl mr-3"></i>
+                    <span class="text-base">Development</span>
+                </a>
+                <a href="handover.html"
+                    class="flex items-center px-4 py-3.5 bg-white/10 text-white rounded-lg border-l-4 border-visionRed transition-all min-h-[48px]">
+                    <i class="ph ph-file-text text-2xl mr-3"></i>
+                    <span class="font-semibold text-base">Handovers</span>
+                </a>
+                <a href="reports.html" id="reportsLink"
+                    class="flex items-center px-4 py-3.5 text-slate-300 hover:bg-white/5 hover:text-white rounded-lg transition-all group hidden min-h-[48px]">
+                    <i class="ph ph-chart-line-up text-2xl mr-3"></i>
+                    <span class="text-base">Reports</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <div id="sidebarUserInitial"
+                        class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-base font-bold">
+                        U
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-base font-semibold truncate" id="sidebarUserName">User Name</p>
+                        <p class="text-sm text-slate-400" id="sidebarUserRole">Staff Member</p>
+                    </div>
+                </div>
+                <button data-action="logout"
+                    class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-slate-700 text-white text-base font-medium rounded-md transition-colors flex items-center justify-center gap-2 min-h-[48px]">
+                    <i class="ph ph-sign-out text-xl"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 ml-0 p-4 md:p-8 overflow-y-auto h-full w-full">
+
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 fade-in">
+                <div class="flex items-center gap-4">
+                    <button data-action="toggle-mobile-sidebar"
+                        class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-visionBlack">Handover Document</h2>
+                        <p class="text-gray-500 text-sm mt-1" id="handoverSubtitle">Loading...</p>
+                    </div>
+                </div>
+
+                <a href="handover.html"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium border border-gray-200 w-full md:w-auto justify-center">
+                    <i class="ph ph-arrow-left"></i> Back to List
+                </a>
+            </header>
+
+            <!-- Digital Document -->
+            <div class="digital-document rounded-xl p-8 fade-in" id="documentContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/handover-detail.js"></script>
+
+</body>
+
+</html>
