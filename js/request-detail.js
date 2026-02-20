@@ -102,6 +102,7 @@ async function loadRequestDetails(id) {
 
         displayRequestHeader();
         displayRequestDetails();
+        displaySupportingDocuments();
         displayTimeline();
     } catch (error) {
         console.error('Failed to load request:', error);
@@ -529,6 +530,56 @@ function displayTimeline() {
                 </div>
             </div>`;
     }).join('');
+}
+
+
+// Display supporting documents
+function displaySupportingDocuments() {
+    const documentsTab = document.getElementById('documents');
+    if (!documentsTab) return;
+
+    const documents = currentRequest.supporting_documents;
+    
+    if (!documents || documents.length === 0) {
+        documentsTab.innerHTML = `
+            <div class="text-center py-12">
+                <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="ph ph-file-text"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">No documents attached</h3>
+                <p class="text-gray-500">No supporting documents were uploaded with this request</p>
+            </div>
+        `;
+        return;
+    }
+
+    documentsTab.innerHTML = `
+        <div>
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Supporting Documents (${documents.length})</h3>
+            <div class="space-y-3">
+                ${documents.map(doc => {
+                    const fileUrl = apiClient.getFileUrl(doc);
+                    const fileName = doc.name || 'Document';
+                    const fileSize = doc.size ? `${(doc.size / 1024).toFixed(1)} KB` : '';
+                    const fileExt = doc.ext || doc.mime?.split('/')[1]?.toUpperCase() || '';
+                    
+                    return `
+                        <a href="${fileUrl}" target="_blank" download
+                            class="flex items-center gap-4 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors group">
+                            <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-300">
+                                <i class="ph ph-file text-2xl text-gray-600 group-hover:text-visionRed transition-colors"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-gray-800 group-hover:text-visionRed transition-colors truncate">${fileName}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">${fileExt}${fileSize ? ` • ${fileSize}` : ''}</p>
+                            </div>
+                            <i class="ph ph-download-simple text-xl text-gray-400 group-hover:text-visionRed transition-colors"></i>
+                        </a>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
 }
 
 async function submitClarificationResponse() {

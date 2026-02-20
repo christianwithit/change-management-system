@@ -5,6 +5,34 @@ let trendChart = null;
 let statusChartPill = null;
 let allRequests = [];
 
+// Helper: Get display status for a request
+function getDisplayStatus(request) {
+    const hodReview = request.change_ms_hod_review;
+    const status = request.request_status;
+
+    if (status === 'Rejected' && hodReview?.already_in_progress) {
+        return { label: 'Already in Progress', class: 'bg-purple-100 text-purple-700' };
+    }
+    if (status === 'Rejected' && hodReview?.already_exists) {
+        return { label: 'Already Exists', class: 'bg-slate-100 text-slate-700' };
+    }
+    if (status === 'Rejected') {
+        return { label: 'Rejected', class: 'bg-red-100 text-red-700' };
+    }
+    if (status === 'Completed') {
+        return { label: 'Completed', class: 'bg-green-100 text-green-700' };
+    }
+    if (status === 'Development') {
+        return { label: 'In Development', class: 'bg-purple-100 text-purple-700' };
+    }
+    if (status === 'IT Review') {
+        return { label: 'IT Review', class: 'bg-blue-100 text-blue-700' };
+    }
+    if (status === 'Pending HOD approval') {
+        return { label: 'Pending HOD Approval', class: 'bg-orange-100 text-orange-700' };
+    }
+    return { label: status, class: 'bg-gray-100 text-gray-700' };
+}
 document.addEventListener('DOMContentLoaded', async function () {
     const user = checkAuth();
     if (!user) return;
@@ -510,11 +538,8 @@ function updateReportTable(requests) {
             request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
             'bg-blue-100 text-blue-700';
 
-        const statusClass = request.request_status === 'Completed' ? 'bg-green-100 text-green-700' :
-            request.request_status === 'Rejected' ? 'bg-red-100 text-red-700' :
-            request.request_status === 'Development' ? 'bg-purple-100 text-purple-700' :
-            request.request_status === 'IT Review' ? 'bg-blue-100 text-blue-700' :
-            'bg-orange-100 text-orange-700';
+        // Use the helper function to get correct display status
+        const { label: displayStatus, class: statusClass } = getDisplayStatus(request);
 
         return `
             <tr class="hover:bg-gray-50 transition-colors">
@@ -529,7 +554,7 @@ function updateReportTable(requests) {
                 </td>
                 <td class="px-6 py-4">
                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
-                        ${request.request_status}
+                        ${displayStatus}
                     </span>
                 </td>
                 <td class="px-6 py-4 text-gray-600 text-sm">${formattedDate}</td>
@@ -585,17 +610,21 @@ function exportReport() {
         return;
     }
 
-    const exportData = allRequests.map(r => ({
-        'Request ID': r.id,
-        'Title': r.title,
-        'Department': r.department?.department_name || 'N/A',
-        'Section': r.change_ms_section?.section_name || 'N/A',
-        'Type': r.change_type,
-        'Priority': r.priority,
-        'Status': r.request_status,
-        'Requestor': r.staff?.staff_name || 'N/A',
-        'Date Submitted': new Date(r.createdAt).toLocaleDateString('en-US')
-    }));
+    const exportData = allRequests.map(r => {
+        const { label: displayStatus } = getDisplayStatus(r);
+        
+        return {
+            'Request ID': r.id,
+            'Title': r.title,
+            'Department': r.department?.department_name || 'N/A',
+            'Section': r.change_ms_section?.section_name || 'N/A',
+            'Type': r.change_type,
+            'Priority': r.priority,
+            'Status': displayStatus,  // Use display status instead of raw status
+            'Requestor': r.staff?.staff_name || 'N/A',
+            'Date Submitted': new Date(r.createdAt).toLocaleDateString('en-US')
+        };
+    });
 
     // Convert to CSV
     const headers = Object.keys(exportData[0]);

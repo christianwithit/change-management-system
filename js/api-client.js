@@ -330,7 +330,7 @@ class ApiClient {
         }
     }
 
-        /**
+    /**
      * Submit clarification response
      */
     async submitClarificationResponse(id, response) {
@@ -344,6 +344,42 @@ class ApiClient {
             throw error;
         }
     }
+
+    /**
+     * Create change request with file uploads
+     */
+    async createChangeRequestWithFiles(formData) {
+        try {
+            const response = await fetch(`${this.baseUrl}/change-requests/create`, {
+                method: 'POST',
+                body: formData
+                // Don't set Content-Type - browser will set it automatically with boundary
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || 'Failed to create request');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to create change request with files:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get file URL from Strapi file object
+     */
+    getFileUrl(file) {
+        if (!file) return null;
+        if (file.url) {
+            return file.url.startsWith('http') ? file.url : `http://localhost:1337${file.url}`;
+        }
+        return null;
+    }
+
+    
 }
 
 // Create and export a singleton instance

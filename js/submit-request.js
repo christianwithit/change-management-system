@@ -274,48 +274,79 @@ async function handleSubmit(e) {
 
     try {
         const user = getCurrentUser();
-        const formData = new FormData(e.target);
-        const sectionName = formData.get('section');
+        const form = e.target;
+        const sectionName = form.section.value;
 
         // Convert section name to section ID
         const sectionId = findSectionIdByName(sectionName);
         
         if (!sectionId) {
-            showToast(`Section "${sectionName}" not found. Please check the section name or contact your department head.`, 'error');
+            showToast(`Section "${sectionName}" not found. Please check the section name.`, 'error');
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalContent;
             submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
             return;
         }
 
-        // Prepare data matching backend schema
-        const requestData = {
-            title: formData.get('title'),
-            justification: formData.get('justification'),
-            description: formData.get('description'),
-            priority: formData.get('priority'),
-            expected_benefits: formData.get('benefits'),
-            change_type: formData.get('type'),
-            change_ms_section: sectionId,  // Send section ID
-            department: parseInt(formData.get('department')),
-            staff: user.staffId || 2
-        };
+        // Check if there are files to upload
+        const hasFiles = uploadedFiles && uploadedFiles.length > 0;
 
-        console.log('Section name entered:', sectionName);
-        console.log('Section ID found:', sectionId);
-        console.log('Submitting request:', requestData);
+        if (hasFiles) {
+            // USE FORMDATA for file uploads
+            const formData = new FormData();
+            
+            // Add request data as JSON string
+            const requestData = {
+                title: form.title.value,
+                justification: form.justification.value,
+                description: form.description.value,
+                priority: form.priority.value,
+                expected_benefits: form.benefits.value,
+                change_type: form.type.value,
+                change_ms_section: sectionId,
+                department: parseInt(form.department.value),
+                staff: user.staffId,
+                request_status: 'Pending HOD approval'
+            };
+            
+            formData.append('data', JSON.stringify(requestData));
 
-        // Send to backend
-        const response = await apiClient.createChangeRequest(requestData);
+            // Add files
+            uploadedFiles.forEach(file => {
+                formData.append('files.supporting_documents', file);
+            });
 
-        console.log('Response:', response);
+            console.log('Submitting with files. File count:', uploadedFiles.length);
+
+            // Send with files
+            const response = await apiClient.createChangeRequestWithFiles(formData);
+            console.log('Response:', response);
+
+        } else {
+            // NO FILES - use regular JSON request
+            const requestData = {
+                title: form.title.value,
+                justification: form.justification.value,
+                description: form.description.value,
+                priority: form.priority.value,
+                expected_benefits: form.benefits.value,
+                change_type: form.type.value,
+                change_ms_section: sectionId,
+                department: parseInt(form.department.value),
+                staff: user.staffId
+            };
+
+            console.log('Submitting without files');
+            const response = await apiClient.createChangeRequest(requestData);
+            console.log('Response:', response);
+        }
 
         // Show success message
         showToast('Request Submitted Successfully!', 'success');
         
-        // Redirect to dashboard
+        // Redirect to my requests page
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'my-requests.html';
         }, 1500);
 
     } catch (error) {
