@@ -379,6 +379,36 @@ window.getTaskWarningStatus = function(deadline) {
     };
 };
 
+// Check if user can access handover section
+window.canAccessHandovers = function(user) {
+    if (!user) return false;
+    
+    // IT/Admin always have access
+    const HANDOVER_ROLES = ['it', 'admin'];
+    if (HANDOVER_ROLES.includes(user.role)) {
+        return true;
+    }
+    
+    // Known signatories have access
+    const HANDOVER_SIGNATORIES = [
+        'Felix Ssembajjwe Bashabe',      // Project Manager
+        'Emmanuel Cliff Mughanwa',        // Information Security
+        'Paul Ikanza',                    // Head of Technology
+        'Agatha Joyday Gloria',           // HR
+        'Marjorie Nalubowa'               // HOD
+    ];
+    if (HANDOVER_SIGNATORIES.includes(user.fullName)) {
+        return true;
+    }
+    
+    // HODs have access (potential signatories)
+    if (user.role === 'hod') {
+        return true;
+    }
+    
+    return false;
+};
+
 // Export functions
 window.utils = {
     formatDate,

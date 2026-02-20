@@ -25,3 +25,29 @@
     transform: translateY(0);
   }
 }
+
+/* Handwriting font for signatures */
+.font-handwriting {
+  font-family: 'Brush Script MT', cursive;
+  font-style: italic;
+}
+
+/* Print styles for handover documents */
+@media print {
+  .sidebar,
+  header,
+  button,
+  [data-action] {
+    display: none !important;
+  }
+  
+  .digital-document {
+    box-shadow: none !important;
+    max-width: 100% !important;
+  }
+  
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}

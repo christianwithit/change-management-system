@@ -479,8 +479,57 @@ const API = {
             status: 'in-progress', // in-progress, completed, rejected
             attempt: 1,
             
-            // System specifications
-            systemSpecs: handoverData.systemSpecs || {},
+            // System specifications (enhanced with memo digital format)
+            systemSpecs: {
+                // Overview
+                overview: handoverData.systemSpecs?.overview || project.description || `The ${project.title} was developed to ${project.expectedBenefits}. This system provides a centralized platform for ${project.department} to improve operational efficiency and streamline workflows.`,
+                
+                // Purpose
+                purpose: handoverData.systemSpecs?.purpose || [
+                    `Provide a centralized system for ${project.department}`,
+                    'Improve operational efficiency and reduce manual processes',
+                    'Enable better data management and reporting capabilities',
+                    'Facilitate collaboration and workflow automation',
+                    'Reduce processing time and eliminate errors'
+                ],
+                
+                // Hosting Details
+                serverEnvironment: handoverData.systemSpecs?.serverEnvironment || 'VPS at Vision Group Infrastructure (Shared environment)',
+                publicURL: handoverData.systemSpecs?.publicURL || null,
+                intranetAccess: handoverData.systemSpecs?.intranetAccess || 'Restricted access for authorized users with authentication',
+                sslStatus: handoverData.systemSpecs?.sslStatus || 'Enabled',
+                databaseLocation: handoverData.systemSpecs?.databaseLocation || 'Hosted on the same VPS instance',
+                backupStrategy: handoverData.systemSpecs?.backupStrategy || 'Managed by IT; scheduled incremental backups recommended',
+                
+                // System Users
+                systemUsers: handoverData.systemSpecs?.systemUsers || [
+                    {
+                        role: 'End User',
+                        description: `${project.department} staff members`,
+                        accessLevel: 'View and submit data, generate reports'
+                    },
+                    {
+                        role: 'Department Admin',
+                        description: `${project.department} administrators`,
+                        accessLevel: 'Manage users, configure settings, full access to department data'
+                    },
+                    {
+                        role: 'IT Support (Admin)',
+                        description: 'Internal IT team managing backend operations',
+                        accessLevel: 'User management, system maintenance, monitoring, and technical support'
+                    }
+                ],
+                
+                // Current Status
+                currentStatus: handoverData.systemSpecs?.currentStatus || [
+                    { component: 'System Core', status: 'Functional', remarks: 'All core features operational and tested' },
+                    { component: 'User Interface', status: 'Functional', remarks: 'Responsive design, accessible to all users' },
+                    { component: 'Documentation', status: 'Completed', remarks: 'User guides and technical documentation provided' },
+                    { component: 'Training', status: 'Completed', remarks: 'End user training conducted successfully' },
+                    { component: 'Testing', status: 'Completed', remarks: 'UAT completed and signed off' },
+                    { component: 'Deployment', status: 'Ready', remarks: 'System ready for production use' }
+                ]
+            },
             
             // Signatures (6 roles for IT system implementation)
             signatures: [
@@ -495,10 +544,9 @@ const API = {
                     signedBy: handoverData.initiatedBy,
                     ipAddress: '127.0.0.1',
                     checklistResponses: {
-                        source_code_uploaded: true,
-                        system_tested: true,
-                        documentation_completed: true,
-                        training_materials_prepared: true
+                        system_functional: true,
+                        documentation_received: true,
+                        roadmap_confirmed: true
                     },
                     comments: 'Project completed and ready for handover',
                     conditions: []

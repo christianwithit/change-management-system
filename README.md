@@ -1,258 +1,127 @@
-# Vision Group Change Management System
+# Vision Group Change Management System (CMS)
 
-<div align="center">
+A modern, role-based web application for managing organizational change requests with comprehensive workflow tracking, digital handover system, and real-time analytics.
 
-![Vision Group CMS](https://img.shields.io/badge/Status-Production%20Ready-success)
-![Tailwind CSS v4](https://img.shields.io/badge/Tailwind%20CSS-v4.1.18-38bdf8)
-![License](https://img.shields.io/badge/License-MIT-blue)
+## 🚀 Features
 
-A modern, responsive web application for managing organizational change requests with role-based workflows and comprehensive tracking.
+### Core Functionality
+- **Multi-Role Authentication System** - Staff, HOD, IT Admin, and System Admin roles
+- **Change Request Management** - Submit, track, and manage change requests
+- **Workflow Automation** - Automated routing through HOD approval → IT review → Development → Handover
+- **Digital Handover System** - Multi-signature approval workflow for project deployment
+- **Real-time Dashboard** - Role-specific dashboards with live statistics
+- **Development Tracking** - Timeline view with Gantt-style visualization and milestone tracking
+- **Comprehensive Reporting** - Analytics, charts, and exportable reports
 
-[Features](#features) • [Tech Stack](#tech-stack) • [Installation](#installation) • [Usage](#usage) • [Screenshots](#screenshots)
+### User Roles & Capabilities
 
-</div>
+#### 👤 Staff Member
+- Submit new change requests
+- Track personal request status
+- View request history
+- Receive notifications on request updates
 
----
+#### 👔 Head of Department (HOD)
+- Review department change requests
+- Approve/reject/request clarification
+- View department analytics
+- Monitor team submissions
 
-## � Recent Updates
+#### 💻 IT Administrator
+- Technical feasibility review
+- Project development tracking
+- Timeline and milestone management
+- Resource allocation
+- Handover document management
 
-### Version 2.2 - Timeline Status Guide (February 2026)
+#### 🔧 System Administrator
+- Full system access
+- User management
+- System-wide reporting
+- Configuration management
 
-**New Timeline Features:**
-- ✅ **Timeline Status Guide**: Visual legend explaining timeline color coding
-  - Compact header with color-coded indicators (Red/Yellow/Green)
-  - Expandable details section with comprehensive descriptions
-  - Icons for each status type (Overdue, Due Soon, On Track)
-  - Smooth toggle animation for showing/hiding details
-  - Integrated into timeline controls for easy reference
-  - Helps users quickly understand project urgency levels
-
-**Status Definitions:**
-- 🔴 **Overdue**: Tasks past their deadline requiring immediate attention
-- 🟡 **Due Soon**: Tasks approaching deadline within 7 days
-- 🟢 **On Track**: Tasks with sufficient time remaining
-
-### Version 2.1 - Advanced Timeline Features (February 2026)
-
-**New Timeline Capabilities:**
-- ✅ **Grid-Based Timeline Layout**: Pills stretch across dates with precise CSS Grid alignment
-  - Dynamic grid columns based on project date ranges
-  - Pills span exact grid columns matching their start/end dates
-  - Low-opacity status colors with solid 4px left borders
-  - Start/end dates displayed inside pills with icons
-- ✅ **Zoom Levels**: Three view modes for different planning horizons
-  - **Day View**: 100px columns for detailed daily tracking (1-2 months)
-  - **Week View**: 120px columns showing week numbers (2-6 months)
-  - **Month View**: 150px columns for quarterly planning (6+ months)
-  - Reduces horizontal scrolling by up to 90%
-- ✅ **Smart Filters**: Real-time filtering to focus on what matters
-  - Filter by Overdue, Due Soon (72 hours), or On Track
-  - Instant filtering without page reload
-  - Visual feedback when no tasks match filters
-- ✅ **Collapsible Groups**: Organize projects by category
-  - Group by Department, Status, Priority, or None
-  - Click headers to expand/collapse with smooth animations
-  - Project count badges per group
-  - Reduces vertical clutter significantly
-- ✅ **Event Delegation**: Efficient click handling with `data-project-id` attributes
-- ✅ **Smooth Hover Effects**: Pills scale and lift with enhanced shadows
-
-**Technical Improvements:**
-- CSS Grid with `repeat(N, minmax(100px, 1fr))` for perfect alignment
-- Grid column calculation: `grid-column: start / end` syntax
-- Zoom-aware date range calculation (day/week/month units)
-- Filter logic applied before rendering for optimal performance
-- Grouping with smooth CSS transitions
-
-### Version 2.0 - Enhanced Role Management (February 2026)
-
-**New Features:**
-- ✅ **Review Requests Page**: Comprehensive HOD interface for managing department requests
-  - Multiple action options (clarify, accept, reject, mark as existing)
-  - Advanced filtering by status, priority, and staff member
-  - Department-specific view (HODs only see their department)
-  - Real-time statistics dashboard
-- ✅ **Centralized User Info**: Consistent user information display across all pages
-  - Automatic role display (Staff Member, Head of Department, IT Administrator, System Administrator)
-  - User initials in avatar circle
-  - Department information
-- ✅ **Enhanced Access Control**: 
-  - IT Review page restricted to IT personnel and Admin only
-  - Reports page accessible to HOD, IT, and Admin only
-  - Role-based navigation visibility
-- ✅ **Improved Navigation**: Dynamic menu items based on user role
-- ✅ **Better UX**: Renamed "HOD Review" to "Review Requests" for clarity
-
-**Technical Improvements:**
-- Centralized user info management in `app.js`
-- Consistent ID naming across all pages
-- Improved role-based routing and access control
-- Enhanced mock data with 146 test requests
-- Better code organization and maintainability
-
----
-
-## 🎯 Overview
-
-The **Vision Group Change Management System (CMS)** is a full-featured web application designed to streamline the change request workflow within organizations. Built with modern web technologies and a mobile-first approach, it provides an intuitive interface for submitting, reviewing, approving, and tracking change requests across departments.
-
-### Key Highlights
-
-- ✅ **Role-Based Access Control**: Staff, HOD, IT, and Admin roles with tailored permissions
-- ✅ **Mobile-Responsive**: Fully responsive sidebar and layouts optimized for all devices
-- ✅ **Multi-Step Forms**: Wizard-style change request submission with validation
-- ✅ **Real-Time Tracking**: Dashboard with visual analytics and status tracking
-- ✅ **Department Workflows**: Automated routing through HOD approval and IT review
-- ✅ **Comprehensive Reporting**: Export capabilities and visual data representations
-
----
-
-## ✨ Features
-
-### 🔐 Authentication & Authorization
-- Multi-role login system (Staff, HOD, IT, Admin)
-- Mock authentication for demonstration purposes
-- Session-based access control with localStorage
-- Role-specific navigation and features
-- Automatic user info display across all pages
-- Dynamic role-based UI updates
-
-### 📋 Request Management
-- **Submit Requests**: 3-step wizard for creating change requests
-- **My Requests**: Personal dashboard for tracking submitted requests
-- **Review Requests**: Department head interface for reviewing staff requests with multiple action options
-  - Ask for clarification from staff members
-  - Accept requests (forwards to IT review)
-  - Reject requests with reasons
-  - Mark as "Already in Development"
-  - Mark as "Already in Use"
-  - Department-specific filtering (HODs only see their department)
-  - Advanced filtering by status, priority, and staff member
-- **IT Review**: Technical assessment and implementation tracking (IT/Admin only)
-- **Development Projects**: Comprehensive project management with advanced timeline
-  - Visual timeline with grid-based layout
-  - Three zoom levels (Day/Week/Month views)
-  - Smart filters (Overdue/Due Soon/On Track)
-  - Collapsible grouping (Department/Status/Priority)
-  - Task scheduling with start dates and deadlines
-  - Development logs and milestone tracking
-  - Status updates and progress monitoring
-
-### 📊 Analytics & Reporting
-- Visual dashboards with Chart.js integration
-- Status distribution charts and trend analysis
-- Exportable reports in CSV format
-- Department-wise breakdown and metrics
-- Role-based report access (HOD, IT, Admin only)
-
-### 📱 Mobile Experience
-- Responsive sidebar with smooth slide-in animations
-- Touch-friendly interface elements
-- Optimized layouts for mobile, tablet, and desktop
-- Hamburger menu with overlay for mobile navigation
-
-### 🎨 User Interface
-- Modern, clean design with Vision Group branding
-- Tailwind CSS v4 utility-first styling
-- Phosphor Icons for consistent iconography
-- Smooth transitions and micro-animations
-- Dark sidebar with glassmorphism effects
-- Consistent user info display across all pages
-- Role-based navigation visibility
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend Framework
-- **HTML5**: Semantic markup and accessibility features
-- **Tailwind CSS v4.1.18**: Latest version with custom configuration
-  - Custom color palette (Vision Red, Vision Black, Vision Gray)
-  - Responsive breakpoints and mobile-first design
-  - JIT compilation for optimized builds
-- **Vanilla JavaScript**: No framework dependencies, pure ES6+
-
-### UI Components & Icons
-- **Phosphor Icons**: Comprehensive icon library via CDN
-- **Chart.js v4.4.0**: Interactive data visualizations
-- **Google Fonts (Inter)**: Professional typography
-
-### State Management & Data
-- **Mock Data Layer**: Simulated backend with realistic data
-- **LocalStorage**: Session persistence
-- **API Abstraction**: Clean separation of concerns
-
-### Development Tools
-- **Tailwind CLI**: Build and watch modes
-- **NPM Scripts**: Automated build processes
-- **Git**: Version control
-
-### Authentication
-- **Mock Authentication System**: 
-  - Client-side session management
-  - Role-based routing and permissions
-  - Demonstration-ready login flow
-
----
-
-## 📂 Project Structure
+## 📋 System Workflow
 
 ```
-CMS/
-├── css/
-│   └── output.css          # Compiled Tailwind CSS
-├── images/
-│   ├── favicon.png         # Browser favicon
+1. Staff Submission
+   ↓
+2. HOD Review (Approve/Reject/Clarify)
+   ↓
+3. IT Technical Review (Accept/Defer/Reject)
+   ↓
+4. Development Phase (Timeline tracking)
+   ↓
+5. Digital Handover (Multi-signature approval)
+   ↓
+6. Deployment & Completion
+```
+
+## 🛠️ Technology Stack
+
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Styling**: Tailwind CSS v4.1.18
+- **Icons**: Phosphor Icons
+- **Charts**: Chart.js v4.4.0
+- **Fonts**: Inter (Google Fonts)
+- **Build Tools**: Tailwind CLI
+- **Code Quality**: ESLint v10.0.0
+
+## 📁 Project Structure
+
+```
+vision-group-cms/
+├── css/                    # Compiled CSS
+│   └── output.css         # Tailwind compiled output
+├── images/                # Static assets
+│   ├── favicon.png
 │   └── vision-group-logo.png
-├── js/
-│   ├── api.js             # API abstraction layer
-│   ├── app.js             # Main application logic & user info management
-│   ├── approvals.js       # Approvals page logic
-│   ├── auth.js            # Authentication utilities
-│   ├── dashboard.js       # Dashboard page logic
-│   ├── development.js     # Development projects & timeline
-│   ├── hod-review.js      # Review Requests page logic
-│   ├── it-review.js       # IT review page logic
-│   ├── mock-data.js       # Mock backend data (146 requests)
-│   ├── my-requests.js     # My requests page logic
-│   ├── reports.js         # Reports page logic
-│   ├── request-detail.js  # Request detail page logic
-│   ├── submit-request.js  # Submit request wizard logic
-│   └── utils.js           # Helper functions
-├── pages/
-│   ├── approvals.html     # Approvals interface
-│   ├── dashboard.html     # Main dashboard
-│   ├── development.html   # Development projects & timeline
-│   ├── hod-review.html    # Review requests interface
-│   ├── it-review.html     # IT review interface
-│   ├── my-requests.html   # User's requests
-│   ├── reports.html       # Analytics & reporting
-│   ├── request-detail.html # Request details view
-│   └── submit-request.html # New request wizard
-├── src/
-│   └── input.css          # Tailwind source file
-├── index.html             # Login page
-├── package.json           # Dependencies & scripts
-├── tailwind.config.js     # Tailwind configuration
-├── DUE_DATE_WARNING_SYSTEM.md
-├── WARNING_SYSTEM_VISUAL_GUIDE.md
-└── README.md
+├── js/                    # JavaScript modules
+│   ├── api.js            # API & data management
+│   ├── api-client.js     # HTTP client utilities
+│   ├── auth.js           # Authentication logic
+│   ├── dashboard.js      # Dashboard functionality
+│   ├── submit-request.js # Request submission
+│   ├── my-requests.js    # Personal requests view
+│   ├── hod-review.js     # HOD approval workflow
+│   ├── it-review.js      # IT technical review
+│   ├── development.js    # Development tracking
+│   ├── handover.js       # Handover management
+│   ├── handover-detail.js # Handover details
+│   ├── reports.js        # Analytics & reporting
+│   ├── mock-data.js      # Sample data (146 requests)
+│   └── utils.js          # Utility functions
+├── pages/                 # Application pages
+│   ├── dashboard.html
+│   ├── submit-request.html
+│   ├── my-requests.html
+│   ├── request-detail.html
+│   ├── hod-review.html
+│   ├── it-review.html
+│   ├── development.html
+│   ├── handover.html
+│   ├── handover-detail.html
+│   ├── approvals.html
+│   └── reports.html
+├── src/                   # Source files
+│   └── input.css         # Tailwind source
+├── index.html            # Login page
+├── package.json          # Dependencies
+└── README.md            # Documentation
 ```
 
----
-
-## 🚀 Installation
+## 🚦 Getting Started
 
 ### Prerequisites
-- Node.js (v16 or higher)
+- Node.js (v14 or higher)
 - npm or yarn
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
-### Setup Steps
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/vision-cms.git
-   cd vision-cms
+   git clone https://github.com/christianwithit/change-management-system.git
+   cd change-management-system
    ```
 
 2. **Install dependencies**
@@ -260,227 +129,186 @@ CMS/
    npm install
    ```
 
-3. **Build Tailwind CSS**
+3. **Build CSS**
    ```bash
    npm run build:css
    ```
 
-4. **Start development server**
+4. **Development mode (watch CSS changes)**
    ```bash
    npm run watch:css
    ```
 
-5. **Open in browser**
+5. **Open the application**
    - Open `index.html` in your browser
    - Or use a local server (recommended):
      ```bash
      npx serve .
      ```
 
----
-
-## 💻 Usage
-
-### Login Credentials (Mock Auth)
+### Demo Credentials
 
 | Role | Username | Password | Access Level |
 |------|----------|----------|--------------|
-| Staff | `staff` | `staff123` | Submit requests, view own requests |
-| HOD | `hod` | `hod123` | Review department requests, view reports |
-| IT | `it` | `it123` | Review technical implementations, view reports |
-| Admin | `admin` | `admin123` | Full system access, view reports |
+| Staff | `staff` | `staff123` | Submit & track requests |
+| HOD | `hod` | `hod123` | Department approvals |
+| IT Admin | `it` | `it123` | Technical review & development |
+| System Admin | `admin` | `admin123` | Full system access |
 
-### Role-Based Access
+## 📊 Key Features Breakdown
 
-**Staff Member:**
-- ✅ Dashboard
-- ✅ Submit Request
-- ✅ My Requests
-- ❌ Review Requests (HOD only)
-- ❌ IT Review (IT/Admin only)
-- ❌ Reports (HOD/IT/Admin only)
+### 1. Request Submission (3-Step Form)
+- **Step 1**: Request details (title, type, department, description)
+- **Step 2**: Impact analysis (justification, benefits, priority)
+- **Step 3**: Confirmation & document upload
 
-**Head of Department (HOD):**
-- ✅ Dashboard
-- ✅ Submit Request
-- ✅ My Requests
-- ✅ Review Requests (department-specific)
-- ❌ IT Review (IT/Admin only)
-- ✅ Reports
+### 2. HOD Review Dashboard
+- Pending approvals queue
+- Department statistics
+- Bulk actions support
+- Clarification request workflow
+- Approval/rejection with comments
 
-**IT Administrator:**
-- ✅ Dashboard
-- ✅ Submit Request
-- ✅ My Requests
-- ❌ Review Requests (HOD only)
-- ✅ IT Review
-- ✅ Development Projects (with advanced timeline)
-- ✅ Reports
+### 3. IT Review & Development
+- Technical feasibility assessment
+- Methodology documentation
+- Cost & time estimation
+- Risk analysis
+- Development status tracking
+- Timeline visualization (Gantt-style)
+- Milestone management
 
-**System Administrator:**
-- ✅ Dashboard
-- ✅ Submit Request
-- ✅ My Requests
-- ❌ Review Requests (HOD only)
-- ✅ IT Review
-- ✅ Development Projects (with advanced timeline)
-- ✅ Reports
+### 4. Digital Handover System
+- 6-stage signature workflow:
+  1. Project Developer
+  2. Project Manager
+  3. Information Security
+  4. Head of Technology
+  5. End User (HR)
+  6. End User (HOD)
+- System specifications documentation
+- Hosting & deployment details
+- Conditional approvals
+- Rejection with feedback loop
 
-### Workflow
+### 5. Timeline & Development Tracking
+- Visual Gantt-style timeline
+- Day/Week/Month views
+- Status indicators (On Track, Due Soon, Overdue)
+- Group by department/status/priority
+- Interactive task management
+- Milestone tracking
 
-1. **Staff Member**:
-   - Login with staff credentials
-   - Navigate to "Submit Request"
-   - Fill out the 3-step wizard
-   - Track request status in "My Requests"
+### 6. Reports & Analytics
+- Overview statistics
+- Department breakdown
+- Status distribution charts
+- Timeline analysis
+- Exportable reports
+- Custom date ranges
+- Visual charts (Chart.js)
 
-2. **Head of Department**:
-   - Review pending requests in "Review Requests"
-   - Take multiple actions:
-     - Ask staff for clarification
-     - Accept and forward to IT
-     - Reject with reason
-     - Mark as already in development or in use
-   - View department-specific requests only
-   - Filter by status, priority, and staff member
-   - Track approval statistics
-   - Access reports and analytics
+## 🎨 Design System
 
-3. **IT Department**:
-   - Access "IT Review" for approved requests
-   - Update implementation status
-   - Manage technical assessments
-   - Navigate to "Development Projects" for active work
-   - Use timeline zoom levels (Day/Week/Month) to view projects
-   - Filter timeline by urgency (Overdue/Due Soon/On Track)
-   - Group projects by Department, Status, or Priority
-   - Accept tasks and set start dates/deadlines
-   - Track development logs and milestones
-   - Update project status and progress
-   - Access reports and analytics
+### Color Palette
+- **Primary Red**: `#CF2E2E` (Vision Group brand)
+- **Black**: `#1A1A1A` (Sidebar, headers)
+- **Gray Scale**: Slate 50-900 (UI elements)
+- **Status Colors**:
+  - Success: Green (#10B981)
+  - Warning: Amber (#F59E0B)
+  - Error: Red (#DC2626)
+  - Info: Blue (#3B82F6)
 
-4. **Admin**:
-   - Access IT Review features
-   - Access Development Projects with full timeline capabilities
-   - View comprehensive reports
-   - Export data for analysis
-   - Full system visibility
+### Typography
+- **Font Family**: Inter (Google Fonts)
+- **Weights**: 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold)
 
----
+## 📱 Responsive Design
 
-## 🎨 Customization
+- **Mobile-first approach**
+- Collapsible sidebar for mobile devices
+- Touch-friendly interface
+- Responsive tables and charts
+- Optimized for tablets and desktops
 
-### Tailwind Configuration
+## 🔒 Security Features
 
-The project uses custom Tailwind theme variables defined in `src/input.css`:
+- Role-based access control (RBAC)
+- Session management via localStorage
+- Protected routes with authentication checks
+- Input validation
+- XSS protection considerations
 
-```css
-@theme {
-  --color-visionRed: #CF2E2E;
-  --color-visionBlack: #0F172A;
-  --color-visionGray: #F8FAFC;
-}
-```
+## 📈 Mock Data
 
-### Build Commands
+The system includes comprehensive mock data:
+- **146 sample change requests**
+- Multiple departments (13 departments)
+- Various request types (10 types)
+- Complete workflow states
+- Realistic timelines and dates
+- Sample user data (25 requestors)
 
-- **Development**: `npm run watch:css` - Watch mode with live reload
-- **Production**: `npm run build:css` - Minified build for deployment
+## 🛣️ Roadmap
 
----
+### Phase 1 (Completed)
+- ✅ Core request management
+- ✅ Role-based authentication
+- ✅ HOD approval workflow
+- ✅ IT review system
+- ✅ Digital handover
 
-## 📱 Mobile Responsiveness
+### Phase 2 (Completed)
+- ✅ Development tracking
+- ✅ Timeline visualization
+- ✅ Milestone management
+- ✅ Reports & analytics
 
-The application features a fully responsive design with:
-
-- **Breakpoints**: Mobile-first approach with `md:` (768px) breakpoint
-- **Sidebar**: Collapsible mobile menu with smooth animations
-- **Touch Targets**: Minimum 48px for accessibility
-- **Flexible Layouts**: Grid and flexbox for adaptive content
-- **Viewport Optimization**: Proper meta tags and responsive images
-
----
-
-## 🧪 Testing
-
-The application has been audited for:
-- ✅ HTML structure and semantic markup
-- ✅ Asset linking and resource loading
-- ✅ JavaScript code quality
-- ✅ Mobile responsiveness
-- ✅ Navigation consistency
-- ✅ Accessibility compliance
-
----
-
-## 🚢 Deployment
-
-### Static Hosting
-
-This is a static web application and can be deployed to:
-- **GitHub Pages**: Perfect for portfolios
-- **Netlify**: Continuous deployment
-- **Vercel**: Zero-config deployment
-- **AWS S3**: Scalable cloud hosting
-
-### Deployment Steps (GitHub Pages)
-
-1. Build the CSS:
-   ```bash
-   npm run build:css
-   ```
-
-2. Commit and push:
-   ```bash
-   git add .
-   git commit -m "Production build"
-   git push origin main
-   ```
-
-3. Enable GitHub Pages in repository settings
-
----
+### Phase 3 (Future)
+- 🔄 Backend API integration
+- 🔄 Real-time notifications
+- 🔄 Email integration
+- 🔄 Document management system
+- 🔄 Advanced search & filters
+- 🔄 Audit trail & logging
+- 🔄 Mobile app (PWA)
 
 ## 🤝 Contributing
 
-This is a portfolio project, but suggestions and feedback are welcome!
-
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
----
+## 📝 License
 
-## 📄 License
+This project is licensed under the ISC License.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 👥 Authors
 
----
+- **Vision Group IT Team**
+- Project maintained by the Change Management System team
+
+## 📞 Support
+
+For support and questions:
+- Create an issue on GitHub
+- Contact the IT Department
+- Email: support@visiongroup.co.ug
 
 ## 🙏 Acknowledgments
 
-- **Tailwind CSS**: Utility-first CSS framework
-- **Phosphor Icons**: Beautiful icon family
-- **Chart.js**: Simple yet flexible JavaScript charting
-- **Google Fonts**: Inter font family
-- **Vision Group**: Design inspiration and branding
+- Vision Group for project sponsorship
+- IT Department for requirements and testing
+- All department HODs for feedback
+- End users for continuous improvement suggestions
 
 ---
 
-## 📬 Contact
+**Version**: 2.3.0  
+**Last Updated**: February 2026  
+**Status**: Production Ready
 
-**Project Link**: [https://github.com/yourusername/vision-cms](https://github.com/yourusername/vision-cms)
-
-**Portfolio**: [Your Portfolio URL]
-
----
-
-<div align="center">
-
-**Made with ❤️ using Tailwind CSS v4**
-
-⭐ Star this repo if you find it helpful!
-
-</div>
+Made with ❤️ by Vision Group IT Team

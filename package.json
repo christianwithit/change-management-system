@@ -12,8 +12,8 @@
     "tailwindcss": "^4.1.18"
   },
   "name": "cms",
-  "version": "1.0.0",
-  "description": "<div align=\"center\">",
+  "version": "2.3.0",
+  "description": "Vision Group Change Management System - A modern web application for managing organizational change requests with role-based workflows, digital handover system, and comprehensive tracking",
   "main": "index.js",
   "dependencies": {
     "detect-libc": "^2.1.2",

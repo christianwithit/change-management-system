@@ -1,4 +1,4 @@
-/* global checkAuth, getCurrentUser, apiClient, showToast, utils */
+/* global checkAuth, getCurrentUser, API, showToast, utils */
 // My Requests Page Logic
 
 let allRequests = [];
@@ -178,13 +178,12 @@ async function populateDepartmentFilter() {
     if (!select) return;
 
     try {
-        const response = await apiClient.getDepartments();
-        const departments = response.data || response;
+        const departments = API.getDepartments();
         
         departments.forEach(dept => {
             const option = document.createElement('option');
-            option.value = dept.id;
-            option.textContent = dept.attributes?.department_name || dept.department_name;
+            option.value = dept;
+            option.textContent = dept;
             select.appendChild(option);
         });
     } catch (error) {
@@ -192,43 +191,29 @@ async function populateDepartmentFilter() {
     }
 }
 
-// Load requests from backend
-// Load requests from backend
-// Load requests from backend
+// Load requests from mock data
 async function loadRequests() {
     const user = getCurrentUser();
-    
-    if (!user.staffId && user.role === 'staff') {
-        console.error('User does not have staffId');
-        showToast('Unable to load requests: User ID missing', 'error');
-        return;
-    }
 
     try {
-        let response;
-        
         if (user.role === 'staff') {
             // Staff: Get only their own requests
-            response = await apiClient.getChangeRequestsByStaff(user.staffId);
-            allRequests = response.data || response;
+            allRequests = API.getRequests().filter(r => r.requestor === user.fullName);
         } else if (user.role === 'hod') {
             // HOD: Get ALL requests from their department
-            response = await apiClient.getAllChangeRequests();
-            let allRequestsData = response.data || response;
-            allRequests = allRequestsData.filter(r => 
-                r.department?.department_name === user.department
-            );
+            allRequests = API.getRequests().filter(r => r.department === user.department);
         } else {
             // IT/Admin: Get all requests
-            response = await apiClient.getAllChangeRequests();
-            allRequests = response.data || response;
+            allRequests = API.getRequests();
         }
 
         displayRequests(allRequests);
         
     } catch (error) {
         console.error('Failed to load requests:', error);
-        showToast('Failed to load requests', 'error');
+        if (typeof showToast === 'function') {
+            showToast('Failed to load requests', 'error');
+        }
         displayRequests([]);
     }
 }
@@ -253,45 +238,61 @@ function displayRequests(requests) {
     if (tableContainer) tableContainer.classList.remove('hidden');
 
     tbody.innerHTML = requests.map(request => {
-    const priorityClass = request.priority === 'High' ? 'bg-red-100 text-red-700' :
-    request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-    'bg-blue-100 text-blue-700';
+        const priorityClass = request.priority === 'High' ? 'bg-red-100 text-red-700' :
+            request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+            'bg-blue-100 text-blue-700';
 
-    const { label: displayStatus, class: statusClass } = getDisplayStatus(request);  // ✅ renamed to displayStatus
+        // Get status display
+        const status = request.status || 'Pending';
+        let statusClass = 'bg-gray-100 text-gray-700';
+        
+        if (status.includes('Completed')) {
+            statusClass = 'bg-green-100 text-green-700';
+        } else if (status.includes('Development')) {
+            statusClass = 'bg-purple-100 text-purple-700';
+        } else if (status.includes('IT Review')) {
+            statusClass = 'bg-blue-100 text-blue-700';
+        } else if (status.includes('Pending') || status.includes('HOD')) {
+            statusClass = 'bg-orange-100 text-orange-700';
+        } else if (status.includes('Rejected')) {
+            statusClass = 'bg-red-100 text-red-700';
+        } else if (status.includes('Clarification')) {
+            statusClass = 'bg-yellow-100 text-yellow-700';
+        }
 
-    const departmentName = request.department?.department_name || 'N/A';
-    const formattedDate = new Date(request.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-});
+        const departmentName = request.department || 'N/A';
+        const formattedDate = new Date(request.dateSubmitted).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
 
-    return `
-        <tr class="hover:bg-gray-50 transition-colors">
-            <td class="px-6 py-4"><strong class="text-gray-800">${request.id}</strong></td>
-            <td class="px-6 py-4 font-medium text-gray-800">${request.title}</td>
-            <td class="px-6 py-4"><span class="text-gray-600 text-sm">${request.change_type}</span></td>
-            <td class="px-6 py-4 text-gray-700">${departmentName}</td>
-            <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${priorityClass}">
-                    ${request.priority}
-                </span>
-            </td>
-            <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
-                    ${displayStatus}
-                </span>
-            </td>
-            <td class="px-6 py-4 text-gray-600 text-sm">${formattedDate}</td>
-            <td class="px-6 py-4 text-right">
-                <button data-action="view-request" data-request-id="${request.id}"
-                    class="bg-visionRed hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
-                    View Details
-                </button>
-            </td>
-        </tr>
-    `;
-}).join('');
+        return `
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4"><strong class="text-gray-800">${request.id}</strong></td>
+                <td class="px-6 py-4 font-medium text-gray-800">${request.title}</td>
+                <td class="px-6 py-4"><span class="text-gray-600 text-sm">${request.type}</span></td>
+                <td class="px-6 py-4 text-gray-700">${departmentName}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${priorityClass}">
+                        ${request.priority}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+                        ${status}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-gray-600 text-sm">${formattedDate}</td>
+                <td class="px-6 py-4 text-right">
+                    <button data-action="view-request" data-request-id="${request.id}"
+                        class="bg-visionRed hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
+                        View Details
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 // Filter requests
@@ -315,11 +316,11 @@ function filterRequests() {
     }
 
     if (statusValue) {
-        filtered = filtered.filter(r => r.request_status === statusValue);
+        filtered = filtered.filter(r => r.status === statusValue);
     }
 
     if (departmentValue) {
-        filtered = filtered.filter(r => r.department?.id === parseInt(departmentValue));
+        filtered = filtered.filter(r => r.department === departmentValue);
     }
 
     displayRequests(filtered);

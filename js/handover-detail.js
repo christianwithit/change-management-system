@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', function () {
     currentUser = checkAuth();
     if (!currentUser) return;
 
+    // Check if user can access handovers
+    if (window.canAccessHandovers && !window.canAccessHandovers(currentUser)) {
+        alert('You do not have permission to access this page.');
+        window.location.href = 'dashboard.html';
+        return;
+    }
+
     // Show navigation links based on role
     if (currentUser.role === 'hod') {
         const hodLink = document.getElementById('hodReviewLink');
@@ -25,6 +32,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const reportsLink = document.getElementById('reportsLink');
         if (reportsLink) reportsLink.style.display = 'flex';
     }
+    // Show handover link (user already has access if they got here)
+    const handoverLink = document.getElementById('handoverLink');
+    if (handoverLink) handoverLink.style.display = 'flex';
 
     // Initialize event listeners
     initializeEventListeners();
@@ -135,110 +145,151 @@ function loadHandover() {
 // Render document
 function renderDocument() {
     const container = document.getElementById('documentContent');
+    const project = API.getRequest(handover.projectId);
 
     // Memo Header
     let html = `
-        <div class="border-b-4 border-visionRed pb-6 mb-6">
-            <div class="flex items-center gap-4 mb-4">
-                <img src="../images/vision-group-logo.png" alt="Vision Group" class="h-16">
-                <div>
-                    <h1 class="text-2xl font-bold text-visionBlack">VISION GROUP</h1>
-                    <p class="text-sm text-gray-600 uppercase tracking-wider">Internal Memo - System Handover Report</p>
-                </div>
-            </div>
+        <div class="text-center mb-8 pb-6 border-b-2 border-gray-200">
+            <h1 class="text-2xl font-bold tracking-wide text-gray-900 uppercase">Vision Group</h1>
+            <h2 class="text-xl font-bold tracking-wide text-gray-800 uppercase mt-1">Internal Memo</h2>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
-            <div>
-                <span class="font-semibold text-gray-700">TO:</span>
-                <span class="text-gray-900">Head of Technology</span>
-            </div>
-            <div>
-                <span class="font-semibold text-gray-700">FROM:</span>
-                <span class="text-gray-900">${handover.initiatedBy}</span>
-            </div>
-            <div>
-                <span class="font-semibold text-gray-700">DATE:</span>
-                <span class="text-gray-900">${utils.formatDate(handover.initiatedDate)}</span>
-            </div>
-            <div>
-                <span class="font-semibold text-gray-700">SUBJECT:</span>
-                <span class="text-gray-900">${handover.projectTitle} Handover Report</span>
-            </div>
+        <div class="grid grid-cols-[120px_1fr] gap-y-4 text-sm mb-8">
+            <div class="font-bold text-gray-900 uppercase">To:</div>
+            <div class="text-gray-800">Head of Technology</div>
+            <div class="font-bold text-gray-900 uppercase">From:</div>
+            <div class="text-gray-800">${handover.initiatedBy}</div>
+            <div class="font-bold text-gray-900 uppercase">Prepared By:</div>
+            <div class="text-gray-800">${handover.initiatedBy}</div>
+            <div class="font-bold text-gray-900 uppercase">Date:</div>
+            <div class="text-gray-800">${utils.formatDate(handover.initiatedDate)}</div>
+            <div class="font-bold text-gray-900 uppercase mt-4">Subject:</div>
+            <div class="text-gray-900 font-bold mt-4 text-lg">${handover.projectTitle} - Handover Report</div>
         </div>
 
-        <!-- System Overview -->
-        <div class="mb-6">
-            <h3 class="text-lg font-bold text-visionBlack mb-3 flex items-center gap-2">
-                <i class="ph ph-info text-visionRed"></i>
-                System Overview
-            </h3>
-            <div class="bg-slate-50 p-4 rounded-lg space-y-2 text-sm">
-                <div><span class="font-semibold">Project ID:</span> ${handover.projectId}</div>
-                <div><span class="font-semibold">Project Title:</span> ${handover.projectTitle}</div>
-                <div><span class="font-semibold">Department:</span> ${handover.projectDepartment}</div>
-                ${handover.systemSpecs.serverEnvironment ? `<div><span class="font-semibold">Server:</span> ${handover.systemSpecs.serverEnvironment}</div>` : ''}
-                ${handover.systemSpecs.publicURL ? `<div><span class="font-semibold">URL:</span> <a href="${handover.systemSpecs.publicURL}" target="_blank" class="text-visionRed hover:underline">${handover.systemSpecs.publicURL}</a></div>` : ''}
-                ${handover.systemSpecs.sslStatus ? `<div><span class="font-semibold">SSL:</span> ${handover.systemSpecs.sslStatus === 'Enabled' ? '✓' : '✗'} ${handover.systemSpecs.sslStatus}</div>` : ''}
-                ${handover.systemSpecs.databaseLocation ? `<div><span class="font-semibold">Database:</span> ${handover.systemSpecs.databaseLocation}</div>` : ''}
-                ${handover.systemSpecs.backupStrategy ? `<div><span class="font-semibold">Backup:</span> ${handover.systemSpecs.backupStrategy}</div>` : ''}
+        <!-- 1. Overview -->
+        <section class="mb-8">
+            <h3 class="font-bold text-gray-900 mb-3">1. Overview</h3>
+            <p class="text-gray-700 whitespace-pre-line leading-relaxed">${handover.systemSpecs.overview || project?.description || 'System overview and description.'}</p>
+        </section>
+
+        <!-- 2. Purpose of the System -->
+        <section class="mb-8">
+            <h3 class="font-bold text-gray-900 mb-3">2. Purpose of the System</h3>
+            <ol class="list-decimal list-outside ml-5 space-y-1 text-gray-700">
+                ${(handover.systemSpecs.purpose || [
+                    'Provide a centralized system for ' + handover.projectDepartment,
+                    'Improve operational efficiency and reduce manual processes',
+                    'Enable better data management and reporting',
+                    'Facilitate collaboration and workflow automation'
+                ]).map(item => `<li class="pl-1">${item}</li>`).join('')}
+            </ol>
+        </section>
+
+        <!-- 3. Hosting and Access Details -->
+        <section class="mb-8">
+            <h3 class="font-bold text-gray-900 mb-3">3. Hosting and Access Details</h3>
+            <div class="border border-gray-300 rounded-sm overflow-hidden">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-900 font-bold border-b border-gray-300">
+                        <tr>
+                            <th class="p-3 w-1/3 border-r border-gray-300">Environment</th>
+                            <th class="p-3">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-300">
+                        <tr>
+                            <td class="p-3 font-medium border-r border-gray-300">Server</td>
+                            <td class="p-3">${handover.systemSpecs.serverEnvironment || 'VPS - Vision Group Infrastructure'}</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-medium border-r border-gray-300">Public Access</td>
+                            <td class="p-3">${handover.systemSpecs.publicURL ? `<a href="${handover.systemSpecs.publicURL}" target="_blank" class="text-blue-600 underline">${handover.systemSpecs.publicURL}</a>` : 'Internal access only'}</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-medium border-r border-gray-300">Intranet Access</td>
+                            <td class="p-3">${handover.systemSpecs.intranetAccess || 'Restricted access with authentication'}</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-medium border-r border-gray-300">SSL/HTTPS</td>
+                            <td class="p-3">${handover.systemSpecs.sslStatus || 'Enabled'}</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-medium border-r border-gray-300">Database</td>
+                            <td class="p-3">${handover.systemSpecs.databaseLocation || 'Hosted on same server instance'}</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-medium border-r border-gray-300">Backup</td>
+                            <td class="p-3">${handover.systemSpecs.backupStrategy || 'Managed by IT; scheduled incremental backups'}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </section>
 
-        <!-- Sign-off Progress -->
-        <div class="mb-6">
-            <h3 class="text-lg font-bold text-visionBlack mb-3 flex items-center gap-2">
-                <i class="ph ph-check-square text-visionRed"></i>
-                Sign-off Progress
-            </h3>
-            <div class="space-y-3">
-    `;
-
-    // Render each signature
-    handover.signatures.forEach((sig, index) => {
-        const isCompleted = sig.status === 'approved' || sig.status === 'approved-with-conditions';
-        const isRejected = sig.status === 'rejected';
-        const isPending = sig.status === 'pending';
-        const isLocked = sig.stage === 'locked';
-        const isActive = sig.stage === 'active';
-
-        let statusIcon, statusColor, statusText;
-        
-        if (isCompleted) {
-            statusIcon = 'ph-check-circle';
-            statusColor = 'text-green-600';
-            statusText = `Signed ${utils.formatDate(sig.signedDate)}`;
-        } else if (isRejected) {
-            statusIcon = 'ph-x-circle';
-            statusColor = 'text-red-600';
-            statusText = `Rejected ${utils.formatDate(sig.signedDate)}`;
-        } else if (isLocked) {
-            statusIcon = 'ph-lock';
-            statusColor = 'text-gray-400';
-            statusText = 'Locked';
-        } else if (isActive) {
-            statusIcon = 'ph-hourglass-high';
-            statusColor = 'text-amber-600';
-            statusText = 'Pending';
-        }
-
-        html += `
-            <div class="flex items-center gap-3 p-3 rounded-lg ${isCompleted ? 'bg-green-50' : isRejected ? 'bg-red-50' : isActive ? 'bg-amber-50' : 'bg-gray-50'}">
-                <i class="ph ${statusIcon} text-2xl ${statusColor}"></i>
-                <div class="flex-1">
-                    <div class="font-semibold text-gray-800">${sig.role}</div>
-                    <div class="text-sm text-gray-600">${sig.assignedTo}</div>
-                </div>
-                <div class="text-right">
-                    <div class="text-sm font-medium ${statusColor}">${statusText}</div>
-                </div>
+        <!-- 4. System Users and Access Rights -->
+        <section class="mb-8">
+            <h3 class="font-bold text-gray-900 mb-3">4. System Users and Access Rights</h3>
+            <div class="border border-gray-300 rounded-sm overflow-hidden">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-900 font-bold border-b border-gray-300">
+                        <tr>
+                            <th class="p-3 w-1/4 border-r border-gray-300">Role</th>
+                            <th class="p-3 w-1/3 border-r border-gray-300">Description</th>
+                            <th class="p-3">Access Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-300">
+                        ${(handover.systemSpecs.systemUsers || [
+                            { role: 'End User', description: 'Department staff members', accessLevel: 'View and submit data, generate reports' },
+                            { role: 'Department Admin', description: 'Department administrators', accessLevel: 'Manage users, configure settings, full access to department data' },
+                            { role: 'IT Support', description: 'IT team managing backend', accessLevel: 'System administration, maintenance, monitoring' }
+                        ]).map(u => `
+                            <tr>
+                                <td class="p-3 font-medium border-r border-gray-300">${u.role}</td>
+                                <td class="p-3 border-r border-gray-300">${u.description}</td>
+                                <td class="p-3">${u.accessLevel}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
-        `;
-    });
+        </section>
 
-    html += `
+        <!-- 5. Current Status -->
+        <section class="mb-8">
+            <h3 class="font-bold text-gray-900 mb-3">5. Current Status</h3>
+            <div class="border border-gray-300 rounded-sm overflow-hidden">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-900 font-bold border-b border-gray-300">
+                        <tr>
+                            <th class="p-3 w-1/4 border-r border-gray-300">Component</th>
+                            <th class="p-3 w-1/4 border-r border-gray-300">Status</th>
+                            <th class="p-3">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-300">
+                        ${(handover.systemSpecs.currentStatus || [
+                            { component: 'System Core', status: 'Functional', remarks: 'All core features operational' },
+                            { component: 'User Interface', status: 'Functional', remarks: 'Responsive and accessible' },
+                            { component: 'Documentation', status: 'Completed', remarks: 'User guides and technical docs provided' },
+                            { component: 'Training', status: 'Completed', remarks: 'End user training conducted' },
+                            { component: 'Testing', status: 'Completed', remarks: 'UAT completed successfully' },
+                            { component: 'Deployment', status: 'Ready', remarks: 'System ready for production use' }
+                        ]).map(item => `
+                            <tr>
+                                <td class="p-3 font-medium border-r border-gray-300">${item.component}</td>
+                                <td class="p-3 border-r border-gray-300 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full ${item.status === 'Functional' || item.status === 'Completed' ? 'bg-green-500' : item.status === 'In Progress' ? 'bg-blue-500' : 'bg-amber-500'}"></span>
+                                    ${item.status}
+                                </td>
+                                <td class="p-3">${item.remarks}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </section>
     `;
 
     // My Sign-off Card (if pending and active)
@@ -246,98 +297,171 @@ function renderDocument() {
         html += renderSignoffCard();
     }
 
-    // All Signatures (Audit Trail)
+    // Formal Sign-off Section
     html += `
-        <div class="mb-6">
-            <h3 class="text-lg font-bold text-visionBlack mb-3 flex items-center gap-2">
-                <i class="ph ph-clipboard-text text-visionRed"></i>
-                Signature Details
-            </h3>
-            <div class="space-y-4">
+        <section class="mt-12 pt-8 border-t-4 border-gray-900">
+            <h3 class="font-bold text-xl text-gray-900 mb-6 uppercase tracking-wide">Formal Sign-off & Handover</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     `;
 
+    // Render signature cards
     handover.signatures.forEach(sig => {
-        if (sig.status === 'approved' || sig.status === 'approved-with-conditions' || sig.status === 'rejected') {
-            html += `
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex items-start justify-between mb-2">
-                        <div>
-                            <div class="font-semibold text-gray-800">${sig.role}</div>
-                            <div class="text-sm text-gray-600">${sig.signedBy}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-medium ${sig.status === 'rejected' ? 'text-red-600' : 'text-green-600'}">
-                                ${sig.status === 'rejected' ? 'Rejected' : 'Approved'}
-                            </div>
-                            <div class="text-xs text-gray-500">${utils.formatDate(sig.signedDate)}</div>
-                            <div class="text-xs text-gray-400">IP: ${sig.ipAddress}</div>
-                        </div>
-                    </div>
-                    ${sig.comments ? `
-                        <div class="mt-2 text-sm text-gray-700 bg-gray-50 p-2 rounded">
-                            <strong>Comments:</strong> ${sig.comments}
-                        </div>
-                    ` : ''}
-                    ${sig.status === 'rejected' && sig.rejectionReason ? `
-                        <div class="mt-2 text-sm text-red-700 bg-red-50 p-2 rounded">
-                            <strong>Rejection Reason:</strong> ${sig.rejectionReason}
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
+        html += renderSignatureCard(sig);
     });
 
     html += `
             </div>
-        </div>
+        </section>
     `;
 
     container.innerHTML = html;
 }
 
-// Render sign-off card
-function renderSignoffCard() {
+// Render signature card for formal sign-off section
+function renderSignatureCard(sig) {
+    const isCompleted = sig.status === 'approved' || sig.status === 'approved-with-conditions';
+    const isRejected = sig.status === 'rejected';
+    const isPending = sig.status === 'pending';
+    const isLocked = sig.stage === 'locked';
+    const isActive = sig.stage === 'active';
+
     const checklists = {
+        'Project Developer': [
+            { question: 'Do you confirm that the system has been developed and delivered according to the required specifications and is fully functional?', checked: isCompleted },
+            { question: 'Have all relevant system documentation, access details, and source code been handed over to the designated technology team?', checked: isCompleted },
+            { question: 'Do you confirm that key milestones and future enhancements have been communicated as part of the project roadmap?', checked: isCompleted }
+        ],
         'Project Manager': [
-            { id: 'system_functional', label: 'System is fully functional for intended users?' },
-            { id: 'documentation_received', label: 'Documentation and source code received?' },
-            { id: 'roadmap_confirmed', label: 'Project roadmap and future enhancements confirmed?' }
+            { question: 'Do you confirm that the system has been developed and delivered according to the required specifications and is fully functional for both internal and external users?', checked: isCompleted },
+            { question: 'Have all relevant system documentation, access details, and source code (if applicable) been handed over to the designated technology team?', checked: isCompleted },
+            { question: 'Do you confirm that the key upcoming milestones have been communicated as part of the future roadmap?', checked: isCompleted }
         ],
         'Information Security': [
-            { id: 'security_audit_passed', label: 'Security audit completed and passed?' },
-            { id: 'ssl_approved', label: 'SSL/HTTPS and access controls approved?' },
-            { id: 'data_protection', label: 'Data protection measures in place?' },
-            { id: 'backup_confirmed', label: 'Backup and recovery strategy confirmed?' }
+            { question: 'Have you reviewed and approved the current security setup, including SSL/HTTPS enforcement and user access levels?', checked: isCompleted },
+            { question: 'Do you acknowledge the access control model and confirm that it aligns with the organization\'s security standards?', checked: isCompleted },
+            { question: 'Do you support the recommendation for regular security checks and scheduled backups as part of the system\'s ongoing maintenance plan?', checked: isCompleted }
         ],
         'Head of Technology': [
-            { id: 'infrastructure_acknowledged', label: 'Hosting and infrastructure acknowledged?' },
-            { id: 'maintenance_accepted', label: 'Maintenance responsibility and SLA accepted?' },
-            { id: 'integration_confirmed', label: 'Integration with existing systems confirmed?' }
+            { question: 'Do you acknowledge receipt and understanding of the system\'s technical overview, including its hosting and current access controls?', checked: isCompleted },
+            { question: 'Do you accept the ongoing responsibility for system maintenance, monitoring, security, and overseeing planned integrations?', checked: isCompleted },
+            { question: 'Do you confirm that the IT Support team will manage user accounts and system administration?', checked: isCompleted }
         ],
         'End User (HR)': [
-            { id: 'training_confirmed', label: 'Training on system completed and satisfactory?' },
-            { id: 'workflow_understood', label: 'Workflow changes understood and approved?' },
-            { id: 'operational_responsibility', label: 'Operational responsibility accepted?' }
+            { question: 'Have you been trained on and do you understand how to use the system for your operational needs?', checked: isCompleted },
+            { question: 'Do you acknowledge the system features and workflow changes introduced?', checked: isCompleted },
+            { question: 'Do you accept operational responsibility for the system within your department?', checked: isCompleted }
         ],
         'End User (HOD)': [
-            { id: 'requirements_met', label: 'System meets original requirements?' },
-            { id: 'staff_trained', label: 'Staff training completed?' },
-            { id: 'ready_to_use', label: 'Ready to use in daily operations?' }
+            { question: 'Have you been trained on and do you understand how to use the system for departmental operations?', checked: isCompleted },
+            { question: 'Do you confirm that the system meets the original requirements and expectations?', checked: isCompleted },
+            { question: 'Do you accept operational responsibility for the system and its use within your department?', checked: isCompleted }
+        ]
+    };
+
+    const checklist = checklists[sig.role] || [];
+    
+    let statusBadge = '';
+    if (isCompleted) statusBadge = `<div class="flex items-center text-green-600"><i class="ph ph-check-circle text-xl mr-1"></i> Signed</div>`;
+    else if (isRejected) statusBadge = `<div class="flex items-center text-red-600"><i class="ph ph-x-circle text-xl mr-1"></i> Rejected</div>`;
+    else if (isLocked) statusBadge = `<div class="flex items-center text-gray-400"><i class="ph ph-lock text-xl mr-1"></i> Locked</div>`;
+    else if (isActive) statusBadge = `<div class="flex items-center text-amber-600"><i class="ph ph-warning-circle text-xl mr-1"></i> Pending</div>`;
+
+    let checklistHtml = checklist.map((item, idx) => `
+        <div class="flex items-start gap-3">
+            <input 
+                type="checkbox" 
+                class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" 
+                ${item.checked ? 'checked' : ''}
+                disabled
+            />
+            <span class="text-sm text-gray-700">${item.question}</span>
+        </div>
+    `).join('');
+
+    return `
+        <div class="border rounded-lg p-6 transition-all ${isCompleted ? 'bg-green-50 border-green-200' : isRejected ? 'bg-red-50 border-red-200' : isLocked ? 'bg-gray-50 border-gray-200 opacity-50' : 'bg-white border-gray-200'}">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="font-bold text-lg text-gray-900">${sig.role}</h3>
+                    <p class="text-sm text-gray-500">${sig.assignedTo}</p>
+                </div>
+                ${statusBadge}
+            </div>
+
+            <div class="space-y-3 mb-6">
+                ${checklistHtml}
+            </div>
+
+            ${(sig.comments && (isCompleted || isRejected)) ? `
+                <div class="mb-4">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Comments</label>
+                    <p class="text-sm text-gray-800 italic">${sig.comments}</p>
+                </div>
+            ` : ''}
+
+            <div class="border-t pt-4 flex justify-between items-end">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Signature</p>
+                    ${isCompleted || isRejected ? 
+                        `<div class="font-handwriting text-xl text-blue-900 mt-1">${sig.signedBy}</div>` :
+                        `<div class="h-8 border-b border-dashed border-gray-300 w-48 mt-1"></div>`
+                    }
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Date</p>
+                    <p class="text-sm font-medium mt-1">${sig.signedDate ? utils.formatDate(sig.signedDate) : 'DD/MM/YYYY'}</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Render sign-off card (for active user)
+function renderSignoffCard() {
+    const checklists = {
+        'Project Developer': [
+            { id: 'system_functional', label: 'Do you confirm that the system has been developed and delivered according to the required specifications and is fully functional?' },
+            { id: 'documentation_received', label: 'Have all relevant system documentation, access details, and source code been handed over to the designated technology team?' },
+            { id: 'roadmap_confirmed', label: 'Do you confirm that key milestones and future enhancements have been communicated as part of the project roadmap?' }
+        ],
+        'Project Manager': [
+            { id: 'system_functional', label: 'Do you confirm that the system has been developed and delivered according to the required specifications and is fully functional for both internal and external users?' },
+            { id: 'documentation_received', label: 'Have all relevant system documentation, access details, and source code (if applicable) been handed over to the designated technology team?' },
+            { id: 'roadmap_confirmed', label: 'Do you confirm that the key upcoming milestones have been communicated as part of the future roadmap?' }
+        ],
+        'Information Security': [
+            { id: 'security_audit_passed', label: 'Have you reviewed and approved the current security setup, including SSL/HTTPS enforcement and user access levels?' },
+            { id: 'access_control_approved', label: 'Do you acknowledge the access control model and confirm that it aligns with the organization\'s security standards?' },
+            { id: 'backup_confirmed', label: 'Do you support the recommendation for regular security checks and scheduled backups as part of the system\'s ongoing maintenance plan?' }
+        ],
+        'Head of Technology': [
+            { id: 'infrastructure_acknowledged', label: 'Do you acknowledge receipt and understanding of the system\'s technical overview, including its hosting and current access controls?' },
+            { id: 'maintenance_accepted', label: 'Do you accept the ongoing responsibility for system maintenance, monitoring, security, and overseeing planned integrations?' },
+            { id: 'it_support_confirmed', label: 'Do you confirm that the IT Support team will manage user accounts and system administration?' }
+        ],
+        'End User (HR)': [
+            { id: 'training_confirmed', label: 'Have you been trained on and do you understand how to use the system for your operational needs?' },
+            { id: 'workflow_understood', label: 'Do you acknowledge the system features and workflow changes introduced?' },
+            { id: 'operational_responsibility', label: 'Do you accept operational responsibility for the system within your department?' }
+        ],
+        'End User (HOD)': [
+            { id: 'training_confirmed', label: 'Have you been trained on and do you understand how to use the system for departmental operations?' },
+            { id: 'requirements_met', label: 'Do you confirm that the system meets the original requirements and expectations?' },
+            { id: 'operational_responsibility', label: 'Do you accept operational responsibility for the system and its use within your department?' }
         ]
     };
 
     const checklist = checklists[mySignature.role] || [];
 
     return `
-        <div class="border-4 border-visionRed rounded-lg p-6 mb-6 bg-red-50">
+        <div class="border-4 border-visionRed rounded-lg p-6 mb-8 bg-red-50">
             <h3 class="text-xl font-bold text-visionBlack mb-4 flex items-center gap-2">
                 <i class="ph ph-pencil-line text-visionRed"></i>
                 Your Sign-off Required
             </h3>
             
-            <div class="bg-white p-4 rounded-lg mb-4">
-                <div class="flex items-center gap-3 mb-4">
+            <div class="bg-white p-5 rounded-lg">
+                <div class="flex items-center gap-3 mb-5">
                     <i class="ph ph-identification-card text-3xl text-visionRed"></i>
                     <div>
                         <div class="font-bold text-gray-800">${mySignature.role}</div>
@@ -345,22 +469,22 @@ function renderSignoffCard() {
                     </div>
                 </div>
 
-                <div class="space-y-3 mb-4">
-                    <h4 class="font-semibold text-gray-800">Checklist:</h4>
+                <div class="space-y-3 mb-5">
+                    <h4 class="font-semibold text-gray-800">Please confirm the following:</h4>
                     ${checklist.map(item => `
-                        <label class="flex items-start gap-3 cursor-pointer">
+                        <label class="flex items-start gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
                             <input type="checkbox" id="${item.id}" 
-                                class="mt-1 w-5 h-5 text-visionRed border-gray-300 rounded focus:ring-visionRed">
+                                class="mt-1 w-5 h-5 text-visionRed border-gray-300 rounded focus:ring-visionRed checklist-item">
                             <span class="text-sm text-gray-700">${item.label}</span>
                         </label>
                     `).join('')}
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-5">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Comments (Optional)</label>
                     <textarea id="signoffComments" rows="3"
-                        placeholder="Add any comments or recommendations..."
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-visionRed focus:outline-none"></textarea>
+                        placeholder="Add any comments, recommendations, or conditions..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-visionRed focus:ring-1 focus:ring-visionRed outline-none transition-all"></textarea>
                 </div>
 
                 <div class="flex gap-3">
@@ -382,7 +506,7 @@ function renderSignoffCard() {
 function approveHandover() {
     // Get checklist responses
     const checklistResponses = {};
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const checkboxes = document.querySelectorAll('.checklist-item');
     let allChecked = true;
 
     checkboxes.forEach(checkbox => {
@@ -391,13 +515,13 @@ function approveHandover() {
     });
 
     if (!allChecked) {
-        utils.showAlert('Please check all items in the checklist', 'warning');
+        utils.showAlert('Please check all items in the checklist before approving', 'warning');
         return;
     }
 
     const comments = document.getElementById('signoffComments').value.trim();
 
-    if (!confirm('Are you sure you want to approve and sign this handover?')) {
+    if (!confirm('Are you sure you want to approve and sign this handover document? This action cannot be undone.')) {
         return;
     }
 

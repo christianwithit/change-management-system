@@ -1,4 +1,4 @@
-/* global checkAuth, apiClient, showToast */
+/* global checkAuth, API, showToast */
 // Dashboard Page Logic
 
 // Helper: Get display status for a request
@@ -166,6 +166,7 @@ function updateSidebarUserInfo(user) {
 function updateNavigationVisibility(user) {
     const hodReviewLink = document.getElementById('hodReviewLink');
     const itReviewLink = document.getElementById('itReviewLink');
+    const handoverLink = document.getElementById('handoverLink');
     const reportsLink = document.getElementById('reportsLink');
 
     if (hodReviewLink && user.role === 'hod') {
@@ -176,45 +177,39 @@ function updateNavigationVisibility(user) {
         itReviewLink.classList.remove('hidden');
     }
 
+    // Show handover link if user has access
+    if (handoverLink && window.canAccessHandovers && window.canAccessHandovers(user)) {
+        handoverLink.classList.remove('hidden');
+    }
+
     if (reportsLink && (user.role === 'hod' || user.role === 'it' || user.role === 'admin')) {
         reportsLink.classList.remove('hidden');
     }
 }
 
-// Load statistics from backend
+// Load statistics from mock data
 async function loadStatistics(user) {
     try {
         let requests = [];
 
-        // Fetch requests based on user role
+        // Fetch requests based on user role from mock data
         if (user.role === 'staff') {
             // Staff: Get only their own requests
-            if (!user.staffId) {
-                console.error('User does not have staffId');
-                showToast('Unable to load statistics: User ID missing', 'error');
-                return;
-            }
-            const response = await apiClient.getChangeRequestsByStaff(user.staffId);
-            requests = response.data || response;
+            requests = API.getRequests().filter(r => r.requestor === user.fullName);
         } else if (user.role === 'hod') {
             // HOD: Get requests from their department
-            // You'll need to add departmentId to the user object or fetch all and filter
-            const response = await apiClient.getAllChangeRequests();
-            requests = (response.data || response).filter(r => 
-                r.department?.department_name === user.department
-            );
+            requests = API.getRequests().filter(r => r.department === user.department);
         } else {
             // IT/Admin: Get all requests
-            const response = await apiClient.getAllChangeRequests();
-            requests = response.data || response;
+            requests = API.getRequests();
         }
 
         // Calculate statistics
         const stats = {
             total: requests.length,
-            pending: requests.filter(r => r.request_status === 'Pending HOD approval').length,
-            inProgress: requests.filter(r => r.request_status === 'Development' || r.request_status === 'IT Review').length,
-            completed: requests.filter(r => r.request_status === 'Completed').length
+            pending: requests.filter(r => r.status === 'Pending HOD Approval' || r.workflowStage === 'HOD Review').length,
+            inProgress: requests.filter(r => r.status === 'Development' || r.status === 'IT Review').length,
+            completed: requests.filter(r => r.status === 'Completed' || r.workflowStage === 'Completed').length
         };
 
         // Update UI
@@ -225,7 +220,9 @@ async function loadStatistics(user) {
 
     } catch (error) {
         console.error('Failed to load statistics:', error);
-        showToast('Failed to load statistics', 'error');
+        if (typeof showToast === 'function') {
+            showToast('Failed to load statistics', 'error');
+        }
         
         // Show 0 for all stats on error
         document.getElementById('totalRequests').textContent = '0';
@@ -248,12 +245,11 @@ async function loadQuickActions(role) {
     try {
         // HOD: Show Pending Approvals Action Card
         if (role === 'hod') {
-            const response = await apiClient.getAllChangeRequests();
-            const allRequests = response.data || response;
+            const allRequests = API.getRequests();
             
             const departmentPending = allRequests.filter(r => 
-                r.request_status === 'Pending HOD approval' && 
-                r.department?.department_name === user.department
+                (r.status === 'Pending HOD Approval' || r.workflowStage === 'HOD Review') && 
+                r.department === user.department
             ).length;
 
             if (departmentPending > 0) {
@@ -285,11 +281,10 @@ async function loadQuickActions(role) {
 
         // IT: Show IT Review Queue Action Card
         if (role === 'it' || role === 'admin') {
-            const response = await apiClient.getAllChangeRequests();
-            const allRequests = response.data || response;
+            const allRequests = API.getRequests();
             
             const itReviewCount = allRequests.filter(r => 
-                r.request_status === 'IT Review'
+                r.status === 'IT Review' || r.workflowStage === 'Technical Review'
             ).length;
 
             if (itReviewCount > 0) {
@@ -328,7 +323,7 @@ async function loadQuickActions(role) {
     }
 }
 
-// Load recent requests from backend
+// Load recent requests from mock data
 async function loadRecentRequests(user) {
     const tbody = document.getElementById('recentRequestsBody');
     if (!tbody) return;
@@ -336,25 +331,17 @@ async function loadRecentRequests(user) {
     try {
         let requests = [];
 
-        // Fetch requests based on role
+        // Fetch requests based on role from mock data
         if (user.role === 'staff') {
-            if (!user.staffId) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">User ID missing</td></tr>';
-                return;
-            }
-            const response = await apiClient.getChangeRequestsByStaff(user.staffId);
-            requests = response.data || response;
+            requests = API.getRequests().filter(r => r.requestor === user.fullName);
         } else if (user.role === 'hod') {
-            const response = await apiClient.getAllChangeRequests();
-            const allRequests = response.data || response;
-            requests = allRequests.filter(r => r.department?.department_name === user.department);
+            requests = API.getRequests().filter(r => r.department === user.department);
         } else {
-            const response = await apiClient.getAllChangeRequests();
-            requests = response.data || response;
+            requests = API.getRequests();
         }
 
-        // Sort by creation date (most recent first) and get top 5
-        requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Sort by submission date (most recent first) and get top 5
+        requests.sort((a, b) => new Date(b.dateSubmitted) - new Date(a.dateSubmitted));
         requests = requests.slice(0, 5);
 
         if (requests.length === 0) {
@@ -363,34 +350,50 @@ async function loadRecentRequests(user) {
         }
 
         tbody.innerHTML = requests.map(request => {
-    const { label: statusLabel, class: statusClass } = window.getDisplayStatus(request);
-    const departmentName = request.department?.department_name || 'N/A';
-    const formattedDate = new Date(request.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
+            const statusLabel = request.status || 'Pending';
+            let statusClass = 'bg-gray-100 text-gray-700';
+            
+            if (statusLabel.includes('Completed')) {
+                statusClass = 'bg-green-100 text-green-700';
+            } else if (statusLabel.includes('Development')) {
+                statusClass = 'bg-purple-100 text-purple-700';
+            } else if (statusLabel.includes('IT Review')) {
+                statusClass = 'bg-blue-100 text-blue-700';
+            } else if (statusLabel.includes('Pending') || statusLabel.includes('HOD')) {
+                statusClass = 'bg-orange-100 text-orange-700';
+            } else if (statusLabel.includes('Rejected')) {
+                statusClass = 'bg-red-100 text-red-700';
+            } else if (statusLabel.includes('Clarification')) {
+                statusClass = 'bg-yellow-100 text-yellow-700';
+            }
 
-    return `
-        <tr class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm text-slate-600 font-medium">${request.id}</td>
-            <td class="px-6 py-4 font-medium text-slate-900">${request.title}</td>
-            <td class="px-6 py-4 text-slate-700">${departmentName}</td>
-            <td class="px-6 py-4">
-                <span class="px-3 py-1 rounded-full text-sm font-medium ${statusClass}">
-                    ${statusLabel}
-                </span>
-            </td>
-            <td class="px-6 py-4 text-slate-600">${formattedDate}</td>
-            <td class="px-6 py-4 text-right">
-                <button data-action="view-request" data-request-id="${request.id}"
-                    class="text-visionRed hover:text-red-700 font-medium transition-colors">
-                    View
-                </button>
-            </td>
-        </tr>
-    `;
-}).join('');
+            const departmentName = request.department || 'N/A';
+            const formattedDate = new Date(request.dateSubmitted).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 text-sm text-slate-600 font-medium">${request.id}</td>
+                    <td class="px-6 py-4 font-medium text-slate-900">${request.title}</td>
+                    <td class="px-6 py-4 text-slate-700">${departmentName}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-sm font-medium ${statusClass}">
+                            ${statusLabel}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-slate-600">${formattedDate}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button data-action="view-request" data-request-id="${request.id}"
+                            class="text-visionRed hover:text-red-700 font-medium transition-colors">
+                            View
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
 
     } catch (error) {
         console.error('Failed to load recent requests:', error);

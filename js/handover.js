@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', function () {
     currentUser = checkAuth();
     if (!currentUser) return;
 
+    // Check if user can access handovers
+    if (window.canAccessHandovers && !window.canAccessHandovers(currentUser)) {
+        alert('You do not have permission to access this page.');
+        window.location.href = 'dashboard.html';
+        return;
+    }
+
     // Show navigation links based on role
     if (currentUser.role === 'hod') {
         const hodLink = document.getElementById('hodReviewLink');
@@ -25,6 +32,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const reportsLink = document.getElementById('reportsLink');
         if (reportsLink) reportsLink.style.display = 'flex';
     }
+    // Show handover link (user already has access if they got here)
+    const handoverLink = document.getElementById('handoverLink');
+    if (handoverLink) handoverLink.style.display = 'flex';
 
     // Initialize event listeners
     initializeEventListeners();
