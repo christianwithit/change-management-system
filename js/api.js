@@ -25,6 +25,19 @@ const API = {
             clarificationNeeded: false,
             clarificationNotes: null,
             
+            // Head of Tech Review (NEW)
+            headOfTechReview: {
+                reviewedBy: 'Paul Ikanza',
+                reviewDate: '2026-01-17',
+                status: 'Approved',
+                assignedDeveloper: 'Felix Ssembajjwe Bashabe',
+                technicalNotes: 'Assign to Felix - has experience with HR systems and API integration',
+                priority: 'High',
+                comments: 'Approved for immediate development. Critical business need.'
+            },
+            assignedDeveloper: 'Felix Ssembajjwe Bashabe',
+            assignedDate: '2026-01-17',
+            
             // Technical Review
             itStatus: 'Accepted',
             itDecision: 'Accepted', // Accepted, Rejected, Deferred
@@ -129,6 +142,19 @@ const API = {
             hodApprovedDate: '2026-01-26',
             clarificationNeeded: false,
             clarificationNotes: null,
+            
+            // Head of Tech Review (NEW)
+            headOfTechReview: {
+                reviewedBy: 'Paul Ikanza',
+                reviewDate: '2026-01-27',
+                status: 'Approved',
+                assignedDeveloper: 'Emmanuel Cliff Mughanwa',
+                technicalNotes: 'Assign to Emmanuel - has mobile development and hardware integration experience',
+                priority: 'High',
+                comments: 'Approved. Coordinate with procurement for barcode scanners.'
+            },
+            assignedDeveloper: 'Emmanuel Cliff Mughanwa',
+            assignedDate: '2026-01-27',
             
             // Technical Review
             itStatus: 'Accepted',
@@ -263,6 +289,171 @@ const API = {
             priority: 'Low',
             justification: 'Customers requesting online payment option',
             expectedBenefits: 'Improve customer satisfaction, reduce payment delays'
+        },
+        {
+            id: 'CR-2026-006',
+            title: 'Employee Self-Service Portal',
+            description: 'Develop web portal for employees to access payslips, leave requests, and personal information',
+            type: 'New System Proposal',
+            department: 'Human Resources',
+            section: 'Employee Services',
+            requestor: 'Agnes Namusoke',
+            dateSubmitted: '2026-02-08',
+            
+            // Workflow Status - PENDING HEAD OF TECH REVIEW
+            status: 'Head of Tech Review',
+            workflowStage: 'Head of Tech Review',
+            
+            // HOD Review
+            hodApproval: 'Approved',
+            hodComments: 'Excellent initiative. Will reduce HR workload significantly.',
+            hodApprovedDate: '2026-02-09',
+            clarificationNeeded: false,
+            clarificationNotes: null,
+            
+            // Head of Tech Review - PENDING
+            headOfTechReview: null,
+            assignedDeveloper: null,
+            assignedDate: null,
+            
+            // Technical Review
+            itStatus: 'Not Started',
+            itDecision: null,
+            itReviewDate: null,
+            feasibilityNotes: null,
+            
+            // Methodology & Development
+            methodology: null,
+            deliverables: null,
+            estimatedTime: null,
+            estimatedCost: null,
+            risks: null,
+            
+            // Development Progress
+            developmentStatus: 'Not Started',
+            documentationUploaded: false,
+            trainingConducted: false,
+            completionReportGenerated: false,
+            
+            // Solution Review & Acknowledgment
+            solutionDelivered: false,
+            acknowledgmentStatus: 'Pending',
+            acknowledgmentDate: null,
+            acknowledgmentNotes: null,
+            
+            priority: 'High',
+            justification: 'HR receives 50+ requests daily for payslips and leave status',
+            expectedBenefits: 'Reduce HR workload by 60%, improve employee satisfaction, 24/7 access'
+        },
+        {
+            id: 'CR-2026-007',
+            title: 'Real-time Analytics Dashboard',
+            description: 'Create executive dashboard with real-time business metrics and KPIs',
+            type: 'New System Proposal',
+            department: 'Finance',
+            section: 'Business Intelligence',
+            requestor: 'Robert Ssemakula',
+            dateSubmitted: '2026-02-09',
+            
+            // Workflow Status - PENDING HEAD OF TECH REVIEW
+            status: 'Head of Tech Review',
+            workflowStage: 'Head of Tech Review',
+            
+            // HOD Review
+            hodApproval: 'Approved',
+            hodComments: 'Critical for executive decision making. Approved with high priority.',
+            hodApprovedDate: '2026-02-10',
+            clarificationNeeded: false,
+            clarificationNotes: null,
+            
+            // Head of Tech Review - PENDING
+            headOfTechReview: null,
+            assignedDeveloper: null,
+            assignedDate: null,
+            
+            // Technical Review
+            itStatus: 'Not Started',
+            itDecision: null,
+            itReviewDate: null,
+            feasibilityNotes: null,
+            
+            // Methodology & Development
+            methodology: null,
+            deliverables: null,
+            estimatedTime: null,
+            estimatedCost: null,
+            risks: null,
+            
+            // Development Progress
+            developmentStatus: 'Not Started',
+            documentationUploaded: false,
+            trainingConducted: false,
+            completionReportGenerated: false,
+            
+            // Solution Review & Acknowledgment
+            solutionDelivered: false,
+            acknowledgmentStatus: 'Pending',
+            acknowledgmentDate: null,
+            acknowledgmentNotes: null,
+            
+            priority: 'High',
+            justification: 'Management needs real-time visibility into business performance',
+            expectedBenefits: 'Faster decision making, identify trends early, improve forecasting accuracy'
+        },
+        {
+            id: 'CR-2026-008',
+            title: 'Automated Email Marketing System',
+            description: 'Implement automated email campaigns for customer engagement',
+            type: 'Process Automation',
+            department: 'Marketing',
+            section: 'Digital Marketing',
+            requestor: 'Patricia Namukasa',
+            dateSubmitted: '2026-02-10',
+            
+            // Workflow Status - PENDING HEAD OF TECH REVIEW
+            status: 'Head of Tech Review',
+            workflowStage: 'Head of Tech Review',
+            
+            // HOD Review
+            hodApproval: 'Approved',
+            hodComments: 'Will significantly improve our marketing reach. Approved.',
+            hodApprovedDate: '2026-02-10',
+            clarificationNeeded: false,
+            clarificationNotes: null,
+            
+            // Head of Tech Review - PENDING
+            headOfTechReview: null,
+            assignedDeveloper: null,
+            assignedDate: null,
+            
+            // Technical Review
+            itStatus: 'Not Started',
+            itDecision: null,
+            itReviewDate: null,
+            feasibilityNotes: null,
+            
+            // Methodology & Development
+            methodology: null,
+            deliverables: null,
+            estimatedTime: null,
+            estimatedCost: null,
+            risks: null,
+            
+            // Development Progress
+            developmentStatus: 'Not Started',
+            documentationUploaded: false,
+            trainingConducted: false,
+            completionReportGenerated: false,
+            
+            // Solution Review & Acknowledgment
+            solutionDelivered: false,
+            acknowledgmentStatus: 'Pending',
+            acknowledgmentDate: null,
+            acknowledgmentNotes: null,
+            
+            priority: 'Medium',
+            justification: 'Manual email campaigns are time-consuming and inconsistent',
+            expectedBenefits: 'Increase customer engagement by 40%, save 15 hours/week, better targeting'
         }
     ],
     
@@ -483,6 +674,7 @@ const API = {
             systemSpecs: {
                 // Overview
                 overview: handoverData.systemSpecs?.overview || project.description || `The ${project.title} was developed to ${project.expectedBenefits}. This system provides a centralized platform for ${project.department} to improve operational efficiency and streamline workflows.`,
+                projectsCovered: handoverData.systemSpecs?.projectsCovered || project.title,
                 
                 // Purpose
                 purpose: handoverData.systemSpecs?.purpose || [

@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const hodLink = document.getElementById('hodReviewLink');
         if (hodLink) hodLink.style.display = 'flex';
     }
-    if (currentUser.role === 'it' || currentUser.role === 'admin') {
+    if (currentUser.role === 'it' || currentUser.role === 'admin' || currentUser.role === 'headoftech') {
         const itLink = document.getElementById('itReviewLink');
         const devLink = document.getElementById('developmentLink');
         if (itLink) itLink.style.display = 'flex';
         if (devLink) devLink.style.display = 'flex';
     }
-    if (currentUser.role === 'hod' || currentUser.role === 'it' || currentUser.role === 'admin') {
+    if (currentUser.role === 'hod' || currentUser.role === 'it' || currentUser.role === 'admin' || currentUser.role === 'headoftech') {
         const reportsLink = document.getElementById('reportsLink');
         if (reportsLink) reportsLink.style.display = 'flex';
     }
@@ -170,14 +170,14 @@ function renderDocument() {
         <!-- 1. Overview -->
         <section class="mb-8">
             <h3 class="font-bold text-gray-900 mb-3">1. Overview</h3>
-            <p class="text-gray-700 whitespace-pre-line leading-relaxed">${handover.systemSpecs.overview || project?.description || 'System overview and description.'}</p>
+            <p class="text-gray-700 whitespace-pre-line leading-relaxed">${handover.systemSpecs?.overview || project?.description || 'System overview and description.'}</p>
         </section>
 
         <!-- 2. Purpose of the System -->
         <section class="mb-8">
             <h3 class="font-bold text-gray-900 mb-3">2. Purpose of the System</h3>
             <ol class="list-decimal list-outside ml-5 space-y-1 text-gray-700">
-                ${(handover.systemSpecs.purpose || [
+                ${(handover.systemSpecs?.purpose || [
                     'Provide a centralized system for ' + handover.projectDepartment,
                     'Improve operational efficiency and reduce manual processes',
                     'Enable better data management and reporting',
@@ -200,27 +200,27 @@ function renderDocument() {
                     <tbody class="divide-y divide-gray-300">
                         <tr>
                             <td class="p-3 font-medium border-r border-gray-300">Server</td>
-                            <td class="p-3">${handover.systemSpecs.serverEnvironment || 'VPS - Vision Group Infrastructure'}</td>
+                            <td class="p-3">${handover.systemSpecs?.serverEnvironment || 'VPS - Vision Group Infrastructure'}</td>
                         </tr>
                         <tr>
                             <td class="p-3 font-medium border-r border-gray-300">Public Access</td>
-                            <td class="p-3">${handover.systemSpecs.publicURL ? `<a href="${handover.systemSpecs.publicURL}" target="_blank" class="text-blue-600 underline">${handover.systemSpecs.publicURL}</a>` : 'Internal access only'}</td>
+                            <td class="p-3">${handover.systemSpecs?.publicURL ? `<a href="${handover.systemSpecs.publicURL}" target="_blank" class="text-blue-600 underline">${handover.systemSpecs.publicURL}</a>` : 'Internal access only'}</td>
                         </tr>
                         <tr>
                             <td class="p-3 font-medium border-r border-gray-300">Intranet Access</td>
-                            <td class="p-3">${handover.systemSpecs.intranetAccess || 'Restricted access with authentication'}</td>
+                            <td class="p-3">${handover.systemSpecs?.intranetAccess || 'Restricted access with authentication'}</td>
                         </tr>
                         <tr>
                             <td class="p-3 font-medium border-r border-gray-300">SSL/HTTPS</td>
-                            <td class="p-3">${handover.systemSpecs.sslStatus || 'Enabled'}</td>
+                            <td class="p-3">${handover.systemSpecs?.sslStatus || 'Enabled'}</td>
                         </tr>
                         <tr>
                             <td class="p-3 font-medium border-r border-gray-300">Database</td>
-                            <td class="p-3">${handover.systemSpecs.databaseLocation || 'Hosted on same server instance'}</td>
+                            <td class="p-3">${handover.systemSpecs?.databaseLocation || 'Hosted on same server instance'}</td>
                         </tr>
                         <tr>
                             <td class="p-3 font-medium border-r border-gray-300">Backup</td>
-                            <td class="p-3">${handover.systemSpecs.backupStrategy || 'Managed by IT; scheduled incremental backups'}</td>
+                            <td class="p-3">${handover.systemSpecs?.backupStrategy || 'Managed by IT; scheduled incremental backups'}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -240,7 +240,7 @@ function renderDocument() {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-300">
-                        ${(handover.systemSpecs.systemUsers || [
+                        ${(handover.systemSpecs?.systemUsers || [
                             { role: 'End User', description: 'Department staff members', accessLevel: 'View and submit data, generate reports' },
                             { role: 'Department Admin', description: 'Department administrators', accessLevel: 'Manage users, configure settings, full access to department data' },
                             { role: 'IT Support', description: 'IT team managing backend', accessLevel: 'System administration, maintenance, monitoring' }
@@ -269,7 +269,7 @@ function renderDocument() {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-300">
-                        ${(handover.systemSpecs.currentStatus || [
+                        ${(handover.systemSpecs?.currentStatus || [
                             { component: 'System Core', status: 'Functional', remarks: 'All core features operational' },
                             { component: 'User Interface', status: 'Functional', remarks: 'Responsive and accessible' },
                             { component: 'Documentation', status: 'Completed', remarks: 'User guides and technical docs provided' },

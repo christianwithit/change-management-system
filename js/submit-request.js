@@ -12,10 +12,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (user.role === 'hod') {
         document.getElementById('hodReviewLink').style.display = 'flex';
     }
-    if (user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         document.getElementById('itReviewLink').style.display = 'flex';
     }
-    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         document.getElementById('reportsLink').style.display = 'flex';
     }
 

@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     loadQuickActions(user.role);
     await loadRecentRequests(user);
     
-    // Check for due date warnings (IT/Admin only)
-    if (user.role === 'it' || user.role === 'admin') {
+    // Check for due date warnings (IT/Admin/HeadOfTech only)
+    if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         showDueDateWarnings();
     }
 });
@@ -156,6 +156,7 @@ function updateSidebarUserInfo(user) {
             'staff': 'Staff Member',
             'hod': 'Head of Department',
             'it': 'IT Administrator',
+            'headoftech': 'Head of Technology',
             'admin': 'System Administrator'
         };
         userRoleEl.textContent = roleNames[user.role] || 'Staff Member';
@@ -173,8 +174,18 @@ function updateNavigationVisibility(user) {
         hodReviewLink.classList.remove('hidden');
     }
 
+    const headOfTechLink = document.getElementById('headOfTechLink');
+    if (headOfTechLink && (user.role === 'headoftech' || user.role === 'admin')) {
+        headOfTechLink.classList.remove('hidden');
+    }
+
     if (itReviewLink && (user.role === 'it' || user.role === 'admin')) {
         itReviewLink.classList.remove('hidden');
+    }
+
+    const developmentLink = document.getElementById('developmentLink');
+    if (developmentLink && (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech')) {
+        developmentLink.classList.remove('hidden');
     }
 
     // Show handover link if user has access
@@ -182,7 +193,7 @@ function updateNavigationVisibility(user) {
         handoverLink.classList.remove('hidden');
     }
 
-    if (reportsLink && (user.role === 'hod' || user.role === 'it' || user.role === 'admin')) {
+    if (reportsLink && (user.role === 'hod' || user.role === 'it' || user.role === 'admin' || user.role === 'headoftech')) {
         reportsLink.classList.remove('hidden');
     }
 }
@@ -279,8 +290,8 @@ async function loadQuickActions(role) {
             }
         }
 
-        // IT: Show IT Review Queue Action Card
-        if (role === 'it' || role === 'admin') {
+        // IT/Admin/Head of Tech: Show IT Review Queue Action Card
+        if (role === 'it' || role === 'admin' || role === 'headoftech') {
             const allRequests = API.getRequests();
             
             const itReviewCount = allRequests.filter(r => 

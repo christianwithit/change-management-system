@@ -6,9 +6,16 @@ window.getRoleDisplayName = function(role) {
         'staff': 'Staff Member',
         'hod': 'Head of Department',
         'it': 'IT Administrator',
+        'headoftech': 'Head of Technology',
         'admin': 'System Administrator'
     };
     return roleNames[role] || 'Staff Member';
+};
+
+// Check if user is admin or head of tech
+window.isAdminOrHeadOfTech = function(user) {
+    if (!user) return false;
+    return user.role === 'admin' || user.role === 'headoftech';
 };
 
 // Format date
@@ -285,6 +292,7 @@ function updateUserInfo(user) {
             'staff': 'Staff Member',
             'hod': 'Head of Department',
             'it': 'IT Department',
+            'headoftech': 'Head of Technology',
             'admin': 'System Administrator'
         };
         userRoleElement.textContent = roleNames[user.role] || user.role;
@@ -297,7 +305,7 @@ function updateUserInfo(user) {
 // Check for due date warnings/notifications
 window.checkDueDateNotifications = function() {
     const user = window.getCurrentUser();
-    if (!user || (user.role !== 'it' && user.role !== 'admin')) return [];
+    if (!user || (user.role !== 'it' && user.role !== 'admin' && user.role !== 'headoftech')) return [];
     
     const projects = window.API.getRequests().filter(r => 
         r.timelineDeadline && r.developmentStatus !== 'Completed'
@@ -383,8 +391,8 @@ window.getTaskWarningStatus = function(deadline) {
 window.canAccessHandovers = function(user) {
     if (!user) return false;
     
-    // IT/Admin always have access
-    const HANDOVER_ROLES = ['it', 'admin'];
+    // IT/Admin/Head of Tech always have access
+    const HANDOVER_ROLES = ['it', 'admin', 'headoftech'];
     if (HANDOVER_ROLES.includes(user.role)) {
         return true;
     }

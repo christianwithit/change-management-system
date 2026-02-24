@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const user = checkAuth();
     if (!user) return;
 
-    // Check if user has access to IT Review (IT or Admin only)
-    if (user.role !== 'it' && user.role !== 'admin') {
-        alert('Access denied. This page is only for IT personnel and Administrators.');
+    // Check if user has access to IT Review (IT, Admin, or Head of Tech)
+    if (user.role !== 'it' && user.role !== 'admin' && user.role !== 'headoftech') {
+        alert('Access denied. This page is only for IT personnel, Head of Technology, and Administrators.');
         window.location.href = 'dashboard.html';
         return;
     }
@@ -21,11 +21,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const hodLink = document.getElementById('hodReviewLink');
         if (hodLink) hodLink.style.display = 'flex';
     }
-    if (user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         const devLink = document.getElementById('developmentLink');
         if (devLink) devLink.style.display = 'flex';
     }
-    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         const reportsLink = document.getElementById('reportsLink');
         if (reportsLink) reportsLink.style.display = 'flex';
     }

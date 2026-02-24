@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const hodLink = document.getElementById('hodReviewLink');
         if (hodLink) hodLink.style.display = 'flex';
     }
-    if (currentUser.role === 'it' || currentUser.role === 'admin') {
+    if (currentUser.role === 'it' || currentUser.role === 'admin' || currentUser.role === 'headoftech') {
         const itLink = document.getElementById('itReviewLink');
         const devLink = document.getElementById('developmentLink');
         if (itLink) itLink.style.display = 'flex';
         if (devLink) devLink.style.display = 'flex';
     }
-    if (currentUser.role === 'hod' || currentUser.role === 'it' || currentUser.role === 'admin') {
+    if (currentUser.role === 'hod' || currentUser.role === 'it' || currentUser.role === 'admin' || currentUser.role === 'headoftech') {
         const reportsLink = document.getElementById('reportsLink');
         if (reportsLink) reportsLink.style.display = 'flex';
     }

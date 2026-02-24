@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (!user) return;
 
     // Check if user has access to reports
-    if (user.role !== 'hod' && user.role !== 'it' && user.role !== 'admin') {
-        alert('Access denied. This page is only for HODs, IT personnel, and Administrators.');
+    if (user.role !== 'hod' && user.role !== 'it' && user.role !== 'admin' && user.role !== 'headoftech') {
+        alert('Access denied. This page is only for HODs, IT personnel, Head of Technology, and Administrators.');
         window.location.href = 'dashboard.html';
         return;
     }
@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const roleNames = {
             'hod': 'Head of Department',
             'it': 'IT Administrator',
+            'headoftech': 'Head of Technology',
             'admin': 'System Administrator'
         };
         sidebarUserRole.textContent = roleNames[user.role] || 'Staff Member';
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const hodReviewLink = document.getElementById('hodReviewLink');
     const itReviewLink = document.getElementById('itReviewLink');
     if (hodReviewLink && user.role === 'hod') hodReviewLink.style.display = 'flex';
-    if (itReviewLink && (user.role === 'it' || user.role === 'admin')) itReviewLink.style.display = 'flex';
+    if (itReviewLink && (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech')) itReviewLink.style.display = 'flex';
 
     // Set default date range (last 30 days)
     const today = new Date();
@@ -195,7 +196,7 @@ async function populateDepartmentFilter(user) {
             select.value = user.department;
             select.disabled = true;
         } else {
-            // IT/Admin sees all departments
+            // IT/Admin/Head of Tech sees all departments
             const response = await apiClient.getDepartments();
             const departments = response.data || response;
             departments.forEach(dept => {

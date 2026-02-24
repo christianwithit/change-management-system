@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     const developmentLink = document.getElementById('developmentLink');
     const reportsLink = document.getElementById('reportsLink');
     
-    if (currentUser.role === 'it' || currentUser.role === 'admin') {
+    if (currentUser.role === 'it' || currentUser.role === 'admin' || currentUser.role === 'headoftech') {
         if (itReviewLink) itReviewLink.classList.remove('hidden');
         if (developmentLink) developmentLink.classList.remove('hidden');
     }
-    if (currentUser.role === 'hod' || currentUser.role === 'it' || currentUser.role === 'admin') {
+    if (currentUser.role === 'hod' || currentUser.role === 'it' || currentUser.role === 'admin' || currentUser.role === 'headoftech') {
         if (reportsLink) reportsLink.classList.remove('hidden');
     }
 
@@ -620,7 +620,7 @@ async function submitAction() {
         // Update change request status
         let newStatus;
         if (currentAction === 'approve') {
-            newStatus = 'IT Review';
+            newStatus = 'Head of Tech Review'; // Changed from 'IT Review' to 'Head of Tech Review'
         } else if (currentAction === 'reject' || currentAction === 'in_progress' || currentAction === 'already_exists') {
             newStatus = 'Rejected';
         } else if (currentAction === 'clarification') {
@@ -634,7 +634,7 @@ async function submitAction() {
         // Show user-friendly success message
         const successMessages = {
             'clarification': 'Clarification request sent to staff',
-            'approve': 'Request approved and sent to IT Review',
+            'approve': 'Request approved and sent to Head of Technology for review',
             'reject': 'Request has been rejected',
             'in_progress': 'Staff notified that this is already in progress',
             'already_exists': 'Staff notified that this already exists'

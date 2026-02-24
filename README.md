@@ -27,12 +27,18 @@ A modern, role-based web application for managing organizational change requests
 - View department analytics
 - Monitor team submissions
 
-#### 💻 IT Administrator
-- Technical feasibility review
-- Project development tracking
-- Timeline and milestone management
-- Resource allocation
-- Handover document management
+#### 🎯 Head of Technology
+- Review technical feasibility of approved requests
+- Assign projects to IT developers
+- Provide technical guidance and notes
+- Monitor overall IT development progress
+
+#### 💻 IT Developer
+- View assigned development tasks
+- Accept tasks and set timelines
+- Track project milestones
+- Update development status
+- Initiate handover process
 
 #### 🔧 System Administrator
 - Full system access
@@ -47,7 +53,11 @@ A modern, role-based web application for managing organizational change requests
    ↓
 2. HOD Review (Approve/Reject/Clarify)
    ↓
-3. IT Technical Review (Accept/Defer/Reject)
+3. Head of Technology Review (Approve & Assign/Reject)
+   ↓
+4. IT Development (Assigned Developer)
+   ↓
+5. Handover & Deployment
    ↓
 4. Development Phase (Timeline tracking)
    ↓
@@ -152,7 +162,8 @@ vision-group-cms/
 |------|----------|----------|--------------|
 | Staff | `staff` | `staff123` | Submit & track requests |
 | HOD | `hod` | `hod123` | Department approvals |
-| IT Admin | `it` | `it123` | Technical review & development |
+| Head of Technology | `headoftech` | `headoftech123` | Technical review & task assignment |
+| IT Developer | `it` | `it123` | Development & implementation |
 | System Admin | `admin` | `admin123` | Full system access |
 
 ## 📊 Key Features Breakdown

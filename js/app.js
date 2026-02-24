@@ -58,6 +58,7 @@ function getRoleDisplayNameLocal(role) {
         'staff': 'Staff Member',
         'hod': 'Head of Department',
         'it': 'IT Administrator',
+        'headoftech': 'Head of Technology',
         'admin': 'System Administrator'
     };
     return roleNames[role] || 'User';
@@ -77,7 +78,7 @@ function updateNavigationVisibility(user) {
     // Show IT Review for IT and Admin
     const itReviewLink = document.getElementById('itReviewLink');
     if (itReviewLink) {
-        if (user.role === 'it' || user.role === 'admin') {
+        if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
             itReviewLink.classList.remove('hidden');
             itReviewLink.style.display = 'flex';
         }
@@ -86,7 +87,7 @@ function updateNavigationVisibility(user) {
     // Show Development for IT and Admin
     const developmentLink = document.getElementById('developmentLink');
     if (developmentLink) {
-        if (user.role === 'it' || user.role === 'admin') {
+        if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
             developmentLink.classList.remove('hidden');
             developmentLink.style.display = 'flex';
         }
@@ -95,7 +96,7 @@ function updateNavigationVisibility(user) {
     // Show Reports for HOD, IT, and Admin
     const reportsLink = document.getElementById('reportsLink');
     if (reportsLink) {
-        if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
+        if (user.role === 'hod' || user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
             reportsLink.classList.remove('hidden');
             reportsLink.style.display = 'flex';
         }

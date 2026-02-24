@@ -12,6 +12,12 @@ const MOCK_USERS = {
         fullName: 'Head of Department', 
         department: 'Marketing', 
         staffId: 3 },
+    'headoftech': { 
+        password: 'headoftech123', 
+        role: 'headoftech', 
+        fullName: 'Paul Ikanza', 
+        department: 'IT Department', 
+        staffId: 5 },
     'it': { password: 'it123', role: 'it', fullName: 'IT Administrator', department: 'IT Department', staffId: 3 },
     'admin': { password: 'admin123', role: 'admin', fullName: 'System Administrator', department: 'Administration', staffId: 4 }
 };

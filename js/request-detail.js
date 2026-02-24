@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         const hodLink = document.getElementById('hodReviewLink');
         if (hodLink) hodLink.style.display = 'flex';
     }
-    if (user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         const itLink = document.getElementById('itReviewLink');
         if (itLink) itLink.style.display = 'flex';
     }
-    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         const reportsLink = document.getElementById('reportsLink');
         if (reportsLink) reportsLink.style.display = 'flex';
     }

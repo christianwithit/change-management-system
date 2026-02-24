@@ -45,11 +45,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         const hodLink = document.getElementById('hodReviewLink');
         if (hodLink) hodLink.style.display = 'flex';
     }
-    if (user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         const itLink = document.getElementById('itReviewLink');
         if (itLink) itLink.style.display = 'flex';
     }
-    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin') {
+    if (user.role === 'hod' || user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         const reportsLink = document.getElementById('reportsLink');
         if (reportsLink) reportsLink.style.display = 'flex';
     }
@@ -166,7 +166,7 @@ function updatePageHeader(user) {
     if (user.role === 'hod') {
         if (header) header.textContent = 'Department Change Requests';
         if (subtext) subtext.textContent = `Track and manage all change requests from ${user.department}.`;
-    } else if (user.role === 'it' || user.role === 'admin') {
+    } else if (user.role === 'it' || user.role === 'admin' || user.role === 'headoftech') {
         if (header) header.textContent = 'All Change Requests';
         if (subtext) subtext.textContent = 'Track and manage all change requests across the organization.';
     }
